@@ -14,5 +14,6 @@
 int main(void) {
 	puts("Integrantes del grupo:"); //Integrantes
 	puts("\t** Tobias Sandler");
+	puts("\t** Macarena Lepera");
 	return EXIT_SUCCESS;
 }
