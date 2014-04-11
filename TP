@@ -1,6 +1,6 @@
 //Aqui se compilara el programa//
 
-void main (void)
+int main ()
 {
-
+  return 0;
 }
