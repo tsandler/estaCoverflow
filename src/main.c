@@ -12,7 +12,7 @@
 #include <stdlib.h>
 
 int main(void) {
-	puts("Integrantes del grupo:"); //Integrantes del grupo
+	puts("Integrantes del grupo:"); //Integrantes
 	puts("\t** Tobias Sandler");
 	return EXIT_SUCCESS;
 }
