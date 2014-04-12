@@ -12,7 +12,7 @@
 #include <stdlib.h>
 
 int main(void) {
-	puts("Integrantes del grupo:"); //Integrantes
+	puts("Integrantes del grupo:"); /*Nombre de los integrantes */
 	puts("\t** Tobias Sandler");
 	puts("\t** Macarena Lepera");
 	puts("\t** Gonzalo Weiss");
