@@ -1,6 +1,6 @@
 /*
  ============================================================================
- Name        : main.c
+ Name        : tp-2014-1c-out-of-range.c
  Author      : 
  Version     :
  Copyright   : Your copyright notice
@@ -12,9 +12,7 @@
 #include <stdlib.h>
 
 int main(void) {
-	puts("Integrantes del grupo:"); /*Nombre de los integrantes */
+	puts("Integrantes del grupo: ");
 	puts("\t** Tobias Sandler");
-	puts("\t** Macarena Lepera");
-	puts("\t** Gonzalo Weiss");
 	return EXIT_SUCCESS;
 }
