@@ -15,5 +15,6 @@ int main(void) {
 	puts("Integrantes del grupo: ");
 	puts("\t** Tobias Sandler");
 	puts("\t** Gonzalo Weiss");
+	puts("\t** Danila Gallo");
 	return EXIT_SUCCESS;
 }
