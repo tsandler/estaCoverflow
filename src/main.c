@@ -10,8 +10,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "commons/log.h"
-#include "commons/collections/list.h"
+#include <commons/log.h>
+#include <commons/collections/list.h>
 
 int main(void) {
 	puts("Integrantes del grupo: "); /*Colocar el nombre de cada uno a continuacion*/
