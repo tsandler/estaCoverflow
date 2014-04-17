@@ -19,5 +19,6 @@ int main(void) {
 	puts("\t** Gonzalo Weiss");
 	puts("\t** Danila Gallo");
 	puts("\t** Rapaport Matias Ezequiel, al fin");
+	puts("\t** Macarena Lepera");
 	return EXIT_SUCCESS;
 }
