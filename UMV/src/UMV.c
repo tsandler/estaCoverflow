@@ -1,6 +1,6 @@
 /*
  ============================================================================
- Name        : tp-2014-1c-out-of-range.c
+ Name        : UMV.c
  Author      : 
  Version     :
  Copyright   : Your copyright notice
@@ -12,10 +12,6 @@
 #include <stdlib.h>
 
 int main(void) {
-	puts("Integrantes del grupo: ");
-	puts("\t** Tobias Sandler");
-	puts("\t** Gonzalo Weiss");
-	puts("\t** Danila Gallo");
-	puts("\t** Rapaport Matias Ezequiel, al fin");
+	puts("!!!Hello World!!!"); /* prints !!!Hello World!!! */
 	return EXIT_SUCCESS;
 }

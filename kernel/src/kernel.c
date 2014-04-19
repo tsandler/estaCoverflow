@@ -1,6 +1,6 @@
 /*
  ============================================================================
- Name        : tp-2014-1c-out-of-range.c
+ Name        : kernel.c
  Author      : 
  Version     :
  Copyright   : Your copyright notice
@@ -9,13 +9,14 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
+#include <commons/string.h>
+#include "headers/manejoDelPCB.h"
+
 
 int main(void) {
-	puts("Integrantes del grupo: ");
-	puts("\t** Tobias Sandler");
-	puts("\t** Gonzalo Weiss");
-	puts("\t** Danila Gallo");
-	puts("\t** Rapaport Matias Ezequiel, al fin");
-	return EXIT_SUCCESS;
+	inicializar();
+ 	mostrar();
+	return 0;
 }
