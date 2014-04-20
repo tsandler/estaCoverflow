@@ -9,14 +9,15 @@
  */
 
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
-#include <commons/string.h>
 #include "headers/manejoDelPCB.h"
-
+#include <commons/temporal.h>
 
 int main(void) {
-	inicializar();
- 	mostrar();
+	//inicializar();
+	//mostrar();
+	char *tiempo = temporal_get_string_time();
+	puts (tiempo);
+	free (tiempo);
 	return 0;
 }

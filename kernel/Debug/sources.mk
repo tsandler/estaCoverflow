@@ -15,6 +15,4 @@ EXECUTABLES :=
 SUBDIRS := \
 src \
 src/headers \
-src/headers/commons \
-src/headers/commons/collections \
 
