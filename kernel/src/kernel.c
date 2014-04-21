@@ -12,11 +12,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include <commons/string.h>
-#include "headers/manejoDelPCB.h"
+
 
 
 int main(void) {
-	inicializar();
- 	mostrar();
-	return 0;
+ printf("%s", string_repeat ('a',5));
+
+	return EXIT_SUCCESS;
 }
