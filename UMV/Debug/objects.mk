@@ -4,5 +4,9 @@
 
 USER_OBJS :=
 
+<<<<<<< HEAD
 LIBS :=
+=======
+LIBS := -lcommons
+>>>>>>> 3270cb850a1a4931bd8961d47cbf4efa307283c2
 

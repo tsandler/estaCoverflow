@@ -24,12 +24,4 @@ C_UPPER_DEPS :=
 # Every subdirectory with source files must be described here
 SUBDIRS := \
 src \
-kernel/src \
-kernel/src/headers \
-kernel/src/headers/commons \
-kernel/src/headers/commons/collections \
-kernel/Debug/src \
-kernel/Debug/src/headers \
-kernel/Debug/src/headers/commons \
-kernel/Debug/src/headers/commons/collections \
 

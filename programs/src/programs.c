@@ -8,11 +8,20 @@
  ============================================================================
  */
 
+
 #include <stdio.h>
 #include <stdlib.h>
+<<<<<<< HEAD
 #include "headers/manejoDelProcesoPrograma.h"
+=======
+#include <commons/temporal.h>
+>>>>>>> 3270cb850a1a4931bd8961d47cbf4efa307283c2
 
 int main(void) {
-	puts("!!!Hello World!!!"); /* prints !!!Hello World!!! */
-	return EXIT_SUCCESS;
+	//inicializar();
+	//mostrar();
+	char *tiempo = temporal_get_string_time();
+	puts (tiempo);
+	free (tiempo);
+	return 0;
 }

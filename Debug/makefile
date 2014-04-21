@@ -9,14 +9,6 @@ RM := rm -rf
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include src/subdir.mk
--include kernel/src/headers/commons/collections/subdir.mk
--include kernel/src/headers/commons/subdir.mk
--include kernel/src/headers/subdir.mk
--include kernel/src/subdir.mk
--include kernel/Debug/src/headers/commons/collections/subdir.mk
--include kernel/Debug/src/headers/commons/subdir.mk
--include kernel/Debug/src/headers/subdir.mk
--include kernel/Debug/src/subdir.mk
 -include subdir.mk
 -include objects.mk
 

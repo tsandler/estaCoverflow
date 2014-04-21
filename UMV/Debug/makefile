@@ -25,11 +25,22 @@ endif
 # All Target
 all: UMV
 
+<<<<<<< HEAD
 # Tool invocations
 UMV: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
 	gcc  -o "UMV" $(OBJS) $(USER_OBJS) $(LIBS)
+=======
+dependents:
+	-cd /home/utnso/workspace/tp-2014-1c-out-of-range/commons/Debug && $(MAKE) all
+
+# Tool invocations
+UMV: $(OBJS) $(USER_OBJS) /home/utnso/workspace/tp-2014-1c-out-of-range/commons/Debug/libcommons.so
+	@echo 'Building target: $@'
+	@echo 'Invoking: GCC C Linker'
+	gcc -L"/home/utnso/workspace/tp-2014-1c-out-of-range/commons/Debug" -o "UMV" $(OBJS) $(USER_OBJS) $(LIBS)
+>>>>>>> 3270cb850a1a4931bd8961d47cbf4efa307283c2
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -40,5 +51,9 @@ clean:
 
 .PHONY: all clean dependents
 .SECONDARY:
+<<<<<<< HEAD
+=======
+/home/utnso/workspace/tp-2014-1c-out-of-range/commons/Debug/libcommons.so:
+>>>>>>> 3270cb850a1a4931bd8961d47cbf4efa307283c2
 
 -include ../makefile.targets
