@@ -4,20 +4,26 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../src/headers/manejoDelPCB.c 
+../libs/manejoDelPCB.c \
+../libs/manejoStack.c \
+../libs/primitivas.c 
 
 OBJS += \
-./src/headers/manejoDelPCB.o 
+./libs/manejoDelPCB.o \
+./libs/manejoStack.o \
+./libs/primitivas.o 
 
 C_DEPS += \
-./src/headers/manejoDelPCB.d 
+./libs/manejoDelPCB.d \
+./libs/manejoStack.d \
+./libs/primitivas.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
-src/headers/%.o: ../src/headers/%.c
+libs/%.o: ../libs/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C Compiler'
-	gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
+	gcc -O0 -g3 -Wall -c -fmessage-length=0 -fPIC -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

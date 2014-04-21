@@ -1,6 +1,6 @@
 /*
  ============================================================================
- Name        : programs.c
+ Name        : tp-2014-1c-out-of-range.c
  Author      : 
  Version     :
  Copyright   : Your copyright notice
@@ -8,16 +8,10 @@
  ============================================================================
  */
 
-
 #include <stdio.h>
 #include <stdlib.h>
-#include <commons/temporal.h>
 
 int main(void) {
-	//inicializar();
-	//mostrar();
-	char *tiempo = temporal_get_string_time();
-	puts (tiempo);
-	free (tiempo);
-	return 0;
+	puts("!!!Hello World!!!"); /* prints !!!Hello World!!! */
+	return EXIT_SUCCESS;
 }

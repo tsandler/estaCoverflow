@@ -10,13 +10,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "headers/manejoStack.h"
-#include <commons/temporal.h>
+#include <libs/manejoStack.h>
+#include <commons/string.h>
 
 int main(void) {
 	//inicializar();
 	//mostrar();
-	char *tiempo = temporal_get_string_time();
+	char *tiempo = string_repeat('a', 5);
 	puts (tiempo);
 	free (tiempo);
 	return 0;

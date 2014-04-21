@@ -8,7 +8,6 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
--include src/headers/subdir.mk
 -include src/subdir.mk
 -include subdir.mk
 -include objects.mk
@@ -26,11 +25,14 @@ endif
 # All Target
 all: UMV
 
+dependents:
+	-cd /home/utnso/workspace/tp-2014-1c-out-of-range/commons/Debug && $(MAKE) all
+
 # Tool invocations
-UMV: $(OBJS) $(USER_OBJS)
+UMV: $(OBJS) $(USER_OBJS) /home/utnso/workspace/tp-2014-1c-out-of-range/commons/Debug/libcommons.so
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc  -o "UMV" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc -L"/home/utnso/workspace/tp-2014-1c-out-of-range/commons/Debug" -o "UMV" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -41,5 +43,6 @@ clean:
 
 .PHONY: all clean dependents
 .SECONDARY:
+/home/utnso/workspace/tp-2014-1c-out-of-range/commons/Debug/libcommons.so:
 
 -include ../makefile.targets
