@@ -1,0 +1,48 @@
+
+[ERROR] 18:37:00:30 CPU.c/(13317:13317): El servidor no se creo correctamente
+[ERROR] 18:37:00:30 CPU.c/(13317:13317): No se pudo conectar con el socket.
+[ERROR] 18:37:00:31 CPU.c/(13317:13317): El servidor no se creo correctamente
+[ERROR] 18:42:42:242 CPU.c/(13782:13782): Error al bindear el socket.
+[ERROR] 18:42:42:242 CPU.c/(13782:13782): El servidor no se creo correctamente
+[ERROR] 19:04:20:892 CPU.c/(14402:14402): Error al recibir los datost.
+[INFO] 19:04:20:892 CPU.c/(14402:14402): El servidor se creo correctamente
+[ERROR] 19:05:23:522 CPU.c/(14535:14535): Error al recibir los datost.
+[INFO] 19:05:23:523 CPU.c/(14535:14535): El servidor se creo correctamente
+[ERROR] 19:05:56:481 CPU.c/(14619:14619): Error al recibir los datost.
+[INFO] 19:05:56:481 CPU.c/(14619:14619): El servidor se creo correctamente
+[ERROR] 19:06:49:985 CPU.c/(14782:14782): Error al recibir los datost.
+[INFO] 19:06:49:985 CPU.c/(14782:14782): El servidor se creo correctamente
+[ERROR] 19:08:30:248 CPU.c/(14869:14869): Error al recibir los datost.
+[INFO] 19:08:30:248 CPU.c/(14869:14869): El servidor se creo correctamente
+[ERROR] 19:08:49:894 CPU.c/(14948:14948): Error al recibir los datost.
+[INFO] 19:08:49:894 CPU.c/(14948:14948): El servidor se creo correctamente
+[ERROR] 19:11:46:835 CPU.c/(15130:15130): Error al recibir los datost.
+[INFO] 19:11:46:835 CPU.c/(15130:15130): El servidor se creo correctamente
+[ERROR] 12:59:04:193 CPU.c/(15668:15668): Error al recibir los datost.
+[INFO] 12:59:04:193 CPU.c/(15668:15668): El servidor se creo correctamente
+[ERROR] 13:00:24:18 CPU.c/(15768:15768): Error al recibir los datost.
+[INFO] 13:00:24:18 CPU.c/(15768:15768): El servidor se creo correctamente
+[ERROR] 13:07:49:821 CPU.c/(15889:15889): Error al recibir los datost.
+[INFO] 13:07:49:821 CPU.c/(15889:15889): El servidor se creo correctamente
+[ERROR] 13:08:41:239 CPU.c/(15968:15968): Error al recibir los datost.
+[ERROR] 13:08:41:239 CPU.c/(15968:15968): El servidor no se creo correctamente
+[ERROR] 13:12:23:72 CPU.c/(16066:16066): Error al recibir los datost.
+[ERROR] 13:12:23:72 CPU.c/(16066:16066): El servidor no se creo correctamente
+[ERROR] 13:13:54:60 CPU.c/(16161:16161): Error al recibir los datost.
+[ERROR] 13:13:54:60 CPU.c/(16161:16161): El servidor no se creo correctamente
+[INFO] 13:18:32:368 CPU.c/(16253:16253): Servidor cerrado correctamente
+[INFO] 13:18:32:368 CPU.c/(16253:16253): El servidor se creo correctamente
+[INFO] 13:21:44:659 CPU.c/(16557:16557): Servidor cerrado correctamente
+[INFO] 13:21:44:659 CPU.c/(16557:16557): El servidor se creo correctamente
+[INFO] 13:24:10:492 CPU.c/(16787:16787): Servidor cerrado correctamente
+[INFO] 13:24:10:493 CPU.c/(16787:16787): El servidor se creo correctamente
+[INFO] 13:24:26:561 CPU.c/(16863:16863): Servidor cerrado correctamente
+[INFO] 13:24:26:562 CPU.c/(16863:16863): El servidor se creo correctamente
+[ERROR] 13:24:55:407 CPU.c/(16939:16939): Error al bindear el socket.
+[ERROR] 13:24:55:407 CPU.c/(16939:16939): El servidor no se creo correctamente
+[ERROR] 13:25:07:52 CPU.c/(16942:16942): Error al bindear el socket.
+[ERROR] 13:25:07:53 CPU.c/(16942:16942): El servidor no se creo correctamente
+[INFO] 20:26:40:307 CPU.c/(18625:18625): Servidor cerrado correctamente
+[INFO] 20:26:40:307 CPU.c/(18625:18625): El servidor se creo correctamente
+[INFO] 20:29:22:476 CPU.c/(18736:18736): Servidor cerrado correctamente
+[INFO] 20:29:22:476 CPU.c/(18736:18736): El servidor se creo correctamente

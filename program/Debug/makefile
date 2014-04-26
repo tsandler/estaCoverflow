@@ -23,22 +23,22 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: UMV
+all: program
 
 dependents:
 	-cd /home/utnso/workspace/tp-2014-1c-out-of-range/commons/Debug && $(MAKE) all
 
 # Tool invocations
-UMV: $(OBJS) $(USER_OBJS) /home/utnso/workspace/tp-2014-1c-out-of-range/commons/Debug/libcommons.so
+program: $(OBJS) $(USER_OBJS) /home/utnso/workspace/tp-2014-1c-out-of-range/commons/Debug/libcommons.so
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc -L"/home/utnso/workspace/tp-2014-1c-out-of-range/commons/Debug" -o "UMV" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc -L"/home/utnso/workspace/tp-2014-1c-out-of-range/commons/Debug" -o "program" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(OBJS)$(C_DEPS)$(EXECUTABLES) UMV
+	-$(RM) $(OBJS)$(C_DEPS)$(EXECUTABLES) program
 	-@echo ' '
 
 .PHONY: all clean dependents

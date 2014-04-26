@@ -10,14 +10,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <libs/manejoStack.h>
-#include <commons/string.h>
 
 int main(void) {
-	//inicializar();
-	//mostrar();
-	char *tiempo = string_repeat('a', 5);
-	puts (tiempo);
-	free (tiempo);
-	return 0;
+	puts("!!!Hello World!!!"); /* prints !!!Hello World!!! */
+	return EXIT_SUCCESS;
 }

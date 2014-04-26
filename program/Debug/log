@@ -1,0 +1,26 @@
+[ERROR] 18:45:08:445 program.c/(13849:13849): El cliente no se pudo conectar correctamente
+[ERROR] 18:46:22:326 program.c/(13892:13892): El cliente no se pudo conectar correctamente
+[ERROR] 18:49:24:594 program.c/(13927:13927): El cliente no se pudo conectar correctamente
+[ERROR] 18:51:10:525 program.c/(13948:13948): El cliente no se pudo conectar correctamente
+[ERROR] 18:57:35:266 program.c/(14038:14038): El cliente no se pudo conectar correctamente
+[ERROR] 18:57:39:413 program.c/(14041:14041): El cliente no se pudo conectar correctamente
+[ERROR] 18:59:08:29 program.c/(14168:14168): El cliente no se pudo conectar correctamente
+[ERROR] 18:59:38:179 program.c/(14350:14350): Error al conectar socket
+[ERROR] 18:59:38:179 program.c/(14350:14350): El cliente no se pudo conectar correctamente
+[ERROR] 19:03:12:794 program.c/(14403:14403): Error al conectar socket
+[ERROR] 19:03:12:794 program.c/(14403:14403): El cliente no se pudo conectar correctamente
+[ERROR] 12:58:56:881 program.c/(15672:15672): No se envio un parametro al proceso program
+[ERROR] 13:21:00:11 program.c/(16558:16558): No se envio un parametro al proceso program
+[INFO] 13:21:44:656 program.c/(16560:16560): Cliente cerrado correctamente.
+[INFO] 13:21:44:656 program.c/(16560:16560): El cliente se conecto y envio la informacion correctamente
+[ERROR] 13:23:40:945 program.c/(16785:16785): No se envio un parametro al proceso program
+[ERROR] 13:23:49:580 program.c/(16786:16786): Error al conectar socket
+[ERROR] 13:23:49:580 program.c/(16786:16786): El cliente no se pudo conectar correctamente
+[INFO] 13:24:10:490 program.c/(16788:16788): Cliente cerrado correctamente.
+[INFO] 13:24:10:490 program.c/(16788:16788): El cliente se conecto y envio la informacion correctamente
+[INFO] 13:24:26:564 program.c/(16864:16864): Cliente cerrado correctamente.
+[INFO] 13:24:26:564 program.c/(16864:16864): El cliente se conecto y envio la informacion correctamente
+[INFO] 20:26:40:309 program.c/(18627:18627): Cliente cerrado correctamente.
+[INFO] 20:26:40:309 program.c/(18627:18627): El cliente se conecto y envio la informacion correctamente
+[INFO] 20:29:22:473 program.c/(18738:18738): Cliente cerrado correctamente.
+[INFO] 20:29:22:474 program.c/(18738:18738): El cliente se conecto y envio la informacion correctamente

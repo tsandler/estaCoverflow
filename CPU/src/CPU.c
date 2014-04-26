@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 /*
  ============================================================================
  Name        : CPU.c
@@ -12,15 +10,21 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <commons/temporal.h>
+#include <libs/sockets.h>
+#include <commons/log.h>
+#include <commons/config.h>
 
 int main(void) {
-	//inicializar();
-	//mostrar();
-	char *tiempo = temporal_get_string_time();
-	puts (tiempo);
-	free (tiempo);
+	t_log *logs = log_create("log", "CPU.c", 0, LOG_LEVEL_TRACE);
+	t_config *config = config_create("config.cnf");
+	int port = config_get_int_value(config, "PORT");
+
+	if(!crearServidor(port, logs)){
+		log_error(logs, "El servidor no se creo correctamente");
+		perror("El proceso no se realizo correctamente.");
+		return 0;
+	}
+	log_info(logs, "El servidor se creo correctamente");
+	puts("El proceso se realizo correctamente.");
 	return 0;
 }
-
->>>>>>> 3270cb850a1a4931bd8961d47cbf4efa307283c2
