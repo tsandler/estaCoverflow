@@ -25,7 +25,8 @@
 #include "../commons/config.h"
 #include "../commons/log.h"
 
+
 int crearServidor(int port, t_log *logs);
-int conectarCliente(char *ip, int port, char *script, t_log *logs);
+int conectarCliente(char *ip, int port, t_log *logs);
 
 #endif /* SOCKETS_H_ */
