@@ -26,5 +26,7 @@ int main(void) {
 	}
 	log_info(logs, "El servidor se creo correctamente");
 	puts("El proceso se realizo correctamente.");
+	log_destroy(logs);
+	config_destroy(config);
 	return 0;
 }

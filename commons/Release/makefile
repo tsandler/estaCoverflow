@@ -8,7 +8,10 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
--include src/subdir.mk
+-include parser/subdir.mk
+-include libs/subdir.mk
+-include commons/collections/subdir.mk
+-include commons/subdir.mk
 -include subdir.mk
 -include objects.mk
 
@@ -23,26 +26,22 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: CPU
-
-dependents:
-	-cd /home/utnso/workspace/tp-2014-1c-out-of-range/commons/Debug && $(MAKE) clean all
+all: libcommons.so
 
 # Tool invocations
-CPU: $(OBJS) $(USER_OBJS) /home/utnso/workspace/tp-2014-1c-out-of-range/commons/Debug/libcommons.so
+libcommons.so: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc -L"/home/utnso/workspace/tp-2014-1c-out-of-range/commons/Debug" -o "CPU" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc -shared -o "libcommons.so" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(OBJS)$(C_DEPS)$(EXECUTABLES) CPU
+	-$(RM) $(OBJS)$(C_DEPS)$(LIBRARIES) libcommons.so
 	-@echo ' '
 
 .PHONY: all clean dependents
 .SECONDARY:
-/home/utnso/workspace/tp-2014-1c-out-of-range/commons/Debug/libcommons.so:
 
 -include ../makefile.targets
