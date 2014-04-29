@@ -28,7 +28,7 @@ int main(){
 		} else {
 			log_error(logs, "Error al enviar datos, server no encontrado.");
 			perror("Error al enviar datos. Server no encontrado.\n");
-			break;
+			goto endProgram;
 		}
 		scanf("%s", buffer);
 	}
@@ -36,6 +36,9 @@ int main(){
 	log_info(logs, "El cliente se conecto y envio la informacion correctamente");
 	puts("El cliente envio la informacion correctamente.");
 	
+	//En caso de que haya habido error salto a esta instruccion para evitar que se
+	//imprima el mensaje de proceso realizado, no hay que abusar del uso del goto.
+	endProgram:
 	config_destroy(config);
 	log_destroy(logs);
 	close(s); 

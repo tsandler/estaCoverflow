@@ -46,6 +46,7 @@ int main(int index, char **argcv) {
 		} else {
 			log_error(logs, "Error al enviar datos, server no encontrado.");
 			perror("Error al enviar datos. Server no encontrado.\n");
+			goto endProgram;
 			break;
 		}
 		scanf("%s", argcv[1]);
@@ -54,7 +55,9 @@ int main(int index, char **argcv) {
 	log_info(logs, "El cliente se conecto y envio la informacion correctamente");
 	puts("El cliente envio la informacion correctamente.");
 
+	endProgram:
 	config_destroy(config);
 	log_destroy(logs);
+	close(s);
 	return 0;
 }

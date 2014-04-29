@@ -23,13 +23,16 @@ int main(){
 			}
 		}else{
 			printf("Hubo un error");
-			break;
+			goto endProgram;
 		}
 	}
 
 	log_info(logs, "El proceso se realizo correctamente");
 	puts("El proceso se realizo correctamente.");
 
+	//En caso de que haya habido error salto a esta instruccion para evitar que se
+	//imprima el mensaje de proceso realizado, no hay que abusar del uso del goto.
+	endProgram:
 	log_destroy(logs);
 	config_destroy(config);
 	close(socket_conectado);
