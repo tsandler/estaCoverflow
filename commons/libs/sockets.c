@@ -28,18 +28,21 @@ int crearServidor(int port, t_log *logs){
 	if (bind(s, (struct sockaddr*)&dir, sizeof(dir)) != 0){
 		log_error(logs, "Error al bindear el socket.");
 		perror("Error al bindear el socket");
+		close(s);
 		return -1;
 	}
 
 	if (listen(s, SOMAXCONN) != 0) {
 		log_error(logs, "Error al escuchar el socket.");
 		perror("Error al poner a escuchar socket");
+		close(s);
 		return -1;
 	}
 
 	if ((socket_conectado = accept(s, NULL, 0)) < 0) {
 		log_error(logs, "Error al aceptar conexion entrante");
 		perror("Error al aceptar conexion entrante");
+		close(s);
 		return -1;
 	}
 

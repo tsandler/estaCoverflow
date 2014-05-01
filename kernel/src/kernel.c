@@ -8,10 +8,18 @@
  ============================================================================
  */
 
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <commons/collections/queue.h>
+#include <commons/collections/list.h>
+/*No tendria que devolver void sino un script pero como no tengo bien definido que tipo de elemento
+  es eso decidi ponerle void*/
 
-int main(void) {
-	puts("!!!Hello World!!!"); /* prints !!!Hello World!!! */
-	return EXIT_SUCCESS;
+
+void *programa;
+
+int main(void){
+
+	return 0;
 }
