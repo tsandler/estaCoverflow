@@ -18,7 +18,7 @@ int main(int index, char **argcv) {
 	t_config *config = config_create("config.cnf");
 	char buffer[1024];
 	char *ip = config_get_string_value(config, "IP");
-	int port = config_get_int_value(config, "PORT");
+	int port = config_get_int_value(config, "PUERTO_KERNEL");
 	int s;
 
 	if (index != 2){
@@ -45,7 +45,6 @@ int main(int index, char **argcv) {
 			goto endProgram;
 			break;
 		}
-		scanf("%s", argcv[1]);
 	}
 	while(1){
 		if (recv(s, buffer, 1024,0)){

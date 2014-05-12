@@ -80,3 +80,16 @@
 [INFO] 19:45:28:388 program.c/(29174:29174): El cliente se conecto y envio la informacion correctamente
 [INFO] 19:46:13:800 program.c/(29223:29223): Cliente cerrado correctamente.
 [INFO] 19:46:13:800 program.c/(29223:29223): El cliente se conecto y envio la informacion correctamente
+[ERROR] 17:21:31:812 program.c/(6919:6919): No se envio un parametro al proceso program
+[ERROR] 17:36:04:889 program.c/(7517:7517): Error al conectar socket
+[ERROR] 17:36:04:891 program.c/(7517:7517): El cliente no se pudo conectar correctamente
+[ERROR] 17:42:22:264 program.c/(7522:7522): Se produjo un error recibiendo los datos del kernel
+[ERROR] 17:43:53:299 program.c/(7852:7852): No se envio un parametro al proceso program
+[INFO] 17:44:08:170 program.c/(7857:7857): El cliente se conecto y envio la informacion correctamente
+[ERROR] 17:44:17:115 program.c/(7860:7860): Error al conectar socket
+[ERROR] 17:44:17:117 program.c/(7860:7860): El cliente no se pudo conectar correctamente
+[ERROR] 17:44:50:857 program.c/(7863:7863): Error al conectar socket
+[ERROR] 17:44:50:859 program.c/(7863:7863): El cliente no se pudo conectar correctamente
+[INFO] 17:44:57:797 program.c/(7867:7867): El cliente se conecto y envio la informacion correctamente
+[INFO] 17:45:13:714 program.c/(7871:7871): El cliente se conecto y envio la informacion correctamente
+[INFO] 17:46:15:396 program.c/(7883:7883): El cliente se conecto y envio la informacion correctamente
