@@ -11,7 +11,7 @@
 por el cliente, devuelve 0 en caso de error. */
 
 int crearServidor(int port, t_log *logs){
-	int s, socket_conectado;
+	int s;
 	struct sockaddr_in dir;
 
 	dir.sin_family = PF_INET;
@@ -38,27 +38,29 @@ int crearServidor(int port, t_log *logs){
 		close(s);
 		return -1;
 	}
+	return s;
+}
 
+/*Funcion para aceptar conexiones entrantes (una vez que el servidor fue creado),
+  devuelve -1 en caso de error */
+
+int aceptarConexion(int s, t_log *logs){
+	int socket_conectado;
 	if ((socket_conectado = accept(s, NULL, 0)) < 0) {
 		log_error(logs, "Error al aceptar conexion entrante");
-		perror("Error al aceptar conexion entrante");
-		close(s);
 		return -1;
 	}
-
-	close(s);
 	return socket_conectado;
 }
 
 /* Funcion para conectar al cliente con el servidor y enviar datos, recibe los
-   datos de conexion y la informacion a enviar, devuelve 0 en caso de error */
+   datos de conexion, devuelve 0 en caso de error */
 
 int conectarCliente(char *ip, int port, t_log *logs){
 	int s;
 	struct sockaddr_in dir;
 
 	printf("Conectando...\n");
-
 	s = socket(PF_INET, SOCK_STREAM, 0);
 	if (s < 0){
 		log_error(logs, "No se pudo crear el socket");
@@ -76,4 +78,40 @@ int conectarCliente(char *ip, int port, t_log *logs){
 	printf("Conectado!\n");
 
 	return s;
+}
+
+/*Recibe como parametro la estructura que indica el tamanio a enviar y los datos,
+  enviando primero uno y despues el otro, devuelve 0 en caso de error  */
+
+int enviarDatos(int socket, t_length* tam, void* datos, t_log* logs){
+	if (send (socket, tam, sizeof(tam), MSG_WAITALL) < 0){
+		log_error(logs, "Se produjo un problema al enviar el tamanio del dato");
+		return 0;
+	}
+	if (send (socket, datos, tam->length, MSG_WAITALL) < 0){
+		log_error(logs, "Se produjo un problema al enviar el dato");
+		return 0;
+	}
+	return 1;
+}
+
+/* Recibe en los parametros un t_lenght tamanio y la variable que va a almacenar
+   los datos recibidos, devuelve 0 en caso de error */
+
+int recibirDatos(int socket, t_length* tam, void* datos, t_log* logs){
+	if (recv (socket, tam, sizeof(tam), MSG_WAITALL) < 0){
+		log_error(logs, "Se produjo un problema al recibir el tamanio del dato");
+		return 0;
+	}
+	if (recv (socket, datos, tam->length, MSG_WAITALL) < 0){
+		log_error(logs, "Se produjo un problema al recibir el tamanio del dato");
+		return 0;
+	}
+	return 1;
+}
+
+/* Cierra el socket enviado */
+
+void cerrarSocket(int s){
+	close (s);
 }
