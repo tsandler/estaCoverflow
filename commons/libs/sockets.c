@@ -8,7 +8,7 @@
 #include "sockets.h"
 
 /* Funcion para crear el servidor y procesar los datos que son enviados
-por el cliente, devuelve 0 en caso de error. */
+por el cliente, devuelve -1 en caso de error. */
 
 int crearServidor(int port, t_log *logs){
 	int s;
@@ -21,20 +21,17 @@ int crearServidor(int port, t_log *logs){
 	s = socket(PF_INET, SOCK_STREAM, 0);
 	if (s < 0){
 		log_error(logs, "No se pudo conectar con el socket.");
-		perror("Error al conectar socket");
 		return -1;
 	}
 
 	if (bind(s, (struct sockaddr*)&dir, sizeof(dir)) != 0){
 		log_error(logs, "Error al bindear el socket.");
-		perror("Error al bindear el socket");
 		close(s);
 		return -1;
 	}
 
 	if (listen(s, SOMAXCONN) != 0) {
 		log_error(logs, "Error al escuchar el socket.");
-		perror("Error al poner a escuchar socket");
 		close(s);
 		return -1;
 	}
@@ -60,28 +57,25 @@ int conectarCliente(char *ip, int port, t_log *logs){
 	int s;
 	struct sockaddr_in dir;
 
-	printf("Conectando...\n");
 	s = socket(PF_INET, SOCK_STREAM, 0);
 	if (s < 0){
 		log_error(logs, "No se pudo crear el socket");
-		perror("Error al crear socket");
-		return 0;
+		return -1;
 	}
 	dir.sin_family = PF_INET;
 	dir.sin_port = htons(port);
 	dir.sin_addr.s_addr = inet_addr(ip);
 	if (connect(s, (struct sockaddr*) &dir, sizeof(dir))!= 0) {
 		log_error(logs, "Error al conectar socket");
-		perror("Error al conectar socket");
 		return -1;
 	}
-	printf("Conectado!\n");
 
 	return s;
 }
 
 /*Recibe como parametro la estructura que indica el tamanio a enviar y los datos,
-  enviando primero uno y despues el otro, devuelve 0 en caso de error  */
+  enviando primero uno y despues el otro, devuelve 0 en caso de error.
+  El socket que recibe es el devuelto por aceptarConexion() o conectarCliente() */
 
 int enviarDatos(int socket, t_length* tam, void* datos, t_log* logs){
 	if (send (socket, tam, sizeof(tam), MSG_WAITALL) < 0){
@@ -96,7 +90,8 @@ int enviarDatos(int socket, t_length* tam, void* datos, t_log* logs){
 }
 
 /* Recibe en los parametros un t_lenght tamanio y la variable que va a almacenar
-   los datos recibidos, devuelve 0 en caso de error */
+   los datos recibidos, devuelve 0 en caso de error.
+   El socket que recibe es el devuelto por aceptarConexion() o conectarCliente() */
 
 int recibirDatos(int socket, t_length* tam, void* datos, t_log* logs){
 	if (recv (socket, tam, sizeof(tam), MSG_WAITALL) < 0){
