@@ -44,10 +44,13 @@ void manejar_cola_new(){
 	queue_pop(colaNew);
 	manejar_cola_ready(colaReady , programaNuevo);//el plp manda señal
 };
-int calcular_peso(t_medatada_program programa)
-		{int peso;
-		peso=(5 * programa.cantidad_de_funciones) + (3 * programa.cantidad_de_etiquetas)+programa.instrucciones_size;
-	return(peso);};
+
+int calcular_peso(t_medatada_program programa){
+	int peso;
+	peso=(5 * programa.cantidad_de_funciones) + (3 * programa.cantidad_de_etiquetas)+programa.instrucciones_size;
+	return(peso);
+};
+
 t_medatada_program_con_prioridad obtener_programa_con_peso(t_medatada_program programaNuevo,t_medatada_program_con_prioridad programaConPeso){
 	programaConPeso.peso = calcular_peso(programaNuevo);
 	programaConPeso.medatadaprogram.instruccion_inicio = programaNuevo.instruccion_inicio;
@@ -59,23 +62,19 @@ t_medatada_program_con_prioridad obtener_programa_con_peso(t_medatada_program pr
 	programaConPeso.medatadaprogram.cantidad_de_etiquetas = programaNuevo.cantidad_de_etiquetas;
 	return (programaConPeso);
 };
-bool comparador(void *uno, void *dos);
+bool comparador (t_medatada_program_con_prioridad *unElem, t_medatada_program_con_prioridad *otroElem);
+
 void manejar_cola_ready(t_list *colaReady,t_medatada_program programaNuevo){
 	t_medatada_program_con_prioridad programaConPeso;//entra el archivo
 	programaConPeso = obtener_programa_con_peso(programaNuevo, programaConPeso);
 	list_add(colaReady ,&programaConPeso);
-	list_sort(colaReady, comparador);//ordeno la lista
+	list_sort(colaReady, (void*)comparador);//ordeno la lista
 };
-bool comparador (void *uno, void *dos){
-	t_medatada_program_con_prioridad *aux1, *aux2;
-	aux1 = (t_medatada_program_con_prioridad*) uno;
-	aux2 = (t_medatada_program_con_prioridad*) dos;
-	if ((aux1->peso) > (aux2->peso))
-		return 1;
-	else
-		return 0;
-	return 0;
+
+bool comparador (t_medatada_program_con_prioridad *unElem, t_medatada_program_con_prioridad *otroElem){
+	return (unElem->peso) > (otroElem->peso);
 };
+
 void* programador_largo_plazo (void *auxPLP){
 	PLP *varPLP = (PLP*) auxPLP;
 	while (1){
