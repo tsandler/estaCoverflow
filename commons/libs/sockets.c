@@ -67,7 +67,7 @@ int conectarCliente(char *ip, int port, t_log *logs){
 	dir.sin_addr.s_addr = inet_addr(ip);
 	if (connect(s, (struct sockaddr*) &dir, sizeof(dir))!= 0) {
 		log_error(logs, "Error al conectar socket");
-		return -1;
+		return 0;
 	}
 
 	return s;
