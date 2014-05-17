@@ -21,7 +21,6 @@
 
 #include <unistd.h>
 
-#include "../commons/config.h"
 #include "../commons/log.h"
 
 typedef struct{
