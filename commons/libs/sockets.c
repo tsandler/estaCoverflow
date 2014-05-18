@@ -98,7 +98,7 @@ int recibirDatos(int socket, t_length* tam, void** datos, t_log* logs){
 		log_error(logs, "Se produjo un problema al recibir el tamanio del dato");
 		return 0;
 	}
-	datos = malloc(tam->length);
+	*datos = malloc(tam->length);
 	if (recv (socket, datos, tam->length, MSG_WAITALL) < 0){
 		log_error(logs, "Se produjo un problema al recibir el tamanio del dato");
 		return 0;
