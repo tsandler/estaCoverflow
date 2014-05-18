@@ -78,11 +78,11 @@ int conectarCliente(char *ip, int port, t_log *logs){
   El socket que recibe es el devuelto por aceptarConexion() o conectarCliente() */
 
 int enviarDatos(int socket, t_length* tam, void* datos, t_log* logs){
-	if (send (socket, tam, sizeof(tam), MSG_WAITALL) < 0){
+	if (send (socket, tam, sizeof(tam), 0) < 0){
 		log_error(logs, "Se produjo un problema al enviar el tamanio del dato");
 		return 0;
 	}
-	if (send (socket, datos, tam->length, MSG_WAITALL) < 0){
+	if (send (socket, datos, tam->length, 0) < 0){
 		log_error(logs, "Se produjo un problema al enviar el dato");
 		return 0;
 	}
@@ -93,11 +93,12 @@ int enviarDatos(int socket, t_length* tam, void* datos, t_log* logs){
    los datos recibidos, devuelve 0 en caso de error.
    El socket que recibe es el devuelto por aceptarConexion() o conectarCliente() */
 
-int recibirDatos(int socket, t_length* tam, void* datos, t_log* logs){
+int recibirDatos(int socket, t_length* tam, void** datos, t_log* logs){
 	if (recv (socket, tam, sizeof(tam), MSG_WAITALL) < 0){
 		log_error(logs, "Se produjo un problema al recibir el tamanio del dato");
 		return 0;
 	}
+	datos = malloc(tam->length);
 	if (recv (socket, datos, tam->length, MSG_WAITALL) < 0){
 		log_error(logs, "Se produjo un problema al recibir el tamanio del dato");
 		return 0;

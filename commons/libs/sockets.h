@@ -21,6 +21,7 @@
 
 #include <unistd.h>
 
+#include "../commons/config.h"
 #include "../commons/log.h"
 
 typedef struct{
@@ -31,7 +32,7 @@ typedef struct{
 int crearServidor(int port, t_log *logs);
 int aceptarConexion(int s, t_log *logs);
 int enviarDatos(int s, t_length* tam, void* datos, t_log* logs);
-int recibirDatos(int s, t_length* tam, void* datos, t_log* logs);
+int recibirDatos(int s, t_length* tam, void** datos, t_log* logs);
 int conectarCliente(char *ip, int port, t_log *logs);
 void cerrarSocket(int s);
 
