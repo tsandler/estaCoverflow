@@ -48,9 +48,6 @@ typedef struct nodoHuecos{
 
 
 int crear_agregar_segmento(int pid, int tamanio);
-void destruir_segmentos(int pidInt);
-void solicitar_memoria_desde_pos(int *base, int tamanio, int offset);
-void consola();
 
 
 #endif /* GLOBALES_H_ */
