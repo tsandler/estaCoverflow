@@ -8,14 +8,10 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
--include parser/so-ansisop-parser-dummy/build/subdir.mk
--include parser/parser/build/parser/subdir.mk
 -include parser/parser-dummy/subdir.mk
 -include parser/subdir.mk
 -include libs/subdir.mk
 -include commons/collections/subdir.mk
--include commons/Debug/collections/subdir.mk
--include commons/Debug/subdir.mk
 -include commons/subdir.mk
 -include subdir.mk
 -include objects.mk
