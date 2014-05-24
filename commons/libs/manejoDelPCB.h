@@ -27,9 +27,8 @@ typedef struct registroPCB{
 
 	//SEGMENTO DE CODIGO
 	int segemento_codigo; //puntero que apunta simepre al inicio del segemento del codigo.
-	int indece_codigo; //  puntero que se mueve en el segmento codigo.
 	int tamanio_indice_codigo ; //tamaño del indice del codigo
-	t_intructions* instrucciones;	// array que guarda en cada componenete [longitud, desplazamiento]
+	t_intructions* indice_codigo;	// array que guarda en cada componenete [longitud, desplazamiento]
 	int program_counter; //recorre el arrar del indice de codigo.
 
 	//SEGMENTO DE ETIQUETA, FUNCIONES Y PROCEDIMIENTOS
@@ -37,11 +36,6 @@ typedef struct registroPCB{
 	char* indice_etiquetas_funciones; //indice de etiquetas y funciones serializado
 	int puntero_etiquetas_funciones;
 	int tamanio_indice_etiquetas_funciones; //tamaño del indice de etiquetas y funciones
-
-	//HEAP....
-	int puntero_heap;
-
-
 
 }registroPCB;
 
