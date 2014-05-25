@@ -145,8 +145,9 @@ void eliminarUMV(){
 	list_clean(listaHuecos);
 }
 
+/*Funcion que lee un segmento de la umv y retorna un puntero a la posicion solicitada */
 char *leer(int dirLog, int tamanioALeer, int offset){ //solicitar_memoria_desde_una_pos();
-	nodoDirLog *nodoAux= malloc(sizeof(nodoDirLog)); //cómo hago para hacer polimorfico a se_inicializo_segmento();
+	nodoDirLog *nodoAux= malloc(sizeof(nodoDirLog));
 	se_inicializo_puntero((void*)nodoAux);
 	char* destino = malloc(sizeof(char));
 	se_inicializo_puntero((void*)destino);
@@ -164,12 +165,9 @@ char *leer(int dirLog, int tamanioALeer, int offset){ //solicitar_memoria_desde_
 			memcpy((void*)destino,(void*)desde,tamanioALeer);
 			free(nodoAux);
 			free(desde);
-
 			return destino;
 		}else
 			log_error(logs,"Segmentation fault");
-			// deberia cortar la ejecución y tirar el mensaje (excepcion + mensaje).
-			// averigua cómo se hace eso
 	}else
 		log_error(logs,"se intento acceder a una base inexistente");
 	free(nodoAux);
