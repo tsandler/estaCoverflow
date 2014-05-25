@@ -44,6 +44,7 @@
 		int				cantidad_de_etiquetas;
 	} t_metadata_program;
 
+<<<<<<< HEAD
 t_metadata_program* metadata_desde_literal(const char*);
 void metadata_destruir(t_metadata_program*);
 t_puntero_instruccion metadata_buscar_etiqueta(const t_nombre_etiqueta objetivo, char *etiquetas, const t_size etiquetas_size);
@@ -51,5 +52,10 @@ t_puntero_instruccion metadata_buscar_etiqueta(const t_nombre_etiqueta objetivo,
 // compatibilidad hacia atras
 t_metadata_program* metadatada_desde_literal(const char*);
 typedef t_metadata_program t_medatada_program;
+=======
+t_medatada_program* metadatada_desde_literal(const char*); // codigo litareal y devulve la metadata
+void metadata_destruir(t_medatada_program*);
+t_puntero_instruccion metadata_buscar_etiqueta(const t_medatada_program* const, const t_nombre_etiqueta); //paso el metadata y el nombre de una etiquete y me da el numero de la etiqeuta
+>>>>>>> 9b97cd3d36733fc42956aff8f88cb359320a5ca3
 
 #endif

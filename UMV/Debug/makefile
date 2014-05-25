@@ -8,6 +8,7 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
+-include src/headers/subdir.mk
 -include src/subdir.mk
 -include subdir.mk
 -include objects.mk
@@ -26,7 +27,7 @@ endif
 all: UMV
 
 dependents:
-	-cd /home/utnso/workspace/tp-2014-1c-out-of-range/commons/Debug && $(MAKE) all
+	-cd /home/utnso/workspace/tp-2014-1c-out-of-range/commons/Debug && $(MAKE) clean all
 
 # Tool invocations
 UMV: $(OBJS) $(USER_OBJS) /home/utnso/workspace/tp-2014-1c-out-of-range/commons/Debug/libcommons.so

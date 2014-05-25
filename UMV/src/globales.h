@@ -41,13 +41,8 @@ typedef struct nodoDirLog{
 }nodoDirLog;
 
 typedef struct nodoHuecos{
-	int dirLogica; //corroborar si es necesaria
 	int tamanioSegmento;
 	char *dirFisica;
 }nodoHuecos;
-
-
-int crear_agregar_segmento(int pid, int tamanio);
-
 
 #endif /* GLOBALES_H_ */
