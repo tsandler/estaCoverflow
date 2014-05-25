@@ -19,13 +19,14 @@ void inicializar_umv(int tamanioUMV){
 /* Funcion que crea y agrega un segmento a la lista de segmentos, segun pid */
 int crear_agregar_segmento(int pidInt, int tamanio){
 
-	tablaSegUMV *unElem = malloc(sizeof(tablaSegUMV));
 	int nroSeg=0;
 	char* pid = (char*)string_itoa(pidInt);
 	t_list *listaSeg;
+	tablaSegUMV *unElem = malloc(sizeof(tablaSegUMV));
+	se_inicializo_puntero((void*)unElem);
 
 	unElem->tamanioSegmento= tamanio;
-	unElem->dirLogica= obtener_dir_logica(tamanio);
+	unElem->dirLogica= obtener_dir_logica(tamanio,pid);
 	unElem->dirFisica = obtener_dir_fisica(tamanio, unElem->dirLogica);
 	if(dictionary_is_empty(tablaPidSeg) || !(dictionary_has_key(tablaPidSeg, pid))){
 		unElem->idSegmento=1;
@@ -65,7 +66,7 @@ bool sort_nroSeg(tablaSegUMV* unElem, tablaSegUMV* otroElem){
 }
 
 /* Funcion que obtiene la direccion logica */
-int obtener_dir_logica(int tamanio){
+int obtener_dir_logica(int tamanio, char* pid){
 	nodoDirLog *unElem=malloc(sizeof(nodoDirLog));
 
 	if(list_is_empty(listaDirLogica))
@@ -74,6 +75,7 @@ int obtener_dir_logica(int tamanio){
 		unElem->dirLog=baseLogica;
 		unElem->tamanio=tamanio;
 		unElem->dirFisica= obtener_dir_fisica(tamanio,unElem->dirLog);
+		unElem->pid= pid;
 		list_add(listaDirLogica, (void*)unElem);
 		baseLogica = baseLogica + tamanio + 1;
 	}
@@ -128,6 +130,12 @@ void criterio_iterate(tablaSegUMV *unElem){
 	list_add(listaHuecos, (void*)nodoNuevo);
 }
 
+void se_inicializo_puntero(void* unElem){
+	if(unElem)
+		log_info(logs,"Se otorgo la porcion de memoria");
+	else
+		log_error(logs,"No se otorgo la porcion de memoria");
+}
 
 /*Funcion que elimina estructuras del manejo de la UMV liberando el bloque de memoria principal*/
 void eliminarUMV(){
@@ -135,4 +143,37 @@ void eliminarUMV(){
 	dictionary_destroy(tablaPidSeg);
 	list_clean(listaDirLogica);
 	list_clean(listaHuecos);
+}
+
+char *leer(int dirLog, int tamanioALeer, int offset){ //solicitar_memoria_desde_una_pos();
+	nodoDirLog *nodoAux= malloc(sizeof(nodoDirLog)); //cómo hago para hacer polimorfico a se_inicializo_segmento();
+	se_inicializo_puntero((void*)nodoAux);
+	char* destino = malloc(sizeof(char));
+	se_inicializo_puntero((void*)destino);
+	char* desde = malloc(sizeof(char));
+	se_inicializo_puntero((void*)desde);
+
+	bool existe_dir_logica(nodoDirLog *elemLista){
+		return  dirLog == elemLista->dirLog;
+	}
+	nodoAux =list_find(listaDirLogica, (void*)existe_dir_logica);
+
+	if(nodoAux){
+		if( nodoAux->dirFisica + offset + tamanioALeer <= nodoAux->dirFisica + nodoAux->tamanio ){
+			desde = nodoAux->dirFisica + offset;
+			memcpy((void*)destino,(void*)desde,tamanioALeer);
+			free(nodoAux);
+			free(desde);
+
+			return destino;
+		}else
+			log_error(logs,"Segmentation fault");
+			// deberia cortar la ejecución y tirar el mensaje (excepcion + mensaje).
+			// averigua cómo se hace eso
+	}else
+		log_error(logs,"se intento acceder a una base inexistente");
+	free(nodoAux);
+	free(desde);
+	free(destino);
+	return 0;
 }

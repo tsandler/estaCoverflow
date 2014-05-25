@@ -26,3 +26,4 @@ int main(int argc, char** argv){
 	config_destroy(config);
 	return 0;
 }
+

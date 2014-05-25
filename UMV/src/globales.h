@@ -38,11 +38,13 @@ typedef struct nodoDirLog{
 	int dirLog;
 	char *dirFisica;
 	int tamanio;
+	char *pid;
 }nodoDirLog;
 
 typedef struct nodoHuecos{
 	int tamanioSegmento;
 	char *dirFisica;
 }nodoHuecos;
+
 
 #endif /* GLOBALES_H_ */
