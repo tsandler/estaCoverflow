@@ -8,61 +8,43 @@
  ============================================================================
  */
 
-#include <stdio.h>
-#include <libs/sockets.h>
-#include <commons/config.h>
-#include <commons/log.h>
+#include "globales.h"
+#include "functions.h"
 
-int main(int index, char **argcv) {
-	t_log *logs = log_create("log", "program.c", 0, LOG_LEVEL_TRACE);
-	t_config *config = config_create("config.cnf");
-	char buffer[1024];
+int main(int argc, char **argv) {
+
+	t_config *config = config_create(argv[1]);
+
 	char *ip = config_get_string_value(config, "IP");
 	int port = config_get_int_value(config, "PUERTO_KERNEL");
-	int s;
 
-	if (index != 2){
+	config_destroy(config);
+
+	logs = log_create("log", "program.c", 0, LOG_LEVEL_TRACE);
+
+	if (argc < 3){
 		log_error(logs, "No se envio un parametro al proceso program");
-		perror("No se envio un parametro para procesar");
 		return 0;
 	}
-	s = conectarCliente(ip, port, logs);
-	//Posicion 0 es el mismo programa y 1 es el script ansisop enviado por parametro
-	if (s < 0){
+
+	socket_kernel = conectarCliente(ip, port, logs);
+
+	if (socket_kernel < 0){
 		log_error(logs, "El cliente no se pudo conectar correctamente");
-		perror("El cliente no se pudo conectar");
 		log_destroy(logs);
 		config_destroy(config);
 		return 0;
 	}
-	while (1) {
-		if (send(s, argcv[1], strlen(argcv[1]) + 1, 0) >= 0){
-			printf("Script enviado!\n");
-			break;
-		} else {
-			log_error(logs, "Error al enviar datos, server no encontrado.");
-			perror("Error al enviar datos. Server no encontrado.\n");
-			goto endProgram;
-			break;
-		}
-	}
-	while(1){
-		if (recv(s, buffer, 1024,0)){
-			break;
-		}else{
-			log_error(logs, "Se produjo un error recibiendo los datos del kernel");
-			return 0;
-		}
-	}
 
-	printf("Datos recibidos del kernel:\n%s", buffer);
+	log_info(logs, "El proceso se conecto correctamente con el kernel");
 
-	log_info(logs, "El cliente se conecto y envio la informacion correctamente");
-	puts("El cliente envio la informacion correctamente.");
+	enviarProgramaAlKernel(argv[2]);
 
-	endProgram:
-	config_destroy(config);
+	recibirSentencia();
+
+	//ya recibio la sentencia, falta imprimirla por consola
+
 	log_destroy(logs);
-	close(s);
+	cerrarSocket(socket_kernel);
 	return 0;
 }
