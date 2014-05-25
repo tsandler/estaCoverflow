@@ -17,13 +17,13 @@
 #include "metadata_program.h"
 
 char* _separarLineas(char*);
-void _agregarEtiqueta(char*, t_medatada_program*, char*);
+void _agregarEtiqueta(char*, t_metadata_program*, char*);
 
-t_medatada_program* metadatada_desde_literal(const char* literal){
+t_metadata_program* metadata_desde_literal(const char* literal){
 	char* copia_literal = strdup(literal);	//Para conservar el const-ness
-	t_medatada_program* ret = malloc( sizeof(t_medatada_program) );
+	t_metadata_program* ret = malloc( sizeof(t_metadata_program) );
 
-	memset(ret, 0, sizeof(t_medatada_program) );
+	memset(ret, 0, sizeof(t_metadata_program) );
 	char* buffer;
 
 	int position = 0;			//Bytes de offset en el copia_literal
@@ -56,19 +56,25 @@ t_medatada_program* metadatada_desde_literal(const char* literal){
 	return ret;
 }
 
-void metadata_destruir(t_medatada_program* victima){
+t_metadata_program* metadatada_desde_literal(const char* literal){
+	puts("DEPRECATED: la funcion metadatada_desde_literal tenia un error de tipeo y esta deprecada.");
+	puts("DEPRECATED: deberia llamarse a la funcion metadata_desde_literal en cambio.");
+	return metadata_desde_literal(literal);
+}
+
+void metadata_destruir(t_metadata_program* victima){
 	free(victima->etiquetas);
 	free(victima->instrucciones_serializado);
 	free(victima);
 }
 
-t_puntero_instruccion metadata_buscar_etiqueta(const t_medatada_program* const programa, const t_nombre_etiqueta etiqueta){
+t_puntero_instruccion metadata_buscar_etiqueta(const t_nombre_etiqueta objetivo, char *etiquetas, const t_size etiquetas_size) {
 	int i=0;
 	int offset = 0;
 	char* nombre;
-	for(i=0; i < programa->etiquetas_size; i++){
-		nombre = programa->etiquetas + offset;
-		if( string_equals_ignore_case(nombre, etiqueta) )
+	for(i=0; i < etiquetas_size; i++){
+		nombre = etiquetas + offset;
+		if( string_equals_ignore_case(nombre, objetivo) )
 			return *(nombre + 1 + strlen(nombre));
 		offset += strlen(nombre) + 1 + sizeof(t_puntero_instruccion);
 	}
@@ -89,7 +95,7 @@ char* _separarLineas(char* linea){
 	return linea;
 }
 
-void _agregarEtiqueta(char* linea, t_medatada_program* programa, char* prefix){
+void _agregarEtiqueta(char* linea, t_metadata_program* programa, char* prefix){
 	char* auxName = linea + strlen(prefix) ;
 	int etiquetaNameLength = (strlen(auxName) +1) * sizeof(char);
 

@@ -41,9 +41,9 @@ int crearServidor(int port, t_log *logs){
 /*Funcion para aceptar conexiones entrantes (una vez que el servidor fue creado),
   devuelve -1 en caso de error */
 
-int aceptarConexion(int s, t_log *logs){
+int aceptarConexion(int socket, t_log *logs){
 	int socket_conectado;
-	if ((socket_conectado = accept(s, NULL, 0)) < 0) {
+	if ((socket_conectado = accept(socket, NULL, 0)) < 0) {
 		log_error(logs, "Error al aceptar conexion entrante");
 		return -1;
 	}
@@ -67,6 +67,7 @@ int conectarCliente(char *ip, int port, t_log *logs){
 	dir.sin_addr.s_addr = inet_addr(ip);
 	if (connect(s, (struct sockaddr*) &dir, sizeof(dir))!= 0) {
 		log_error(logs, "Error al conectar socket");
+		close(s);
 		return -1;
 	}
 
@@ -108,6 +109,6 @@ int recibirDatos(int socket, t_length* tam, void** datos, t_log* logs){
 
 /* Cierra el socket enviado */
 
-void cerrarSocket(int s){
-	close (s);
+void cerrarSocket(int socket){
+	close (socket);
 }
