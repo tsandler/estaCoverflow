@@ -1,20 +1,21 @@
 /*
  * manejoDelPCB.c
  *
- *  Created on: 18/04/2014
+ *  Created on: 24/05/2014
  *      Author: utnso
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "../parser/metadata_program.h"
+
 #include "manejoDelPCB.h"
+
+int identificadorUnicoDelPCB(){
+	ultimoIdentificador =+ 1;
+	return ultimoIdentificador;
+}
 
 registroPCB crearNuevoPCB (){
 
 	registroPCB pcb;
-
-	//INICIALIZO LAS VARIABLES DEL NUEVO PCB
 	pcb.pid = identificadorUnicoDelPCB();
 
 	return pcb;
@@ -37,24 +38,18 @@ t_intructions obtenerSiguienteIntruccion (registroPCB pcb){
 
 
 registroPCB llenarPCB(registroPCB pcb, t_medatada_program program, int stack, int codigo){
-
-		//SEGMENTO STACK
 		pcb.cursor_stack = stack;
 		pcb.tamanio_contexto = stack;
 		pcb.tamanio_contexto = 0;
 
-		//SEGMENTO DE CODIGO
-		pcb.tamanio_indice_codigo = program.instrucciones_size; //numero de instrucciones
+		pcb.tamanio_indice_codigo = program.instrucciones_size;
 		pcb.program_counter = 0;
-		pcb.segemento_codigo = codigo; //codigo literal
-		pcb.indice_codigo = program.instrucciones_serializado; // intrucciones
+		pcb.segemento_codigo = codigo;
+		pcb.indice_codigo = program.instrucciones_serializado;
 
-		//SEGMENTO DE ETIQUETAS Y FUNCIONES
-		pcb.tamanio_indice_etiquetas_funciones = program.etiquetas_size; //numero de instrucciones
-		pcb.indice_etiquetas_funciones = program.etiquetas; //estructura "uno\0001dos\00002..."
+		pcb.tamanio_indice_etiquetas_funciones = program.etiquetas_size;
+		pcb.indice_etiquetas_funciones = program.etiquetas;
 		pcb.puntero_etiquetas_funciones = 0;
-
 
 	return pcb;
 }
-

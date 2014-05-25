@@ -1,41 +1,34 @@
 /*
  * manejoDelPCB.h
  *
- *  Created on: 18/04/2014
+ *  Created on: 24/05/2014
  *      Author: utnso
  */
 
 #ifndef MANEJODELPCB_H_
 #define MANEJODELPCB_H_
 
-int ultimoIdentificador = 0;
+#include <stdio.h>
+#include <stdlib.h>
+#include "../parser/metadata_program.h"
 
-int identificadorUnicoDelPCB()
-{
-	ultimoIdentificador =+ 1;
-	return ultimoIdentificador;
-}
-
+int ultimoIdentificador;
 
 typedef struct registroPCB{
     int pid;
 
-	//SEGMENTO DEL STACK
-	int segemento_stack; // puntero que siemrpe apunta al inicio del segmento del stack
-	int cursor_stack; // es el puntero que recorre el stack
-	int tamanio_contexto; //es un valor calculable en base a la diferencia del puntero del stack y contexto.
+	int segemento_stack;
+	int cursor_stack;
+	int tamanio_contexto;
 
-	//SEGMENTO DE CODIGO
-	int segemento_codigo; //puntero que apunta simepre al inicio del segemento del codigo.
-	int tamanio_indice_codigo ; //tamaño del indice del codigo
-	t_intructions* indice_codigo;	// array que guarda en cada componenete [longitud, desplazamiento]
-	int program_counter; //recorre el arrar del indice de codigo.
+	int segemento_codigo;
+	int tamanio_indice_codigo ;
+	t_intructions* indice_codigo;
+	int program_counter;
 
-	//SEGMENTO DE ETIQUETA, FUNCIONES Y PROCEDIMIENTOS
-
-	char* indice_etiquetas_funciones; //indice de etiquetas y funciones serializado
+	char* indice_etiquetas_funciones;
 	int puntero_etiquetas_funciones;
-	int tamanio_indice_etiquetas_funciones; //tamaño del indice de etiquetas y funciones
+	int tamanio_indice_etiquetas_funciones;
 
 }registroPCB;
 
