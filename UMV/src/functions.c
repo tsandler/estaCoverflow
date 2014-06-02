@@ -1,4 +1,7 @@
 #include "functions.h"
+#include <libs/sockets.h>
+#include <pthread.h>
+#include <libs/estructurasParser.h>
 
 /* Funcion que solicita el bloque de memoria inicial para la UMV y
 crea estructuras para el manejo de la UMV. */
@@ -175,3 +178,71 @@ char *leer(int dirLog, int tamanioALeer, int offset){ //solicitar_memoria_desde_
 	free(destino);
 	return 0;
 }
+
+//Distingue que proceso se conecto CPU o KERNEL y por cada conexion que e
+bool handshake(int procesoConectado){
+	int processName;
+	char*datos;
+	t_length*tam = malloc(sizeof(tam));
+	int esCPU;
+	int esKernel;
+	processName = recibirDatos(procesoConectado,tam, (void*)&datos,logs);
+	if(processName<0){
+		log_error(logs,"no se puedieron recibir los datos correctamente");
+		return 0;
+	}
+	//a modo de test:
+	char* str = string_from_format("%s \n", datos);
+	printf("%s",str);
+
+	if (strcmp(str,"soy CPU"))
+		return 1;
+	else if(strcmp(str,"soy kernel"))
+		return 2;
+	else
+		return 0;
+}
+
+void escucharKernel(int*pConectado){
+	int datosKernel;
+	t_length*tam=malloc(sizeof(tam));
+	pthread_t thread1;
+	pthread_t thread2;
+	int operacionKernel;
+	 datosKernel = recibirDatos(pConectado,tam,(void*)&operacionKernel,logs);
+	 switch(*operacionKernel);
+	 case RESERVAR:
+	 pthread_create(&thread1,NULL,reservar, (void*)pConectado);
+	 case ESCRIBIR:
+	 pthread_create(&thread2,NULL,escribir,(void*)pConectado);
+	 return;
+}
+
+void reservar(int pidInt,int tamanio);
+/*LO QUE TENGA QUE HACER LA UMV CON RESERVAR*/
+void escribir(int base, int offset, int tamanio);
+/*LO QUE TENGA Q HACER LA UMV CON ESCRIBIR*/
+
+
+
+void escucharCPU(int*pConectado){
+	int datosCPU;
+	t_length*tam=malloc(sizeof(tam));
+	int operacionCPU;
+	pthread_t thread1;
+	pthread_t thread2;
+	datosCPU = recibirDatos(pConectado,tam,(void*)&operacionCPU,logs);
+	switch(*operacionCPU);
+	case PEDIR_SEGMENTO:
+	pthread_create(&thread1,NULL,pedir_segmento,(void*)pConectado);
+	case PEDIR_SENTENCIA:
+	pthread_create(&thread2,NULL,pedir_sentencia,(void*)pConectado);
+	return;
+}
+
+
+void pedir_segmento(int leer);
+/*LO QUE TENGA QUE HACER LA UMB CON PEDIR_SEGMENTO*/
+
+void pedir_sentencia(int base, int tamanio);
+

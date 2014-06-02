@@ -29,4 +29,8 @@ void se_inicializo_puntero(void* unElem);
 
 char *leer(int dirLog, int tamanioALeer, int offset);
 
+bool handshake(int procesoConectado);
+void escucharKernel(int*pConectado);
+void escucharCPU(int*pConectado);
+
 #endif /* FUNCTIONS_H_ */
