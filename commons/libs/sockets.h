@@ -27,7 +27,7 @@ typedef struct t_stream{
 	char* data;
 }t_stream;
 
-typedef struct{
+typedef struct t_length{
 	t_menu menu; //valor para saber que se va a hacer con el dato enviado
 	int length; //tamanio del dato enviado
 }t_length;

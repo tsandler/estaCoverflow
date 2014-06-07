@@ -29,7 +29,7 @@ endif
 all: kernel
 
 dependents:
-	-cd /home/utnso/workspace/tp-2014-1c-out-of-range/commons/Debug && $(MAKE) clean all
+	-cd /home/utnso/workspace/tp-2014-1c-out-of-range/commons/Debug && $(MAKE) all
 
 # Tool invocations
 kernel: $(OBJS) $(USER_OBJS) /home/utnso/workspace/tp-2014-1c-out-of-range/commons/Debug/libcommons.so

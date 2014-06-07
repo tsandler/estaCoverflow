@@ -14,6 +14,7 @@
 #include <commons/log.h>
 
 t_log *logs;
+
 t_length *tam;
 
 int socket_kernel;

@@ -1,4 +1,5 @@
-src/kernel.d: ../src/kernel.c ../src/globales.h \
+src/planificador_corto_plazo.d: ../src/planificador_corto_plazo.c \
+ ../src/globales.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/collections/queue.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/collections/list.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/collections/node.h \

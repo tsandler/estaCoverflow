@@ -24,7 +24,7 @@ registroPCB crearNuevoPCB (){
 
 
 
-int calcularPesoPCB (t_medatada_program program ){
+int calcularPesoPCB (t_metadata_program program ){
 	int peso=0;
 	peso = program.cantidad_de_etiquetas + (3 * program.cantidad_de_funciones) + program.instrucciones_size;
 	return peso;
@@ -37,7 +37,7 @@ t_intructions obtenerSiguienteIntruccion (registroPCB pcb){
 
 
 
-registroPCB llenarPCB(registroPCB pcb, t_medatada_program program, int stack, int codigo){
+registroPCB llenarPCB(registroPCB pcb, t_metadata_program program, int stack, int codigo){
 		pcb.cursor_stack = stack;
 		pcb.tamanio_contexto = stack;
 		pcb.tamanio_contexto = 0;

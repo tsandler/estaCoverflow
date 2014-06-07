@@ -10,27 +10,26 @@
 
 #include "globales.h"
 
-void inicializar_umv(int tamanioUMV);
-void eliminarUMV();
 
-int crear_agregar_segmento(int pid, int tamanio);
-void destruir_segmentos(int pidInt);
+  void inicializar_umv(int tamanioUMV);
+  void eliminarUMV();
 
-char *obtener_dir_fisica(int tamanio,int dirLogica);
-int obtener_dir_logica(int tamanio, char* pid);
-int obtener_nroSeg(t_list *listaSeg);
-bool sort_nroSeg(tablaSegUMV* unElem, tablaSegUMV* otroElem);
+  int crear_agregar_segmento(int pid, int tamanio);
+  void destruir_segmentos(int pidInt);
 
-bool criterio(nodoDirLog *unElem);
-bool criterio_remover(nodoDirLog *elemLista);
-void criterio_iterate(tablaSegUMV *unElem);
+  char *obtener_dir_fisica(int tamanio,int dirLogica);
+  int obtener_dir_logica(int tamanio, char* pid);
+  int obtener_nroSeg(t_list *listaSeg);
+  bool sort_nroSeg(tablaSegUMV* unElem, tablaSegUMV* otroElem);
 
-void se_inicializo_puntero(void* unElem);
+  bool criterio(nodoDirLog *unElem);
+  bool criterio_remover(nodoDirLog *elemLista);
+  void criterio_iterate(tablaSegUMV *unElem);
 
-char *leer(int dirLog, int tamanioALeer, int offset);
+  void se_inicializo_puntero(void* unElem);
 
-bool handshake(int procesoConectado);
-void escucharKernel(int*pConectado);
-void escucharCPU(int*pConectado);
+
+  char *leer(int dirLog, int tamanioALeer, int offset);
+
 
 #endif /* FUNCTIONS_H_ */
