@@ -94,6 +94,7 @@ int obtener_nuevo_nroSeg(t_list *listaSeg){
 	return unElem->idSegmento +1;
 }
 
+/* Funcion que retorna una dirLogica para asignarsela a un nuevo segmento */
 
 int obtener_proxima_dir_logica(int tamanio, char* pid){
 	t_list* listaSeg = dictionary_get(tablaPidSeg,pid);
@@ -117,7 +118,7 @@ char *obtener_proxima_dirFisica(int tamanio){
 			unElem = worst_fit(tamanio);
 			break;
 		default:
-			perror("ALGORITMO NO VALIDO");
+			log_error(logs,"ALGORITMO NO VALIDO");
 	}
 	return unElem->dirFisica;
 }
@@ -202,13 +203,12 @@ void cambio_proceso_activo(int pid){
 /*Funcion de la consola*/
 char* ejec_operacion(int nroOp){
 	int dirLogica=0 ,offset =0;
-	void* buffer;
-	int pid, tamanio, tamanioAEscribir, tamanioALeer;
+	void* buffer = NULL;
+	int pid, tamanio=0, tamanioAEscribir=0, tamanioALeer=0;
 
 	switch(nroOp){
 		case LEER_SEGMENTO:
 			retardo(retardoActual);
-			printf("");
 			return leer_segmento(dirLogica,tamanioALeer,offset);
 			break;
 		case ESCRIBIR_SEGMENTO:

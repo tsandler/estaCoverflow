@@ -34,7 +34,7 @@ int main(int argc, char** argv){
 }
 
 
-void *consola(void* ptr){ //TODO: hacer otra funcion de consola
+void *consola(void* ptr){
 	int pid, cambioAlgoritmo ,nroOp, operacion, retardoNuevo;
 
 	printf("Seleccione la operación segun...\n");

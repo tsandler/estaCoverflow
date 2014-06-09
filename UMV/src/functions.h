@@ -44,4 +44,5 @@ void imprime_campos_listahuecos(nodoHuecos *unElem);
 void imprime_estado_mem_ppal();
 void imprime_estructuras_memoria();
 
+
 #endif /* FUNCTIONS_H_ */
