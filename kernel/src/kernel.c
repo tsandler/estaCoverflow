@@ -43,8 +43,6 @@ int main() {
 	if((sem_multiprogramacion = sem_open("/semaforo_multiprogramacion", O_CREAT ,0644, valor_multiprogramacion)) == (sem_t*)-1)
 		{ perror ("No se puede crear el semaforo"); goto terminar_proceso; };
 
-
-
 	if(socket_programa < 0 ){
 		log_error(logs, "El servidor no se creo correctamente");
 	}else{

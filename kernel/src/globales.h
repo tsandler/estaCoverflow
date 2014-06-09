@@ -49,4 +49,6 @@ t_list *colaReady;
 
 sem_t *sem_multiprogramacion;
 
+static pthread_mutex_t semaforo_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 #endif /* GLOBALES_H_ */
