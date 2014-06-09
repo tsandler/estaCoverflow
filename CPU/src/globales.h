@@ -13,15 +13,19 @@
 #include <libs/manejoDelPCB.h>
 #include <commons/log.h>
 #include <commons/config.h>
-#include <commons/collections/dictionary.h>
-#include <parser/parser.h>
-#include "funcionesParser.h"
 
 t_log *logs;
 t_length* tam;
 registroPCB *pcb;
-int socket_kernel, socket_umv;
-char* sentencia;
+t_config* config;
 t_dictionary* diccionarioDeVariables;
+int socket_kernel, socket_umv;
+unsigned char* stack;
+int desplazamiento;
+bool systemCall;
+int error; //TODO: no se si hace falta // variable de error por si el programa tiene que cortar la ejecucion
+
+AnSISOP_funciones functions;
+AnSISOP_kernel kernel_functions;
 
 #endif /* GLOBALES_H_ */

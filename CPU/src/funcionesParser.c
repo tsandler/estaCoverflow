@@ -6,135 +6,166 @@
  */
 
 #include "funcionesParser.h"
-#include "globales.h"
 
+void inicializarFuncionesParser(){
+	functions.AnSISOP_definirVariable = definirVariable;
+	functions.AnSISOP_obtenerPosicionVariable = obtenerPosicionVariable;
+	functions.AnSISOP_dereferenciar = dereferenciar;
+	functions.AnSISOP_asignar = asignar;
+	functions.AnSISOP_obtenerValorCompartida = obtenerValorCompartida;
+	functions.AnSISOP_asignarValorCompartida = asignarValorCompartida;
+	functions.AnSISOP_irAlLabel = irAlLabel;
+	functions.AnSISOP_llamarSinRetorno = llamarSinRetorno;
+	functions.AnSISOP_llamarConRetorno = llamarConRetorno;
+	functions.AnSISOP_finalizar = finalizar;
+	functions.AnSISOP_retornar = retornar;
+	functions.AnSISOP_imprimir = imprimir;
+	functions.AnSISOP_imprimirTexto = imprimirTexto;
+	functions.AnSISOP_entradaSalida = entradaSalida;
+
+	kernel_functions.AnSISOP_wait = wait;
+	kernel_functions.AnSISOP_signal = signal;
+}
+
+/* Primitiva que almacena en el stack y en el diccionario de variables a una variable, dejandola sin inicializar*/
 t_puntero definirVariable(t_nombre_variable identificador_variable){
-	tam->menu = DEFINIR_VARIABLE;
-	tam->length = sizeof(identificador_variable);
-	t_variable variable;
-
-	if (!enviarDatos(socket_umv, tam, &identificador_variable, logs))
-		log_error(logs, "No se pudieron enviar los datos para definir variable %c a la UMV", identificador_variable);
-	else
-		log_info(logs, "La variable %c se envio correctamente", identificador_variable);
-
-	if (!recibirDatos(socket_umv, tam, (void*)&variable, logs))
-		log_error(logs, "Se produjo un error al recibir la posicion de una variable luego de definirla");
-	else
-		log_info(logs, "La posicion de la variable se recibio correctamente");
-
-	dictionary_put(diccionarioDeVariables, &identificador_variable, &variable);
-	return variable.posicion;
+	t_puntero* posicion = malloc(sizeof(t_puntero));
+	*posicion = desplazamiento;
+	memcpy(stack + desplazamiento, &identificador_variable, 1);
+	desplazamiento += 5;
+	char variable[2];
+	variable[0] = identificador_variable;
+	variable[1] = '\0';
+	dictionary_put(diccionarioDeVariables, variable, posicion);
+	log_info(logs, "La variable %c fue definida correctamente", identificador_variable);
+	printf("Definiendo variable: %c\n", identificador_variable);
+	return *posicion;
 }
 
+/* Primitiva que obtiene del diccionario de variables la posicion de una variable */
 t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable){
-	tam->menu = OBTENER_POSICION_VARIABLE;
-	tam->length = sizeof(identificador_variable);
-	t_puntero posicion;
-
-	if (!enviarDatos(socket_umv, tam, &identificador_variable, logs))
-		log_error(logs, "Se produjo un error enviando los datos para obtener la posicion de la variable %c", identificador_variable);
-	else
-		log_info(logs, "El identificador de la variable %c para obtener su posicion se envio correctamente", identificador_variable);
-
-	if (!recibirDatos(socket_umv, tam, (void*)&posicion, logs)){
-		log_error(logs, "Se produjo un error recibiendo la posicion de una variable");
-		return -1;
-	}
-	log_info(logs, "La posicion de la variable se recibio correctamente");
-	return posicion;
+	t_puntero *posicion;
+	char variable[2];
+	variable[0] = identificador_variable;
+	variable[1] = '\0';
+	posicion = dictionary_get(diccionarioDeVariables, variable);
+	log_info(logs, "La posicion de la variable %c es %d", identificador_variable, *posicion);
+	printf("Posicion de la variable %c: %d\n", identificador_variable, *posicion);
+	return *posicion;
 }
 
+/* Primitiva que obtiene el valor de una direccion especifica */
 t_valor_variable dereferenciar(t_puntero direccion_variable){
-	tam->menu = DEREFERENCIAR;
-	tam->length = sizeof(direccion_variable);
-	t_valor_variable posicion;
-
-	if (!enviarDatos(socket_umv, tam, &direccion_variable, logs))
-		log_error(logs, "Se produjo un error enviando los datos para dereferenciar la variable %d", direccion_variable);
-	else
-		log_info(logs, "Se enviaron los datos para referenciar la variable %d", direccion_variable);
-
-	if (!recibirDatos(socket_umv, tam, (void*)&posicion, logs))
-		log_error(logs, "Se produjo un error recibiendo la posicion de una variable");
-	else
-		log_info(logs, "Se recibio la posicion de la variable correctamente");
-
-	return posicion;
+	t_valor_variable valor;
+	memcpy(&valor, stack + direccion_variable + 1, 4);
+	log_info(logs, "El valor de la direccion %d es %d", direccion_variable, valor);
+	printf("Desreferenciado la variable en la posicion %d con el valor %d\n", direccion_variable, valor);
+	return valor;
 }
 
+/* Primitiva que asigna el valor de una variable, almacenandola en el stack */
 void asignar(t_puntero direccion_variable, t_valor_variable valor ){
-	tam->menu = ASIGNAR;
-	t_val_variable variable;
-	variable.direccion_variable = direccion_variable;
-	variable.valor = valor;
-	tam->length = sizeof(variable);
-
-	if (!enviarDatos(socket_umv, tam, &variable, logs))
-		log_error(logs, "Se produjo un error enviando los datos para asignar el valor %d a la variable %d", valor, direccion_variable);
-	else
-		log_info(logs, "Se enviaron los datos para asignar el valor %d a la variable %d", valor, direccion_variable);
+	memcpy(stack + direccion_variable + 1, &valor, 4);
+	log_info(logs, "El valor %d fue asignado a la variable en la posicion %d", valor, direccion_variable);
+	printf("Asignando valor %d a la variable en la direccion %d\n", valor, direccion_variable);
 }
 
+/* Primitiva que pide al kernel el valor de una variable compartida */
 t_valor_variable obtenerValorCompartida(t_nombre_compartida variable){
 	tam->menu = OBTENER_VALOR_COMPARTIDA;
-	tam->length = sizeof(variable);
-	t_valor_variable valorVariable;
+	tam->length = strlen(variable)+1;
+	t_valor_variable *valorVariable = malloc(sizeof(t_valor_variable));
 
 	if (!enviarDatos(socket_kernel, tam, variable, logs))
 		log_error(logs, "Se produjo un error enviando la variable %s para obtener su valor", variable);
 	else
 		log_info(logs, "Se envio la variable %s para obtener su valor", variable);
 
-	if (!recibirDatos(socket_kernel, tam, (void*)&valorVariable, logs))
+	if (!recibirDatos(socket_kernel, tam, (void*)valorVariable, logs))
 		log_error(logs, "Se produjo un error recibiendo el valor de la variable");
 	else
 		log_info(logs, "Se recibio el valor de la variable correctamente");
 
-	return valorVariable;
+	return *valorVariable;
 }
 
+/* Primitiva que envia el valor a asignarle a una variable */
 t_valor_variable asignarValorCompartida(t_nombre_compartida variable, t_valor_variable valor){
 	tam->menu = ASIGNAR_VALOR_COMPARTIDA;
-	t_variable_asignar var;
-	var.valor = valor;
-	var.variable = variable;
-	tam->length = sizeof(var);
+	tam->length = sizeof(valor);
 
-	if (!enviarDatos(socket_kernel, tam, &var, logs))
-		log_error(logs, "Se produjo un error enviando la variable %s y el valor %d para asignarselo", variable, valor);
+	if (!enviarDatos(socket_kernel, tam, &valor, logs))
+		log_error(logs, "Se produjo un error enviando el valor %d para asignarselo", valor);
+
+	tam->length = strlen(variable) + 1;
+	if (!enviarDatos(socket_kernel, tam, variable, logs))
+		log_error(logs, "Se produjo un error enviando la variable %s", variable);
 	else
 		log_info(logs, "Se envio la variable %s para asignarle el valor %d", variable, valor);
+
 	return valor;
 }
 
+/* Primitiva que cambia el program counter al correspondiente de una etiqueta dada */
 void irAlLabel(t_nombre_etiqueta etiqueta){
-	tam->menu = IR_AL_LABEL;
-	tam->length = sizeof(etiqueta);
-
-	if (!enviarDatos(socket_kernel, tam, &etiqueta, logs)) //kernel o umv?
+	t_etiqueta* etiquetaAEnviar = malloc(sizeof(t_etiqueta));
+	etiquetaAEnviar->base = pcb->indice_etiquetas_funciones;
+	etiquetaAEnviar->offset = 0;
+	etiquetaAEnviar->tamanio = pcb->tamanio_indice_etiquetas_funciones;
+	tam->menu = PEDIR_INDICE_ETIQUETAS;
+	tam->length = sizeof(t_etiqueta);
+	char* etiquetas;
+	if (!enviarDatos(socket_umv, tam, etiquetaAEnviar, logs))
 		log_error(logs, "Se produjo un error enviando la etiqueta %s", etiqueta);
 	else
-		log_info(logs, "Se envio la etiqueta %s para ir al label", etiqueta);
+		log_info(logs, "Se envio lal etiqueta %s para ir al label", etiqueta);
+
+	if(!recibirDatos(socket_umv, tam, (void*)&etiquetas, logs))
+		log_error(logs, "Se produjo un error recibiendo el segmento de etiquetas");
+	else
+		log_error(logs, "Se recibio el segmento de etiquetas");
+
+	t_size tamanio = strlen(etiquetas) + 1;
+
+	pcb->program_counter = metadata_buscar_etiqueta(etiqueta, etiquetas, tamanio); //TODO: verificar si esto es asi
 }
 
+/* Primitiva que se invoca en los procedimientos, cambia el contexto de ejecucion a una etiqueta dada */
 void llamarSinRetorno(t_nombre_etiqueta etiqueta){
-	tam->menu = LLAMAR_SIN_RETORNO;
+	memcpy(stack+desplazamiento, &pcb->cursor_stack, 4);
+	desplazamiento += 4;
+	memcpy(stack+desplazamiento, &pcb->program_counter+1, 4);
+	desplazamiento += 4;
 
+	pcb->cursor_stack =(int*) stack + desplazamiento;
+
+	irAlLabel(etiqueta);
 }
 
+/* Primitiva que se invoca en las funciones, recibe la direccion donde retornar el valor y la etiqueta a la cual tiene que ir */
 void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar){
-	tam->menu = LLAMAR_CON_RETORNO;
+	llamarSinRetorno(etiqueta);
+	memcpy(stack+desplazamiento, &donde_retornar, 4);
+	pcb->cursor_stack = (int*) stack + desplazamiento;
 }
 
+/* Primitiva que finaliza el contexto actual */
 void finalizar(){
-	tam->menu = FINALIZAR;
+	memcpy(&pcb->program_counter, pcb->cursor_stack - 4, 4);
+	memcpy(&pcb->cursor_stack, pcb->cursor_stack - 8, 4);
+	systemCall = true;//FIXME: saber si se necesita un systemcall
 }
 
+/* Primitiva que finaliza el contexto actual y asigna el valor a retornar en su posicion correspondiente en el stack */
 void retornar(t_valor_variable retorno){
-	tam->menu = RETORNAR;
+	t_puntero* posicion = malloc(sizeof(t_puntero));
+	memcpy(posicion, pcb->cursor_stack - 4, 4);
+	asignar(*posicion, retorno);
+	pcb->cursor_stack -= 4;
+	finalizar();
 }
 
+/* Primitiva que envia al kernel un valor para mostrar por consola */
 void imprimir(t_valor_variable valor_mostrar){
 	tam->menu = IMPRIMIR;
 	tam->length = sizeof(valor_mostrar);
@@ -143,8 +174,11 @@ void imprimir(t_valor_variable valor_mostrar){
 		log_error(logs, "Se produjo un error enviando el valor %d para imprimir", valor_mostrar);
 	else
 		log_info(logs, "Se envio el valor %d para imprimirlo", valor_mostrar);
+
+	systemCall = true;
 }
 
+/* Primitiva que envia al kernel un texto para mostrar por consola */
 void imprimirTexto(char* texto){
 	tam->menu = IMPRIMIR_TEXTO;
 	tam->length = strlen(texto) + 1;
@@ -153,21 +187,39 @@ void imprimirTexto(char* texto){
 		log_error(logs, "Se produjo un error enviando el texto %s para imprimirlo", texto);
 	else
 		log_info(logs, "Se envio el texto %s para imprimirlo", texto);
+
+	systemCall = true;
 }
 
+/* Primitiva que le dice al kernel que fue a entrada y salida con un dispositivo por un determinado tiempo */
 void entradaSalida(t_nombre_dispositivo dispositivo, int tiempo){
+	systemCall = true;
 	tam->menu = ENTRADA_SALIDA;
+	tam->length = sizeof(int);
+	if (!enviarDatos(socket_kernel, tam, &tiempo, logs))
+		log_error(logs, "Se produjo un error enviando un tiempo de entrada y salida al kernel");
+	tam->length = strlen(dispositivo) + 1;
+	if (!enviarDatos(socket_kernel, tam, dispositivo, logs))
+		log_error(logs, "Se produjo un error enviando el nombre del dispositivo de entrada y salida al kernel");
 }
 
+/* Primitiva que envia la senial wait de un semaforo al kernel */
 void wait(t_nombre_semaforo identificador_semaforo){
 	tam->menu = WAIT;
 	tam->length = sizeof(identificador_semaforo);
+
 	if (!enviarDatos(socket_kernel, tam, &identificador_semaforo, logs))
 		log_error(logs, "Se produjo un error enviando la senial de wait al semaforo %s", identificador_semaforo);
 	else
 		log_info(logs, "Se envio correctamente la senial de wait al semaforo %s", identificador_semaforo);
+
+	if (!recibirDatos(socket_kernel, tam, (void*)&systemCall, logs))
+		log_error(logs, "Se produjo un error recibiendo el resultado del wait a un semaforo");
+	else
+		log_info(logs, "Se recibio correctamente el resultado de la senial wait del kernel");
 }
 
+/* Primitiva que envia la senial de signal de un semaforo al kernel */
 void signal(t_nombre_semaforo identificador_semaforo){
 	tam->menu = SIGNAL;
 	tam->length = sizeof(identificador_semaforo);

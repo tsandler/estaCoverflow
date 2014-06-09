@@ -11,32 +11,15 @@
 #include "../parser/parser.h"
 
 typedef struct{
-	int longitud;
-	t_puntero posicion;
-}t_variable;
-
-typedef struct{
-	t_nombre_compartida variable;
-	t_valor_variable valor;
-}t_variable_asignar;
-
-typedef struct{
-	t_puntero direccion_variable;
-	t_valor_variable valor;
-}t_val_variable;
+	int base;
+	int offset;
+	int tamanio;
+}t_etiqueta;
 
 typedef enum{
-	DEFINIR_VARIABLE,
-	OBTENER_POSICION_VARIABLE,
-	DEREFERENCIAR,
-	ASIGNAR,
 	OBTENER_VALOR_COMPARTIDA,
 	ASIGNAR_VALOR_COMPARTIDA,
-	IR_AL_LABEL,
-	LLAMAR_SIN_RETORNO,
-	LLAMAR_CON_RETORNO,
-	FINALIZAR,
-	RETORNAR,
+	PEDIR_INDICE_ETIQUETAS,
 	IMPRIMIR,
 	IMPRIMIR_TEXTO,
 	ENTRADA_SALIDA,

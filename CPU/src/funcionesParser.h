@@ -8,9 +8,12 @@
 #ifndef FUNCIONESPARSER_H_
 #define FUNCIONESPARSER_H_
 
-#include <parser/parser.h>
-#include <commons/collections/dictionary.h>
 #include <libs/estructurasParser.h>
+#include <parser/metadata_program.h>
+#include "globales.h"
+#include <string.h>
+
+void inicializarFuncionesParser();
 
 t_puntero definirVariable(t_nombre_variable identificador_variable);
 t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable);
@@ -28,6 +31,5 @@ void imprimirTexto(char* texto);
 void entradaSalida(t_nombre_dispositivo dispositivo, int tiempo);
 void wait(t_nombre_semaforo identificador_semaforo);
 void signal(t_nombre_semaforo identificador_semaforo);
-
 
 #endif /* FUNCIONESPARSER_H_ */
