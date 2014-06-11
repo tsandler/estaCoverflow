@@ -14,10 +14,11 @@
 #include <commons/log.h>
 
 t_log *logs;
-
 t_length *tam;
+t_config *config;
 
 int socket_kernel;
 char* sentencia;
+char* path;
 
 #endif /* GLOBALES_H_ */
