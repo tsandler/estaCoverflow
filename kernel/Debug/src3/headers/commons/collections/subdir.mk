@@ -4,26 +4,23 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../src/kernel.c \
-../src/planificador_corto_plazo.c \
-../src/planificador_largo_plazo.c \
-../src/sockets.c 
+../src3/headers/commons/collections/dictionary.c \
+../src3/headers/commons/collections/list.c \
+../src3/headers/commons/collections/queue.c 
 
 OBJS += \
-./src/kernel.o \
-./src/planificador_corto_plazo.o \
-./src/planificador_largo_plazo.o \
-./src/sockets.o 
+./src3/headers/commons/collections/dictionary.o \
+./src3/headers/commons/collections/list.o \
+./src3/headers/commons/collections/queue.o 
 
 C_DEPS += \
-./src/kernel.d \
-./src/planificador_corto_plazo.d \
-./src/planificador_largo_plazo.d \
-./src/sockets.d 
+./src3/headers/commons/collections/dictionary.d \
+./src3/headers/commons/collections/list.d \
+./src3/headers/commons/collections/queue.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
-src/%.o: ../src/%.c
+src3/headers/commons/collections/%.o: ../src3/headers/commons/collections/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C Compiler'
 	gcc -I"/home/utnso/workspace/tp-2014-1c-out-of-range/commons" -O0 -g3 -Wall -lrt -pthread -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
