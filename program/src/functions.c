@@ -41,8 +41,8 @@ char* obtenerPrograma(char* path){
 
 /* Funcion que se conecta al kernel y devuelve el socket al que conecto */
 int conectarKernel(){
-	char *ip = config_get_string_value(config, "IP");
-	int port = config_get_int_value(config, "PUERTO_KERNEL");
+	char *ip = "127.0.0.1";//config_get_string_value(config, "IP");
+	int port = 5000;//config_get_int_value(config, "PUERTO_KERNEL");
 	int socket = conectarCliente(ip, port, logs);
 	if (socket < 0)
 		log_error(logs, "El cliente no se pudo conectar correctamente");
@@ -52,8 +52,9 @@ int conectarKernel(){
 
 /* Funcion para inicializar las variables globales */
 void inicializarVariables(){
-	path = getenv("ANSISOP_CONFIG");
-	config = config_create(path);
+	//path = getenv("ANSISOP_CONFIG");
+	//config = config_create(path);
+	tam = malloc(sizeof(t_length));
 	logs = log_create("log", "program.c", 0, LOG_LEVEL_TRACE);
 }
 
