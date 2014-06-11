@@ -51,6 +51,7 @@ registroPCB *queue_pop_min(t_queue *self) {
 
 }
 
+
 void deNewAReady(void){
 	while(1){
 
@@ -77,6 +78,7 @@ void deNewAReady(void){
 
 }
 
+}
 
 
 void plp(void* ptr){
@@ -117,7 +119,7 @@ void plp(void* ptr){
 
 
 
-}
+
 
 
 

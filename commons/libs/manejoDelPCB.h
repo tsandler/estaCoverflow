@@ -12,29 +12,29 @@
 #include <stdlib.h>
 #include "../parser/metadata_program.h"
 
-int ultimoIdentificador;
+
 
 typedef struct registroPCB{
     int pid;
 
-	int segemento_stack;
-	int cursor_stack;
+	int* segemento_stack;
+	int* cursor_stack;
 	int tamanio_contexto;
 
-	int segemento_codigo;
+	int* segemento_codigo;
 	int tamanio_indice_codigo ;
 	t_intructions* indice_codigo;
 	int program_counter;
 
 	char* indice_etiquetas_funciones;
-	int puntero_etiquetas_funciones;
+	int* puntero_etiquetas_funciones;
 	int tamanio_indice_etiquetas_funciones;
+
+	int peso;
+	int fd;
 
 }registroPCB;
 
-registroPCB crearNuevoPCB();
-registroPCB llenarPCB();
-void inicializar();
-void mostrar();
+registroPCB* armarPCB(char* program, int fd);
 
 #endif /* MANEJODELPCB_H_ */
