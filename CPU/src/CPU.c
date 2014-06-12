@@ -8,60 +8,95 @@
  ============================================================================
  */
 
-#include <stdio.h>
 #include <stdlib.h>
-#include <libs/sockets.h>
-#include <commons/log.h>
-#include <commons/config.h>
+#include "globales.h"
+#include "functions.h"
+#include "funcionesParser.h"
 
-typedef struct{
-	t_log *logs;
-	int port;
-}informacionUMV;
+int main(int argc, char** argv){
 
-void *conectarUMV(void *);
+	logs = log_create("log", "CPU.c", 0, LOG_LEVEL_TRACE);
 
-int main(void) {
-	informacionUMV var;
-	t_config *config = config_create("config.cnf");
-	var.logs = log_create("log", "CPU.c", 0, LOG_LEVEL_TRACE);
-	pthread_t thr;
-
-	int r1;
-	var.port = config_get_int_value(config, "PORT");
-
-	r1 = phtread_create(&thr, NULL, conectarUMV, (void*) var);
-
-	if (r1 != 0){
-		log_error(var.logs, "Se produjo un error en el hilo que se conecta con la UMV");
+	if (argc < 2){
+		log_error(logs, "No se pasaron parametros.");
+		log_destroy(logs);
+		return 0;
 	}
 
-	/*
+	config = config_create(argv[1]);
+	diccionarioDeVariables = dictionary_create();
+	tam = malloc(sizeof(t_length));
 
-	t_log *logs = log_create("log", "CPU.c", 0, LOG_LEVEL_TRACE);
-	int s;
-	char *ip = config_get_string_value(config, "IP");
-	int port = config_get_int_value(config, "PORT");
-
-	s = conectarCliente(ip, port, logs);
-	if (s < 0){
-		log_error(logs, "No se pudo conectar al servidor");
+	if (!archivoDeConfiguracionValido()){
+		log_error(logs, "El archivo de configuracion no tiene todos los campos necesarios");
+		liberarEstructuras();
+		return 0;
 	}
 
-	goto salto;
+	socket_umv = conectarUMV();
+	socket_kernel = conectarKernel();
+	int quantum = recibirQuantum();
 
-	printf("esto no corre");
+	if(socket_kernel < 0 || socket_umv < 0 || quantum < 0){ //Si no se conecto al kernel o UMV no puede continuar y termina la ejecucion
+		log_error(logs, "El programa tuvo que finalizar insatisfactoriamente");
+		liberarEstructuras();
+		return 0;
+	}
 
-	salto:
+	inicializarFuncionesParser();
+	int cont;
+	char* sentencia;
 
+	while (1){
+		desplazamiento = 0; //FIXME: ver cursor de stack en la PCB (stack pointer)
+		cont = 0;
+		if(!recibirDatos(socket_kernel, tam, (void*)&pcb, logs))
+			log_error(logs, "Se produjo un error al recibir el PCB del kernel");
 
-	config_destroy(config);*/
+		tam->length = sizeof(pcb->puntero_etiquetas_funciones);
+		tam->menu = LEER_SEGMENTO;
+
+		if(!enviarDatos(socket_umv, tam, &pcb->puntero_etiquetas_funciones, logs))
+			log_error(logs, "Se produjo un error enviando la base a la UMV");
+
+		if(!recibirDatos(socket_umv, tam, (void*)&stack, logs))
+			log_error(logs, "Se produjo un error recibiendo el segmento");
+
+		systemCall = false;
+
+		while (quantum > cont && !systemCall){
+
+			pcb->program_counter++; //FIXME: no aumenta siempre
+			tam->length = sizeof(registroPCB);
+			tam->menu = PEDIR_SENTENCIA;
+			if (!enviarDatos(socket_umv, tam, pcb, logs))//FIXME: enviar base, offset y tamanio
+				log_error(logs, "Se produjo un error al enviar el indice de codigo.");
+
+			if (!recibirDatos(socket_umv, tam, (void*)&sentencia, logs))
+				log_error(logs, "Se produjo un error al recibir la sentencia.");
+
+			analizadorLinea(sentencia, &functions, &kernel_functions);
+
+			cont++;
+		}
+
+		if(tam->menu != FINALIZAR)//TODO: tiene que salir del while o se queda esperando?
+			tam->menu = CONCLUYO_UN_QUANTUM;
+
+		tam->length = sizeof(registroPCB);
+
+		if (!enviarDatos(socket_kernel, tam, pcb, logs))
+			log_error(logs, "Se produjo un error al notificar al pcp que concluyo un quantum.");
+
+		tam->menu = RETORNO_DE_STACK;
+		tam->length = sizeof(stack);
+		if(!enviarDatos(socket_umv, tam, stack, logs))
+			log_error(logs, "Se produjo un error al devolverle el stack a la umv");
+	}
+
+	cerrarSocket(socket_kernel);
+	cerrarSocket(socket_umv);
+	liberarEstructuras();
+
 	return 0;
-}
-
-void *conectarUMV(void* var){
-	informacionUMV *aux;
-	aux = (informacionUMV*) var;
-	crearServidor(aux->port, aux->logs);
-	return (void*) aux;
 }

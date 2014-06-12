@@ -11,7 +11,7 @@
 #include <libs/estructurasParser.h>
 #include <parser/metadata_program.h>
 #include "globales.h"
-#include <string.h>
+#include <commons/string.h>
 
 void inicializarFuncionesParser();
 

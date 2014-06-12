@@ -23,7 +23,6 @@ int socket_kernel, socket_umv;
 unsigned char* stack;
 int desplazamiento;
 bool systemCall;
-int error; //TODO: no se si hace falta // variable de error por si el programa tiene que cortar la ejecucion
 
 AnSISOP_funciones functions;
 AnSISOP_kernel kernel_functions;
