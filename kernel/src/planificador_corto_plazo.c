@@ -6,7 +6,7 @@
  */
 
 #include "planificador_corto_plazo.h"
-#include "sockets.h"
+#include "socketsKernel.h"
 #include <commons/config.h>
 #include <commons/collections/queue.h>
 

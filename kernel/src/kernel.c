@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
 
 /////////////////////////////////////////////////////////////////////////
 	char* str2;
-	str2 = "/home/utnso/workspace/tp-2014-1c-out-of-range/kernel/";
+	str2 = "/home/utnso/git/tp-2014-1c-out-of-range/kernel/";
 	char * str3 = (char *) malloc(
 			1 + strlen("config.cnf") + strlen(str2));
 	strcpy(str3, str2);
