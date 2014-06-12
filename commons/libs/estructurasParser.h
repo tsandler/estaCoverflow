@@ -26,6 +26,7 @@ typedef enum{
 	WAIT,
 	SIGNAL,
 	CONCLUYO_UN_QUANTUM,
+	FINALIZAR,
 }t_menu;
 
 #endif /* ESTRUCTURASPARSER_H_ */
