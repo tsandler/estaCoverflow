@@ -126,8 +126,9 @@ void irAlLabel(t_nombre_etiqueta etiqueta){
 		log_error(logs, "Se recibio el segmento de etiquetas");
 
 	t_size tamanio = strlen(etiquetas) + 1;
+	char* segmentoEtiquetas = string_from_format("%s", &etiquetas);//FIXME: asegurarme si esto lo manejo como string o no
 
-	pcb->program_counter = metadata_buscar_etiqueta(etiqueta, etiquetas, tamanio); //TODO: verificar si esto es asi
+	pcb->program_counter = metadata_buscar_etiqueta(etiqueta, segmentoEtiquetas, tamanio); //TODO: verificar si esto es asi
 }
 
 /* Primitiva que se invoca en los procedimientos, cambia el contexto de ejecucion a una etiqueta dada */
@@ -138,7 +139,7 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta){
 	desplazamiento += 4;
 
 	pcb->cursor_stack =(int*) stack + desplazamiento;
-
+	log_info(logs, "Se llamo a la funcion llamarSinRetorno con la etiqueta %s", etiqueta);
 	irAlLabel(etiqueta);
 }
 
@@ -146,7 +147,10 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta){
 void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar){
 	llamarSinRetorno(etiqueta);
 	memcpy(stack+desplazamiento, &donde_retornar, 4);
+	desplazamiento += 4;
+
 	pcb->cursor_stack = (int*) stack + desplazamiento;
+	log_info(logs, "Se llamo a la funcion llamarConRetorno con la etiqueta %s y puntero %d", etiqueta, donde_retornar);
 }
 
 /* Primitiva que finaliza el contexto actual */
@@ -154,6 +158,7 @@ void finalizar(){
 	memcpy(&pcb->program_counter, pcb->cursor_stack - 4, 4);
 	memcpy(&pcb->cursor_stack, pcb->cursor_stack - 8, 4);
 	systemCall = true;//FIXME: saber si se necesita un systemcall
+	log_info(logs, "Se llamo a la funcion finalizar");
 }
 
 /* Primitiva que finaliza el contexto actual y asigna el valor a retornar en su posicion correspondiente en el stack */
@@ -163,6 +168,7 @@ void retornar(t_valor_variable retorno){
 	asignar(*posicion, retorno);
 	pcb->cursor_stack -= 4;
 	finalizar();
+	log_info(logs, "Se llamo a la funcion retornar");
 }
 
 /* Primitiva que envia al kernel un valor para mostrar por consola */
@@ -193,7 +199,6 @@ void imprimirTexto(char* texto){
 
 /* Primitiva que le dice al kernel que fue a entrada y salida con un dispositivo por un determinado tiempo */
 void entradaSalida(t_nombre_dispositivo dispositivo, int tiempo){
-	systemCall = true;
 	tam->menu = ENTRADA_SALIDA;
 	tam->length = sizeof(int);
 	if (!enviarDatos(socket_kernel, tam, &tiempo, logs))
@@ -201,6 +206,7 @@ void entradaSalida(t_nombre_dispositivo dispositivo, int tiempo){
 	tam->length = strlen(dispositivo) + 1;
 	if (!enviarDatos(socket_kernel, tam, dispositivo, logs))
 		log_error(logs, "Se produjo un error enviando el nombre del dispositivo de entrada y salida al kernel");
+	systemCall = true;
 }
 
 /* Primitiva que envia la senial wait de un semaforo al kernel */

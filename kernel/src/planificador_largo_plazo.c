@@ -5,7 +5,7 @@
 */
 
 #include "planificador_largo_plazo.h"
-#include "sockets.h"
+#include "socketsKernel.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <commons/config.h>

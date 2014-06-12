@@ -16,11 +16,11 @@ int main(int argc, char **argv) {
 
 	inicializarVariables();
 
-	if (!archivoDeConfiguracionValido()){
+/*	if (!archivoDeConfiguracionValido()){
 		log_error(logs, "El archivo de configuracion no tiene todos los campos necesarios");
 		liberarEstructuras();
 		return 0;
-	}
+	}*/
 
 
 	socket_kernel = conectarKernel();
@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
 	}
 	log_info(logs, "El proceso se conecto correctamente con el kernel");
 
-	char* programa = obtenerPrograma(argv[1]);
+	char* programa = obtenerPrograma("facil.ansisop");
 	enviarProgramaAlKernel(programa);
 
 	while (tam->menu != FINALIZAR){
