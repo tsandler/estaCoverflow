@@ -7,19 +7,19 @@ C_SRCS += \
 ../src/kernel.c \
 ../src/planificador_corto_plazo.c \
 ../src/planificador_largo_plazo.c \
-../src/sockets.c 
+../src/socketsKernel.c 
 
 OBJS += \
 ./src/kernel.o \
 ./src/planificador_corto_plazo.o \
 ./src/planificador_largo_plazo.o \
-./src/sockets.o 
+./src/socketsKernel.o 
 
 C_DEPS += \
 ./src/kernel.d \
 ./src/planificador_corto_plazo.d \
 ./src/planificador_largo_plazo.d \
-./src/sockets.d 
+./src/socketsKernel.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

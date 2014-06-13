@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <commons/collections/queue.h>
 #include <semaphore.h>
+#include <commons/log.h>
 
 
 t_config *config;
@@ -31,6 +32,7 @@ sem_t mutexNEW;
 sem_t mutexREADY;
 sem_t gradoProg;
 sem_t hayAlgo;
+t_log *logs;
 
 int main(int argc, char *argv[]) {
 
@@ -53,6 +55,7 @@ int main(int argc, char *argv[]) {
 	sem_init(&mutexREADY, 0, 1);
 	sem_init(&gradoProg, 0, gradoMultiprogramacion-1);
 	sem_init(&hayAlgo, 0, 0);
+	logs = log_create("log_Principal","kernel.c",0,LOG_LEVEL_TRACE);
 
 	pthread_t thread1, thread2;
 
@@ -60,11 +63,9 @@ int main(int argc, char *argv[]) {
 
 	iret1 = pthread_create(&thread1, NULL, plp, NULL );
 
-	if (iret1)
-
-	{
-
-		fprintf(stderr, "Error - pthread_create() return code: %d\n", iret1);
+	if (iret1){
+		log_error(logs,"Error en la creacion del hilo PLP");
+		log_destroy(logs);
 
 		exit(EXIT_FAILURE);
 
@@ -72,11 +73,9 @@ int main(int argc, char *argv[]) {
 
 	iret2 = pthread_create(&thread2, NULL, pcp, NULL );
 
-	if (iret2)
-
-	{
-
-		fprintf(stderr, "Error - pthread_create() return code: %d\n", iret2);
+	if (iret2){
+		log_error(logs, "Error en la creacion del hilo PCP");
+		log_destroy(logs);
 
 		exit(EXIT_FAILURE);
 
@@ -92,6 +91,9 @@ int main(int argc, char *argv[]) {
 	sem_destroy(&gradoProg);
 
 	exit(EXIT_SUCCESS);
+
+	log_destroy(logs);
+	config_destroy(config);
 
 	return EXIT_SUCCESS;
 

@@ -14,6 +14,7 @@
 #include <semaphore.h>
 #include <commons/collections/queue.h>
 #include <libs/manejoDelPCB.h>
+#include <commons/log.h>
 extern t_config *config;
 extern t_queue *NEW;
 extern t_queue *READY;
@@ -21,7 +22,7 @@ extern sem_t mutexNEW;
 extern sem_t mutexREADY;
 extern sem_t gradoProg;
 extern sem_t hayAlgo;
-
+extern t_log *logs;
 
 
 /*
@@ -33,7 +34,8 @@ extern sem_t hayAlgo;
 registroPCB *queue_pop_min(t_queue *self) {
 	int tamanio=queue_size(self);
 	registroPCB* minPCB = queue_pop(self);
-	printf ("el pop saco el peso %d \n", minPCB->peso);
+
+	log_info(logs,"Se saco el programa seg{un SJN");
 	int i=1;
 	while(i<tamanio){
 		registroPCB* otroPCB = queue_pop(self);
@@ -60,23 +62,24 @@ void deNewAReady(void){
 			sem_wait(&mutexNEW);
 
 			int value;
+
 			sem_getvalue(&gradoProg,&value);
-			printf("gradoprog = %d \n",value);
-			printf("en la cola New HAY %d \n", queue_size(NEW));
+			log_info(logs, "El grado de multiprogramacion es : %i \n",value);
+			log_info(logs,"En la cola New hay: %i \n",queue_size(NEW));
 			registroPCB* unPCB=queue_pop_min(NEW);
-			printf ("el pop saco el peso %d \n", unPCB->peso);
-			printf("en la cola DESPUES New HAY %d \n", queue_size(NEW));
+			log_info(logs,"El pop saco el peso %d \n", unPCB->peso);
+			log_info(logs,"En la cola NEW hay %d \n",queue_size(NEW));
 			sem_post(&mutexNEW);
 
 			sem_wait(&mutexREADY);
 
-//			printf("en la cola READY HAY %d \n", queue_size(READY));
+			log_info(logs,"En la cola Ready Hay %i \n", queue_size(READY));
 			queue_push(READY,unPCB);
-			printf("en la cola DESPUES READY HAY %d \n", queue_size(READY));
+			log_info(logs,"En la cola Ready Hay %d \n",queue_size(READY));
 
 			sem_post(&mutexREADY);
 
-}
+	}
 
 }
 
@@ -92,30 +95,20 @@ void plp(void* ptr){
 
 	int iret1 = pthread_create(&thread1, NULL, openSocketServerPLP,(void*)port);
 
-		if (iret1)
-
-		{
-
-			fprintf(stderr, "Error - pthread_create() return code: %d\n", iret1);
-
+		if (iret1){
+			log_info(logs, "Error en la creacion del hilo openSocketServerPLP");
 			exit(EXIT_FAILURE);
-
-
 		}
 
 	int iret2 = pthread_create(&thread2, NULL, deNewAReady,(void*)port);
 
 		if (iret2){
-			fprintf(stderr, "Error - pthread_create() return code %d\n", iret2);
+			log_info(logs,"Error en la creacion del hilo deNewAReady");
 			exit (EXIT_FAILURE);
 		}
 
 
-
-
-
-
-		}
+}
 
 
 
