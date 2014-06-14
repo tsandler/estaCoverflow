@@ -1,3 +1,5 @@
+
+#include "socketsKernel.h"
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <sys/types.h>
@@ -8,15 +10,17 @@
 #include <string.h>
 #include <errno.h>
 #include "commons/collections/queue.h"
-#include "socketsKernel.h"
 #include <libs/manejoDelPCB.h>
 #include <semaphore.h>
+#include <libs/sockets.h>
 #define BROKEN "BROKEN"
 #define MAXBUFFSIZE 1024
 #define GREAT "GREAT"
+
 extern t_queue *NEW;
 extern sem_t mutexNEW;
 extern sem_t hayAlgo;
+
 int openSocketClient(int port, char* ip) {
 
 	int unSocket;
@@ -53,6 +57,7 @@ char* sendMessage(int sockfd, char *msg) {
 }
 
 char* recieveMessage(int sock) {
+	//int recibirDatos(int socket, tam, void** datos, t_log* logs);
 
 	char *buffer = (char *) malloc(MAXBUFFSIZE);
 
