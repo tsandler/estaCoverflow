@@ -86,27 +86,29 @@ void deNewAReady(void){
 
 void plp(void* ptr){
 
-	pthread_t thread1;
-	pthread_t thread2;
+	pthread_t thread4;
+	pthread_t thread5;
 	int port=config_get_int_value(config, "PUERTO_PROG");
 
 
 
 
-	int iret1 = pthread_create(&thread1, NULL, openSocketServerPLP,(void*)port);
+	int iret1 = pthread_create(&thread4, NULL, openSocketServerPLP,(void*)port);
 
 		if (iret1){
 			log_info(logs, "Error en la creacion del hilo openSocketServerPLP");
 			exit(EXIT_FAILURE);
 		}
 
-	int iret2 = pthread_create(&thread2, NULL, deNewAReady,(void*)port);
+	int iret2 = pthread_create(&thread5, NULL, deNewAReady,(void*)port);
 
 		if (iret2){
 			log_info(logs,"Error en la creacion del hilo deNewAReady");
 			exit (EXIT_FAILURE);
 		}
+		pthread_join(thread4, NULL ); //esperar a q termine el otro
 
+		pthread_join(thread5, NULL );
 
 }
 

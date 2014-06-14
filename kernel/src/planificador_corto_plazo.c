@@ -9,6 +9,8 @@
 #include "socketsKernel.h"
 #include <commons/config.h>
 #include <commons/collections/queue.h>
+#include <pthread.h>
+#include <stdlib.h>
 
 extern t_config *config;
 extern t_queue *NEW;
@@ -18,13 +20,21 @@ t_queue *EXEC;
 t_queue *BLOCK;
 t_queue *EXIT;
 
-void pcp(void* ptr){
+void pcp(void* ptr) {
 	EXEC = queue_create();
 	BLOCK = queue_create();
 	EXIT = queue_create();
+	//pthread_t thread1;
+	pthread_t thread3;
+	int port = config_get_int_value(config, "PUERTO_CPU");
+	int iret2 = pthread_create(&thread3, NULL, openSocketServerPCP,(void*)port);
 
-	int port=config_get_int_value(config, "PUERTO_CPU");
-		openSocketServerPCP(port);
+	if (iret2) {
+		//log_info(logs,"Error en la creacion del hilo deNewAReady");
+		exit(EXIT_FAILURE);
+	}
+
+
 }
 
 
