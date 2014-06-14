@@ -26,10 +26,10 @@ int obtener_nuevo_nroSeg(t_list *listaSeg);
 bool sort_nroSeg(tablaSegUMV* unElem, tablaSegUMV* otroElem);
 bool sort_mayor_hueco(nodoHuecos* unElem, nodoHuecos* otroElem);
 bool sort_mayor_dirLogica(tablaSegUMV* unElem, tablaSegUMV* otroElem);
-void criterio_iterate(tablaSegUMV *unElem);
+void elimina_segmento_agrega_hueco(tablaSegUMV *unElem);
 
-nodoHuecos *first_fit(int tamanio);
-nodoHuecos *worst_fit();
+char *first_fit(int tamanio);
+char *worst_fit(int tamanio);
 
 void retardo();
 void cambiar_retardo(int retardoNuevo);
@@ -43,6 +43,9 @@ void imprime_campos_listatablaSegUMV(tablaSegUMV *unElem);
 void imprime_campos_listahuecos(nodoHuecos *unElem);
 void imprime_estado_mem_ppal();
 void imprime_estructuras_memoria();
+
+bool archivo_config_valido();
+void inicializar_var_config();
 
 
 #endif /* FUNCTIONS_H_ */

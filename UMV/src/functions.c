@@ -3,41 +3,38 @@
 
 /* Funcion que solicita el bloque de memoria inicial para la UMV y
 crea estructuras para el manejo de la UMV. */
-void inicializar_umv(int tamanioUMV){
-	ramUMV = malloc(tamanioUMV);
-	ramUMVinicial = ramUMV;
-	if(!ramUMV)
-		log_error(logs,"La UMV no se inicializo correctamente");
-	else
-		log_info(logs,"La UMV se inicializo correctamente");
+void inicializar_umv(int tamanioUMV){  //ANDA :D
 
 	tablaPidSeg = dictionary_create();
 	listaHuecos = list_create();
 	nodoHuecos* unElem= malloc(sizeof(nodoHuecos));
-	unElem->dirFisica=ramUMVinicial;
+	unElem->dirFisica=malloc(tamanioUMV);
 	unElem->tamanioSegmento=tamanioUMV;
-	list_add(listaHuecos, (void*)unElem);
+	list_add(listaHuecos,unElem);
 }
 
 /*Funcion que elimina estructuras del manejo de la UMV liberando el bloque de memoria principal*/
-void eliminarUMV(){
+void eliminarUMV(){ //ANDA :D
 
+	if(!dictionary_is_empty(tablaPidSeg))
+		dictionary_clean(tablaPidSeg);
 	dictionary_destroy(tablaPidSeg);
 	list_clean(listaHuecos);
-	free(ramUMV);
-	free(ramUMVinicial);
+	list_destroy(listaHuecos);
 }
 
-/* Funcion que crea y agrega un segmento a la lista de segmentos, segun pid */
+/* Funcion que crea y agrega un segmento a la lista de segmentos, segun pid. retorna la direccion logica del segmento */
 int crear_agregar_segmento(int pidInt, int tamanio){
 	int nroSeg=0;
-	char* pid = (char*)string_itoa(pidInt);
+	char* pid = string_itoa(pidInt);
 	t_list *listaSeg;
 	tablaSegUMV *unElem = malloc(sizeof(tablaSegUMV));
 
 	unElem->tamanioSegmento= tamanio;
 	unElem->dirLogica= obtener_proxima_dir_logica(tamanio,pid);
+	log_debug(logs,"Se obtuvo la dirLogica");
 	unElem->dirFisica = obtener_proxima_dirFisica(tamanio);
+	log_debug(logs,"Se obtuvo la dirFisica");
 	if(dictionary_is_empty(tablaPidSeg) || !(dictionary_has_key(tablaPidSeg, pid))){
 		unElem->idSegmento=1;
 		listaSeg = list_create();
@@ -66,24 +63,26 @@ void destruir_segmentos(int pidInt){
 
 	if( dictionary_has_key(tablaPidSeg, pid) ){
 		t_list* listaSeg = dictionary_get(tablaPidSeg,pid);
-		list_iterate(listaSeg,(void*)criterio_iterate);
+		list_iterate(listaSeg,(void*)elimina_segmento_agrega_hueco);
 		dictionary_remove(tablaPidSeg,pid);
-		if( !dictionary_has_key(tablaPidSeg, pid)){
-			log_info(logs,"Los segmentos se eliminaron correctamente");
-			free(pid);
-		}else
+
+		if( dictionary_has_key(tablaPidSeg, pid)){
 			log_error(logs,"Los sementos no se eliminaron");
-	}else
+		}else
+			log_info(logs,"Los segmentos se eliminaron correctamente");
+	}else{
 		log_error(logs,"Se intento eliminar segmentos no existentes");
+		free(pid);
+	}
 }
 
 /* Funcion que elimina un segmento y agrega un nodo a la lista de huecos */
-void criterio_iterate(tablaSegUMV *unElem){
-	nodoHuecos* nodoNuevo = malloc(sizeof(nodoHuecos));
+void elimina_segmento_agrega_hueco(tablaSegUMV *unElem){
+	nodoHuecos* nodoNuevo=malloc(sizeof(nodoHuecos));
 	nodoNuevo->dirFisica = unElem->dirFisica;
 	nodoNuevo->tamanioSegmento = unElem->tamanioSegmento;
 	free(unElem);
-	list_add(listaHuecos, (void*)nodoNuevo);
+	list_add(listaHuecos,nodoNuevo);
 }
 
 /* Funcion que retorna el numero de segmento para asignarselo a un nuevo segmento */
@@ -97,8 +96,9 @@ int obtener_nuevo_nroSeg(t_list *listaSeg){
 /* Funcion que retorna una dirLogica para asignarsela a un nuevo segmento */
 
 int obtener_proxima_dir_logica(int tamanio, char* pid){
-	t_list* listaSeg = dictionary_get(tablaPidSeg,pid);
-	if(!list_is_empty(listaSeg)){
+	log_debug(logs,"Entra a obtener direccion logica");
+	if(dictionary_has_key(tablaPidSeg,pid)){
+		t_list* listaSeg = dictionary_get(tablaPidSeg,pid);
 		list_sort(listaSeg,(void*)sort_mayor_dirLogica);
 		tablaSegUMV* unElem = list_get(listaSeg,0);
 		return unElem->dirLogica + unElem->tamanioSegmento + 1;
@@ -106,23 +106,19 @@ int obtener_proxima_dir_logica(int tamanio, char* pid){
 		return 0;
 }
 
-char *obtener_proxima_dirFisica(int tamanio){
-	nodoHuecos* unElem;
-	switch(algoritmo){
-		case FIRST_FIT:
-			log_info(logs,"Algoritmo de asignación: First-Fit");
-			unElem = first_fit(tamanio);
-			break;
-		case WORST_FIT:
-			log_info(logs,"Algoritmo de asignación: Worst-Fit");
-			unElem = worst_fit(tamanio);
-			break;
-		default:
-			log_error(logs,"ALGORITMO NO VALIDO");
-	}
-	return unElem->dirFisica;
-}
 
+char *obtener_proxima_dirFisica(int tamanio){
+	log_debug(logs,"Entra a obtener dir fisica");
+	switch(algoritmoActual){
+		case FIRST_FIT:
+			log_debug(logs,"Algoritmo de asignación: First-Fit");
+			return first_fit(tamanio);
+		case WORST_FIT:
+			log_debug(logs,"Algoritmo de asignación: Worst-Fit");
+			return worst_fit(tamanio);
+	}
+	return NULL;
+}
 
 /*Funcion que lee un segmento de la umv y retorna un puntero a la posicion solicitada */
 char *leer_segmento(int dirLog, int tamanioALeer, int offset){ //solicitar_memoria_desde_una_pos();
@@ -141,35 +137,29 @@ char *leer_segmento(int dirLog, int tamanioALeer, int offset){ //solicitar_memor
 			return destino;
 		}else
 			log_error(logs,"Segmentation fault");
-		perror("SEGMENTATION FAULT");
 	}else
 		log_error(logs,"se intento acceder a una base inexistente");
 	return NULL;
 }
 
 void escribir_segmento(int dirLog, int tamanioAEscribir, int offset, void* buffer){
-
 	bool buscar_dirLogica(tablaSegUMV* unElem){
 		return dirLog == unElem->dirLogica;
 	}
-
 	t_list* listaSeg= dictionary_get(tablaPidSeg,string_itoa(pidActive));
 	tablaSegUMV* unElem= list_find(listaSeg,(void*)buscar_dirLogica);
-
 	if(unElem){
 		log_info(logs,"La direccion logica existe");
 		if(unElem->dirFisica + offset + tamanioAEscribir <= unElem->dirFisica + unElem->tamanioSegmento){
 			char* espacioSegmento = unElem->dirFisica + offset;
-			memcpy((void*)espacioSegmento,buffer,tamanioAEscribir);
+			memcpy(espacioSegmento,buffer,tamanioAEscribir);
 			printf("El segmento fue escrito");
 			log_info(logs,"El segmento fue escrito");
 		}else{
 			log_error(logs,"SEGMENTATION FAULT");
-			perror("SEGMENTATION FAULT");
 		}
 	}else{
 		log_error(logs,"La direccion logica no existe");
-		perror("DIRECCION LOGICA ERRONEA");
 	}
 }
 
@@ -185,10 +175,10 @@ void cambiar_retardo(int retardoNuevo){
 void cambiarAlgoritmo(int cambioAlgoritmo){
 	switch(cambioAlgoritmo){
 		case WORST_FIT:
-			algoritmo = WORST_FIT;
+			algoritmoActual = WORST_FIT;
 			break;
 		case FIRST_FIT:
-			algoritmo = FIRST_FIT;
+			algoritmoActual = FIRST_FIT;
 			break;
 		default:
 			log_error(logs,"ALGORITMO NO VALIDO");
@@ -268,26 +258,40 @@ void dump(){
 
 
 /* Funcion que representa al funcionamiento del algoritmo first-fit de asignacion de memoria*/
-nodoHuecos *first_fit(int tamanio){
+char *first_fit(int tamanio){ //TODO: manejo de memory overload
 	bool filtra_por_tamanio(nodoHuecos* unElem){
 		return unElem->tamanioSegmento >= tamanio;
 	}
-	return list_remove_by_condition(listaHuecos,(void*)filtra_por_tamanio);
+	//
+	log_debug(logs,"Imprime lista Huecos antes de hacer cambios");
+	imprime_listahuecos(listaHuecos);
+	//
+	nodoHuecos* unElem = list_remove_by_condition(listaHuecos,(void*)filtra_por_tamanio);
+	char* nuevaDirFisica=malloc(sizeof(char)*tamanio); //TODO: preguntar si es necesario inicializar
+	memcpy(nuevaDirFisica,unElem->dirFisica,tamanio);
+	unElem->dirFisica = unElem->dirFisica + tamanio;
+	unElem->tamanioSegmento = unElem->tamanioSegmento - tamanio;
+	list_add(listaHuecos,(void*)unElem);
+	//
+	log_debug(logs,"Imprime lista huecos desp de hacer cambios");
+	imprime_listahuecos(listaHuecos);
+	//
+	return nuevaDirFisica;
 }
 
 /* Funcion que representa al funcionamiento del algoritmo worst-fit de asignacion de memoria*/
-nodoHuecos *worst_fit(int tamanio){
+char *worst_fit(int tamanio){
 	list_sort(listaHuecos, (void*)sort_mayor_hueco);
-	nodoHuecos* unElemAux = list_get(listaHuecos,0);
-	list_remove(listaHuecos,0);
+	nodoHuecos* unElem = list_remove(listaHuecos,0);
 
-	bool remover_elemento(nodoHuecos* unElem){
-		return unElem->dirFisica == unElemAux->dirFisica;
-	}
-	list_remove_by_condition(listaHuecos,(void*)remover_elemento);
-	return unElemAux;
+	char* nuevaDirFisica=malloc(sizeof(char)*tamanio);
+	memcpy(nuevaDirFisica,unElem->dirFisica,tamanio);
+	unElem->dirFisica = unElem->dirFisica + tamanio;
+	unElem->tamanioSegmento = unElem->tamanioSegmento - tamanio;
+	list_add(listaHuecos,(void*)unElem);
+
+	return unElem->dirFisica;
 }
-
 
 /* Funcion que retorna el mayor idSegmento entre dos elementos */
 bool sort_nroSeg(tablaSegUMV* unElem, tablaSegUMV* otroElem){
@@ -306,21 +310,19 @@ bool sort_mayor_dirLogica(tablaSegUMV* unElem, tablaSegUMV* otroElem){
 
 
 void imprime_listahuecos(){
+	log_info(logs,"Se imprime lista huecos");
 	list_iterate(listaHuecos, (void*)imprime_campos_listahuecos);
 }
 
 void imprime_campos_listatablaSegUMV(tablaSegUMV *unElem){
 	printf("Nro segmento: %d\n",unElem->idSegmento);
 	printf("  Dirección logica: %d\n",unElem->dirLogica);
-	printf("  Dirección fisica: %s\n",unElem->dirFisica);
 	printf("  Tamaño del segmento: %d\n",unElem->tamanioSegmento);
 }
 
 void imprime_campos_listahuecos(nodoHuecos *unElem){
 	printf("Contenido:\n");
-	printf("Dirección fisica: %s\n",unElem->dirFisica);
 	printf("  Tamaño del segmento: %d\n",unElem->tamanioSegmento);
-
 }
 
 void imprime_estructuras_memoria(){
@@ -337,4 +339,27 @@ void imprime_estado_mem_ppal(){
 	imprime_listahuecos();
 }
 
+bool archivo_config_valido(){
+	if(!config_has_property(config, "TAMANIO_UMV"))
+		return 0;
+
+	if(!config_has_property(config, "RETARDO"))
+		return 0;
+
+	if(!config_has_property(config, "ALGORITMO"))
+		return 0;
+
+	if(!config_has_property(config, "PUERTO_KERNEL"))
+		return 0;
+
+	if(!config_has_property(config, "PUERTO_CPU"))
+		return 0;
+	return 1;
+}
+
+void inicializar_var_config(){
+	tamanioUMV = config_get_int_value(config, "TAMANIO_UMV");
+	retardoActual = config_get_int_value(config,"RETARDO");
+	algoritmoActual = config_get_int_value(config,"ALGORITMO");
+}
 

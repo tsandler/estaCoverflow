@@ -9,32 +9,38 @@
  */
 
 #include "functions.h"
+#include "testeo.h"
 
-void *consola(void* ptr);
-
+void *consola();
 
 
 int main(int argc, char** argv){
-	logs = log_create("log","UMV.c",0,LOG_LEVEL_TRACE);
-	if (argc < 2){
+	logs = log_create("log","UMV.c",1,LOG_LEVEL_TRACE);
+	/*if (argc < 2){
 		log_error(logs, "No se envio ningun parametro");
 		log_destroy(logs);
 		return 0;
+	}*/
+	config = config_create("config");
+	if(!archivo_config_valido()){
+		log_error(logs,"Error en los parametros. Aborta el programa");
+		log_destroy(logs);
+		config_destroy(config);
 	}
-	t_config* config = config_create(argv[1]);
-	tamanioUMV = config_get_int_value(config, "TAMANIO_UMV");
-	retardoActual = config_get_int_value(config,"RETARDO");
-	algoritmo = config_get_int_value(config,"ALGORTIMO");
+	inicializar_var_config();
+	inicializar_umv(tamanioUMV);
+	log_info(logs,"Se inicializo la umv");
 
+	test_crea_elimina_UMV();
 
-
+	eliminarUMV();
 	log_destroy(logs);
 	config_destroy(config);
 	return 0;
 }
 
 
-void *consola(void* ptr){
+void *consola(){
 	int pid, cambioAlgoritmo ,nroOp, operacion, retardoNuevo;
 
 	printf("Seleccione la operación segun...\n");

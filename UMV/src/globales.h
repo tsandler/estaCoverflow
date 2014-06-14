@@ -17,18 +17,16 @@
 #include <commons/config.h>
 #include <commons/collections/dictionary.h>
 #include <commons/collections/list.h>
-#include <commons/error.h>
 #include <libs/estructurasParser.h>
 
 
 t_log *logs;
 t_dictionary *tablaPidSeg;
 t_list *listaHuecos;
-char *ramUMV;
-char *ramUMVinicial;
+t_config* config;
 int tamanioUMV;
 int retardoActual;
-int algoritmo;
+int algoritmoActual;
 int pidActive;
 
 
@@ -57,7 +55,6 @@ typedef enum{
 }t_algoritmo;
 
 typedef enum{
-	LEER_SEGMENTO=1,
 	ESCRIBIR_SEGMENTO=2,
 	CREAR_SEGMENTO=3,
 	ELIMINAR_SEGMENTOS=4,
