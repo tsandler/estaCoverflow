@@ -125,10 +125,10 @@ void irAlLabel(t_nombre_etiqueta etiqueta){
 	else
 		log_error(logs, "Se recibio el segmento de etiquetas");
 
-	t_size tamanio = strlen(etiquetas) + 1;
-	char* segmentoEtiquetas = string_from_format("%s", &etiquetas);//FIXME: asegurarme si esto lo manejo como string o no
+	t_size tamanio = strlen(etiquetas) + 1;//me lo da el PCB
+//	char* segmentoEtiquetas = string_from_format("%s", &etiquetas);//FIXME: asegurarme si esto lo manejo como string o no
 
-	pcb->program_counter = metadata_buscar_etiqueta(etiqueta, segmentoEtiquetas, tamanio); //TODO: verificar si esto es asi
+	pcb->program_counter = metadata_buscar_etiqueta(etiqueta, etiquetas, tamanio); //TODO: verificar si esto es asi
 }
 
 /* Primitiva que se invoca en los procedimientos, cambia el contexto de ejecucion a una etiqueta dada */
@@ -138,7 +138,7 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta){
 	memcpy(stack+desplazamiento, &pcb->program_counter+1, 4);
 	desplazamiento += 4;
 
-	pcb->cursor_stack =(int*) stack + desplazamiento;
+	pcb->cursor_stack =(int) stack + desplazamiento;
 	log_info(logs, "Se llamo a la funcion llamarSinRetorno con la etiqueta %s", etiqueta);
 	irAlLabel(etiqueta);
 }
@@ -149,7 +149,7 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar){
 	memcpy(stack+desplazamiento, &donde_retornar, 4);
 	desplazamiento += 4;
 
-	pcb->cursor_stack = (int*) stack + desplazamiento;
+	pcb->cursor_stack = (int) stack + desplazamiento;
 	log_info(logs, "Se llamo a la funcion llamarConRetorno con la etiqueta %s y puntero %d", etiqueta, donde_retornar);
 }
 
