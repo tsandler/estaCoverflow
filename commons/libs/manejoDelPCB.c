@@ -32,8 +32,8 @@ registroPCB* armarPCB(char* program, int fd){
 	unPCB=malloc(sizeof(int)*9);
 
 	unPCB->peso = peso;
-    unPCB->pid = identificadorUnico+1;
-    identificadorUnico =+ 1;
+	identificadorUnico =+ 1;
+    unPCB->pid = identificadorUnico;
 
 	return unPCB;
 

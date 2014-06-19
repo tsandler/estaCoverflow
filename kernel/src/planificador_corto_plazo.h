@@ -1,14 +1,19 @@
 /*
  * planificador_corto_plazo.h
  *
- *  Created on: 11/06/2014
+ *  Created on: 18/06/2014
  *      Author: utnso
  */
 
 #ifndef PLANIFICADOR_CORTO_PLAZO_H_
 #define PLANIFICADOR_CORTO_PLAZO_H_
 
-void pcp(void* ptr);
+#include "globales.h"
+
+
+t_queue *EXEC;
+t_queue *BLOCK;
+t_queue *EXIT;
 
 
 #endif /* PLANIFICADOR_CORTO_PLAZO_H_ */
