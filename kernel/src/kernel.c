@@ -11,6 +11,7 @@
 t_config *config;
 t_queue *NEW;
 t_queue *READY;
+t_queue *BLOCK;
 t_queue *EXIT;
 sem_t mutexNEW;
 sem_t mutexREADY;
@@ -40,6 +41,7 @@ int main(int argc, char *argv[]) {
 	free(str3);
 	NEW = queue_create();
 	READY = queue_create();
+	BLOCK=queue_create();
 	EXIT=queue_create();
 	int gradoMultiprogramacion = config_get_int_value(config,"MULTIPROGRAMACION");
 	sem_init(&mutexNEW, 0, 1);
