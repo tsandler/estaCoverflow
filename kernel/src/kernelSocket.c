@@ -15,6 +15,7 @@
 extern t_queue *NEW;
 extern sem_t mutexNEW;
 extern sem_t hayAlgo;
+extern t_log*logs;
 
 int openSocketClient(int port, char* ip) {
 
@@ -71,9 +72,10 @@ int openSocketServerPLP(int PORT) {
 	int listener;
 	int newfd;
 	char buf[MAXBUFFSIZE];
-	int nbytes;
+	//int nbytes;
 	/* para setsockopt()  */
 	int yes = 1;
+	t_length* tam;
 
 	FD_ZERO(&master); //que se yo q hace pero tiene  estar
 	FD_ZERO(&read_fds);
@@ -128,18 +130,12 @@ int openSocketServerPLP(int PORT) {
 		} else {
 			printf("aceptado !...\n");
 
-			if ((nbytes = recv(newfd, buf, sizeof(buf), 0)) <= 0) // si es -1 no hay nada
+			if (recibirDatos(newfd, tam, buf, logs) <= 0) // si es -1 no hay nada
 
-					{
-
-				if (nbytes == 0) {
-					printf("No hay nada en el archivo :S");
-				}
-
-				else
-					perror("recvPLP() error ...");
-
+			{
+//mostrar error en logs
 			} else {
+
 				printf("%s",buf);
 				registroPCB* unPCB = armarPCB(buf,newfd);
 				sem_wait(&mutexNEW);
@@ -241,7 +237,13 @@ int openSocketServerPCP(int PORT) {
 
 			} else {
 
-				printf("Mensaje es: %s", buf);
+				pthread_t thread;
+				int iret1 = pthread_create(&thread, NULL, manejoCPU,(void*)newfd);
+
+						if (iret1){
+							log_info(logs, "Error en la creacion del hilo openSocketServerPLP");
+							exit(EXIT_FAILURE);
+						}
 				if (write(newfd, "I got your message", 18) < 0)
 					perror("ERROR writing to socket");
 				memset(&buf[0], 0, sizeof(buf));

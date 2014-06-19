@@ -15,6 +15,7 @@ sem_t mutexNEW;
 sem_t mutexREADY;
 sem_t gradoProg;
 sem_t hayAlgo;
+sem_t hayAlgoEnReady;
 t_log *logs;
 
 void plp(void* ptr);
@@ -43,6 +44,7 @@ int main(int argc, char *argv[]) {
 	sem_init(&mutexREADY, 0, 1);
 	sem_init(&gradoProg, 0, gradoMultiprogramacion-1);
 	sem_init(&hayAlgo, 0, 0);
+	sem_init(&hayAlgoEnReady,0,0);
 	logs = log_create("log_Principal","kernel.c",0,LOG_LEVEL_TRACE);
 
 	pthread_t thread1, thread2;
@@ -77,6 +79,7 @@ int main(int argc, char *argv[]) {
 	sem_destroy(&mutexNEW);
 	sem_destroy(&mutexREADY);
 	sem_destroy(&gradoProg);
+	sem_destroy(&hayAlgoEnReady);
 
 	exit(EXIT_SUCCESS);
 

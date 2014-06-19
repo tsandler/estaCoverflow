@@ -12,6 +12,7 @@ extern sem_t mutexNEW;
 extern sem_t mutexREADY;
 extern sem_t gradoProg;
 extern sem_t hayAlgo;
+extern sem_t hayAlgoEnReady;
 extern t_log *logs;
 extern t_config *config;
 
@@ -66,7 +67,7 @@ void deNewAReady(void){
 			log_info(logs,"En la cola Ready Hay %i \n", queue_size(READY));
 			queue_push(READY,unPCB);
 			log_info(logs,"En la cola Ready Hay %d \n",queue_size(READY));
-
+			sem_post(&hayAlgoEnReady);
 			sem_post(&mutexREADY);
 
 	}

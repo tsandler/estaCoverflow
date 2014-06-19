@@ -19,6 +19,8 @@
 #include <commons/collections/queue.h>
 #include <libs/manejoDelPCB.h>
 #include <libs/sockets.h>
+#include <pthread.h>
+#include "manejoCPU.h"
 
 char* sendMessage(int sockfd, char *msg);
 char* recieveMessage(int sockfd);
