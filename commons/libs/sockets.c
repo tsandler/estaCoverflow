@@ -79,7 +79,7 @@ int conectarCliente(char *ip, int port, t_log *logs){
   El socket que recibe es el devuelto por aceptarConexion() o conectarCliente() */
 
 int enviarDatos(int socket, t_length* tam, void* datos, t_log* logs){
-	if (send (socket, tam, sizeof(tam), 0) < 0){
+	if (send (socket, tam, sizeof(t_length), 0) < 0){
 		log_error(logs, "Se produjo un problema al enviar el tamanio del dato");
 		return 0;
 	}
@@ -90,12 +90,43 @@ int enviarDatos(int socket, t_length* tam, void* datos, t_log* logs){
 	return 1;
 }
 
+/* Enviar una senal con un menu de lo que se va a realizar con la conexion */
+
+int enviarMenu(int socket, t_length* tam, t_log* logs){
+	if (send (socket, tam, sizeof(t_length), 0) < 0){
+		log_error(logs, "Se produjo un problema al enviar el menu");
+		return 0;
+	}
+	return 1;
+}
+
+/* Recibe la senal enviada por sockets con el tamanio del dato que se va a procesar y un menu */
+
+int recibirMenu(int socket, t_length* tam, t_log* logs){
+	if (recv (socket, tam, sizeof(t_length), MSG_WAITALL) < 0){
+		log_error(logs, "Se produjo un problema al recibir el tamanio del dato");
+		return 0;
+	}
+	return 1;
+}
+
+/* Recibe un dato del tamanio especificado por parametro */
+
+int recibirDato(int socket, int size, void** dato, t_log* logs){
+	*dato = malloc(size);
+	if (recv (socket, dato, size, MSG_WAITALL) < 0){
+		log_error(logs, "Se produjo un problema al recibir el tamanio del dato");
+		return 0;
+	}
+	return 1;
+}
+
 /* Recibe en los parametros un t_lenght tamanio y la variable que va a almacenar
    los datos recibidos, devuelve 0 en caso de error.
    El socket que recibe es el devuelto por aceptarConexion() o conectarCliente() */
 
 int recibirDatos(int socket, t_length* tam, void** datos, t_log* logs){
-	if (recv (socket, tam, sizeof(tam), MSG_WAITALL) < 0){
+	if (recv (socket, tam, sizeof(t_length), MSG_WAITALL) < 0){
 		log_error(logs, "Se produjo un problema al recibir el tamanio del dato");
 		return 0;
 	}
