@@ -43,6 +43,15 @@ int recibirQuantum(){
 	return quantum;
 }
 
+int recibirTamanioStack(){
+	int tamanio;
+	if(!recibirDatos(socket_kernel, tam, (void*)&tamanio, logs)){
+		log_error(logs, "Se produjo un error al recibir el quantum del kernel");
+		tamanio = -1;
+	}
+	return tamanio;
+}
+
 int obtenerPosicion(char variable){
 	int x;
 	for (x=0;x<sizeof(stack); x++){
@@ -50,6 +59,21 @@ int obtenerPosicion(char variable){
 			break;
 	}
 	return x;
+}
+
+void pedirStack(int tamanio){
+	t_etiqueta* et = malloc(sizeof(t_etiqueta));
+	et->base = pcb->segmento_stack;
+	et->offset = 0;
+	et->tamanio = tamanio;
+	tam->length = sizeof(t_etiqueta);
+	tam->menu = LEER_SEGMENTO;
+
+	if(!enviarDatos(socket_umv, tam, et, logs))
+		log_error(logs, "Se produjo un error enviando la base a la UMV");
+
+	if(!recibirDatos(socket_umv, tam, (void*)&stack, logs))
+		log_error(logs, "Se produjo un error recibiendo el segmento");
 }
 
 /* Funcion que verifica que sea un archivo de configuracion valido */
@@ -65,10 +89,32 @@ int archivoDeConfiguracionValido(){
 	return 1;
 }
 
-void inicializarEstructuras(){
-	logs = log_create("log", "CPU.c", 0, LOG_LEVEL_TRACE);
-	diccionarioDeVariables = dictionary_create();
-	tam = malloc(sizeof(t_length));
+/* Funcion que recibe la sentencia de la UMV */
+char* recibirSentencia(){
+	t_etiqueta* et = malloc(sizeof(t_etiqueta));
+
+	et->base = pcb->indice_codigo;
+	et->offset = pcb->program_counter * 8;
+	et->tamanio = 8;
+	tam->menu = PEDIR_SENTENCIA;
+	tam->length = sizeof(t_etiqueta);
+
+	if (!enviarDatos(socket_umv, tam, et, logs))
+		log_error(logs, "Se produjo un error al enviar el indice de codigo.");
+
+	if (!recibirDatos(socket_umv, tam, (void*)et, logs))
+		log_error(logs, "Se produjo un error al recibir el segmento de codigo");
+
+	et->base = pcb->segmento_codigo;
+
+	if (!enviarDatos(socket_umv, tam, et, logs))
+		log_error(logs, "Se produjo un error al enviar el segmento de codigo");
+
+	char* sentencia;
+	if (!recibirDatos(socket_umv, tam, (void*)&sentencia, logs))
+		log_error(logs, "Se produjo un error al recibir la sentencia.");
+
+	return string_from_format("%s", &sentencia);
 }
 
 /* Funcion que libera las estructuras usadas */
@@ -78,4 +124,9 @@ void liberarEstructuras(){
 	dictionary_destroy(diccionarioDeVariables);
 	config_destroy(config);
 	log_destroy(logs);
+}
+
+void manejarSenial(){
+	seguir = 0;
+	log_debug(logs, "Se llamo a la senial SIGUSR1");
 }

@@ -8,14 +8,13 @@
  ============================================================================
  */
 
-#include <stdlib.h>
 #include "globales.h"
 #include "functions.h"
 #include "funcionesParser.h"
 
 int main(int argc, char** argv){
 
-	logs = log_create("log", "CPU.c", 0, LOG_LEVEL_TRACE);
+	logs = log_create("log", "CPU.c", 1, LOG_LEVEL_TRACE);
 
 	if (argc < 2){
 		log_error(logs, "No se pasaron parametros.");
@@ -33,63 +32,67 @@ int main(int argc, char** argv){
 		return 0;
 	}
 
+	//TODO: falta cargar el diccionario de variables
 	socket_umv = conectarUMV();
 	socket_kernel = conectarKernel();
 	int quantum = recibirQuantum();
-
-	if(socket_kernel < 0 || socket_umv < 0 || quantum < 0){ //Si no se conecto al kernel o UMV no puede continuar y termina la ejecucion
+	int tamanioStack = recibirTamanioStack();
+	if(socket_kernel < 0 || socket_umv < 0 || quantum < 0 || tamanioStack < 0){ //Si no se conecto al kernel o UMV no puede continuar y termina la ejecucion
 		log_error(logs, "El programa tuvo que finalizar insatisfactoriamente");
 		liberarEstructuras();
 		return 0;
 	}
+	tam->menu = SOY_CPU;
+	enviarMenu(socket_kernel, tam, logs);
+	enviarMenu(socket_umv, tam, logs);
 
 	inicializarFuncionesParser();
+
 	int cont;
 	char* sentencia;
+	int pc;
+	seguir = 1;
 
-	while (1){
-		desplazamiento = 0; //FIXME: ver cursor de stack en la PCB (stack pointer)
+	signal(SIGUSR1, manejarSenial);
+
+	while (seguir){
 		cont = 0;
-		if(!recibirDatos(socket_kernel, tam, (void*)&pcb, logs))
+		if(!recibirDatos(socket_kernel, tam, (void*)pcb, logs))
 			log_error(logs, "Se produjo un error al recibir el PCB del kernel");
 
-		tam->length = sizeof(pcb->puntero_etiquetas_funciones);
-		tam->menu = LEER_SEGMENTO;
+		tam->menu = PID_ACTUAL;
+		tam->length = sizeof(pcb->pid);
+		if(!enviarDatos(socket_umv, tam, &pcb->pid, logs))
+			log_error(logs, "Se produjo un error enviando el pid a la UMV");
 
-		if(!enviarDatos(socket_umv, tam, &pcb->puntero_etiquetas_funciones, logs))
-			log_error(logs, "Se produjo un error enviando la base a la UMV");
+		desplazamiento = pcb->cursor_stack;
 
-		if(!recibirDatos(socket_umv, tam, (void*)&stack, logs))
-			log_error(logs, "Se produjo un error recibiendo el segmento");
+		pedirStack(tamanioStack);
 
 		systemCall = false;
 
-		while (quantum > cont && !systemCall){
+		while (quantum > cont && !systemCall && seguir){
+			pc = pcb->program_counter;
 
-			pcb->program_counter++; //FIXME: no aumenta siempre
-			tam->length = sizeof(registroPCB);
-			tam->menu = PEDIR_SENTENCIA;
-			if (!enviarDatos(socket_umv, tam, pcb, logs))//FIXME: enviar base, offset y tamanio
-				log_error(logs, "Se produjo un error al enviar el indice de codigo.");
+			sentencia = recibirSentencia();
 
-			if (!recibirDatos(socket_umv, tam, (void*)&sentencia, logs))
-				log_error(logs, "Se produjo un error al recibir la sentencia.");
-
-			analizadorLinea(sentencia, &functions, &kernel_functions);
+			analizadorLinea(strdup(sentencia), &functions, &kernel_functions);
 
 			cont++;
+
+			if (pc == pcb->program_counter)
+				pcb->program_counter++;
 		}
 
-		if(tam->menu != FINALIZAR)//TODO: tiene que salir del while o se queda esperando?
-			tam->menu = CONCLUYO_UN_QUANTUM;
-
+		tam->menu = CONCLUYO_UN_QUANTUM;
 		tam->length = sizeof(registroPCB);
 
 		if (!enviarDatos(socket_kernel, tam, pcb, logs))
 			log_error(logs, "Se produjo un error al notificar al pcp que concluyo un quantum.");
 
-		tam->menu = RETORNO_DE_STACK;
-		tam->length = sizeof(stack);
+		tam->menu = ESCRIBIR_SEGMENTO;
+		tam->length = tamanioStack;
+
 		if(!enviarDatos(socket_umv, tam, stack, logs))
 			log_error(logs, "Se produjo un error al devolverle el stack a la umv");
 	}

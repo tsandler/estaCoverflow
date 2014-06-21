@@ -8,7 +8,9 @@
 #ifndef GLOBALES_H_
 #define GLOBALES_H_
 
+#include <stdlib.h>
 #include <stdio.h>
+#include <signal.h>
 #include <libs/sockets.h>
 #include <libs/manejoDelPCB.h>
 #include <commons/log.h>
@@ -22,6 +24,7 @@ t_dictionary* diccionarioDeVariables;
 int socket_kernel, socket_umv;
 unsigned char* stack;
 int desplazamiento;
+int seguir;
 bool systemCall;
 
 AnSISOP_funciones functions;

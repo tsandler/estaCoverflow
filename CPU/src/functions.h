@@ -15,9 +15,12 @@
 int conectarUMV();
 int conectarKernel();
 int recibirQuantum();
+int recibirTamanioStack();
 int obtenerPosicion(char variable);
-void inicializarEstructuras();
 void liberarEstructuras();
+char* recibirSentencia();
+void pedirStack(int tamanio);
 int archivoDeConfiguracionValido();
+void manejarSenial();
 
 #endif /* FUNCTIONS_H_ */

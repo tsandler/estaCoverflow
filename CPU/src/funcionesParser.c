@@ -24,7 +24,7 @@ void inicializarFuncionesParser(){
 	functions.AnSISOP_entradaSalida = entradaSalida;
 
 	kernel_functions.AnSISOP_wait = wait;
-	kernel_functions.AnSISOP_signal = signal;
+	kernel_functions.AnSISOP_signal = signal_parser;
 }
 
 /* Primitiva que almacena en el stack y en el diccionario de variables a una variable, dejandola sin inicializar*/
@@ -38,7 +38,6 @@ t_puntero definirVariable(t_nombre_variable identificador_variable){
 	variable[1] = '\0';
 	dictionary_put(diccionarioDeVariables, variable, posicion);
 	log_info(logs, "La variable %c fue definida correctamente", identificador_variable);
-	printf("Definiendo variable: %c\n", identificador_variable);
 	return *posicion;
 }
 
@@ -50,7 +49,6 @@ t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable){
 	variable[1] = '\0';
 	posicion = dictionary_get(diccionarioDeVariables, variable);
 	log_info(logs, "La posicion de la variable %c es %d", identificador_variable, *posicion);
-	printf("Posicion de la variable %c: %d\n", identificador_variable, *posicion);
 	return *posicion;
 }
 
@@ -59,7 +57,6 @@ t_valor_variable dereferenciar(t_puntero direccion_variable){
 	t_valor_variable valor;
 	memcpy(&valor, stack + direccion_variable + 1, 4);
 	log_info(logs, "El valor de la direccion %d es %d", direccion_variable, valor);
-	printf("Desreferenciado la variable en la posicion %d con el valor %d\n", direccion_variable, valor);
 	return valor;
 }
 
@@ -67,7 +64,6 @@ t_valor_variable dereferenciar(t_puntero direccion_variable){
 void asignar(t_puntero direccion_variable, t_valor_variable valor ){
 	memcpy(stack + direccion_variable + 1, &valor, 4);
 	log_info(logs, "El valor %d fue asignado a la variable en la posicion %d", valor, direccion_variable);
-	printf("Asignando valor %d a la variable en la direccion %d\n", valor, direccion_variable);
 }
 
 /* Primitiva que pide al kernel el valor de una variable compartida */
@@ -92,7 +88,7 @@ t_valor_variable obtenerValorCompartida(t_nombre_compartida variable){
 /* Primitiva que envia el valor a asignarle a una variable */
 t_valor_variable asignarValorCompartida(t_nombre_compartida variable, t_valor_variable valor){
 	tam->menu = ASIGNAR_VALOR_COMPARTIDA;
-	tam->length = sizeof(valor);
+	tam->length = sizeof(t_valor_variable);
 
 	if (!enviarDatos(socket_kernel, tam, &valor, logs))
 		log_error(logs, "Se produjo un error enviando el valor %d para asignarselo", valor);
@@ -112,23 +108,22 @@ void irAlLabel(t_nombre_etiqueta etiqueta){
 	etiquetaAEnviar->base = pcb->indice_etiquetas_funciones;
 	etiquetaAEnviar->offset = 0;
 	etiquetaAEnviar->tamanio = pcb->tamanio_indice_etiquetas_funciones;
-	tam->menu = PEDIR_INDICE_ETIQUETAS;
+	tam->menu = LEER_SEGMENTO;
 	tam->length = sizeof(t_etiqueta);
 	char* etiquetas;
 	if (!enviarDatos(socket_umv, tam, etiquetaAEnviar, logs))
-		log_error(logs, "Se produjo un error enviando la etiqueta %s", etiqueta);
+		log_error(logs, "Se produjo un error enviando el struct de etiquetas");
 	else
-		log_info(logs, "Se envio lal etiqueta %s para ir al label", etiqueta);
+		log_info(logs, "Se envio el struct para pedir el segmento de etiquetas");
 
 	if(!recibirDatos(socket_umv, tam, (void*)&etiquetas, logs))
 		log_error(logs, "Se produjo un error recibiendo el segmento de etiquetas");
 	else
 		log_error(logs, "Se recibio el segmento de etiquetas");
 
-	t_size tamanio = strlen(etiquetas) + 1;//me lo da el PCB
-//	char* segmentoEtiquetas = string_from_format("%s", &etiquetas);//FIXME: asegurarme si esto lo manejo como string o no
-
-	pcb->program_counter = metadata_buscar_etiqueta(etiqueta, etiquetas, tamanio); //TODO: verificar si esto es asi
+	t_size tamanio = pcb->tamanio_indice_etiquetas_funciones;
+	char* et = string_from_format("%s", &etiquetas);
+	pcb->program_counter = metadata_buscar_etiqueta(etiqueta, et, tamanio);
 }
 
 /* Primitiva que se invoca en los procedimientos, cambia el contexto de ejecucion a una etiqueta dada */
@@ -138,7 +133,7 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta){
 	memcpy(stack+desplazamiento, &pcb->program_counter+1, 4);
 	desplazamiento += 4;
 
-	pcb->cursor_stack =(int) stack + desplazamiento;
+	pcb->cursor_stack = desplazamiento;
 	log_info(logs, "Se llamo a la funcion llamarSinRetorno con la etiqueta %s", etiqueta);
 	irAlLabel(etiqueta);
 }
@@ -149,22 +144,21 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar){
 	memcpy(stack+desplazamiento, &donde_retornar, 4);
 	desplazamiento += 4;
 
-	pcb->cursor_stack = (int) stack + desplazamiento;
+	pcb->cursor_stack = desplazamiento;
 	log_info(logs, "Se llamo a la funcion llamarConRetorno con la etiqueta %s y puntero %d", etiqueta, donde_retornar);
 }
 
 /* Primitiva que finaliza el contexto actual */
 void finalizar(){
-	memcpy(&pcb->program_counter, pcb->cursor_stack - 4, 4);
-	memcpy(&pcb->cursor_stack, pcb->cursor_stack - 8, 4);
-	systemCall = true;//FIXME: saber si se necesita un systemcall
+	memcpy(&pcb->program_counter, &pcb->cursor_stack - 4, 4);
+	memcpy(&pcb->cursor_stack, &pcb->cursor_stack - 8, 4);
 	log_info(logs, "Se llamo a la funcion finalizar");
 }
 
 /* Primitiva que finaliza el contexto actual y asigna el valor a retornar en su posicion correspondiente en el stack */
 void retornar(t_valor_variable retorno){
 	t_puntero* posicion = malloc(sizeof(t_puntero));
-	memcpy(posicion, pcb->cursor_stack - 4, 4);
+	memcpy(posicion, &pcb->cursor_stack - 4, 4);
 	asignar(*posicion, retorno);
 	pcb->cursor_stack -= 4;
 	finalizar();
@@ -180,8 +174,6 @@ void imprimir(t_valor_variable valor_mostrar){
 		log_error(logs, "Se produjo un error enviando el valor %d para imprimir", valor_mostrar);
 	else
 		log_info(logs, "Se envio el valor %d para imprimirlo", valor_mostrar);
-
-	systemCall = true;
 }
 
 /* Primitiva que envia al kernel un texto para mostrar por consola */
@@ -193,8 +185,6 @@ void imprimirTexto(char* texto){
 		log_error(logs, "Se produjo un error enviando el texto %s para imprimirlo", texto);
 	else
 		log_info(logs, "Se envio el texto %s para imprimirlo", texto);
-
-	systemCall = true;
 }
 
 /* Primitiva que le dice al kernel que fue a entrada y salida con un dispositivo por un determinado tiempo */
@@ -226,7 +216,7 @@ void wait(t_nombre_semaforo identificador_semaforo){
 }
 
 /* Primitiva que envia la senial de signal de un semaforo al kernel */
-void signal(t_nombre_semaforo identificador_semaforo){
+void signal_parser(t_nombre_semaforo identificador_semaforo){
 	tam->menu = SIGNAL;
 	tam->length = sizeof(identificador_semaforo);
 

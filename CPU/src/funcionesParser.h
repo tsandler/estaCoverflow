@@ -8,9 +8,8 @@
 #ifndef FUNCIONESPARSER_H_
 #define FUNCIONESPARSER_H_
 
-#include <libs/estructurasParser.h>
-#include <parser/metadata_program.h>
 #include "globales.h"
+#include <parser/metadata_program.h>
 #include <commons/string.h>
 
 void inicializarFuncionesParser();
@@ -30,6 +29,6 @@ void imprimir(t_valor_variable valor_mostrar);
 void imprimirTexto(char* texto);
 void entradaSalida(t_nombre_dispositivo dispositivo, int tiempo);
 void wait(t_nombre_semaforo identificador_semaforo);
-void signal(t_nombre_semaforo identificador_semaforo);
+void signal_parser(t_nombre_semaforo identificador_semaforo);
 
 #endif /* FUNCIONESPARSER_H_ */
