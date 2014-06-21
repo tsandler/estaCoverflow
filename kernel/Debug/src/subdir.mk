@@ -6,18 +6,24 @@
 C_SRCS += \
 ../src/kernel.c \
 ../src/kernelSocket.c \
+../src/manejoCPU.c \
+../src/manejoIO.c \
 ../src/planificador_corto_plazo.c \
 ../src/planificador_largo_plazo.c 
 
 OBJS += \
 ./src/kernel.o \
 ./src/kernelSocket.o \
+./src/manejoCPU.o \
+./src/manejoIO.o \
 ./src/planificador_corto_plazo.o \
 ./src/planificador_largo_plazo.o 
 
 C_DEPS += \
 ./src/kernel.d \
 ./src/kernelSocket.d \
+./src/manejoCPU.d \
+./src/manejoIO.d \
 ./src/planificador_corto_plazo.d \
 ./src/planificador_largo_plazo.d 
 

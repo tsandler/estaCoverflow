@@ -103,8 +103,58 @@ void plp(void* ptr){
 
 }
 
+void intercambiarDatosUMV(int socket_UMV, t_log* logs, registroPCB PCBprograma){
 
-void conectarseUMV(){
+	t_length *tam;
+	tam = malloc(sizeof(t_length));
+	tam->menu = SOY_KERNEL;
+	enviarMenu(socket_UMV, tam, logs); //Le aviso a la UMV que soy el kernel
+	if( recibirMenu(socket_UMV,tam,logs))
+	tam->menu = PID_ACTUAL ;
+	int datos_pid = PCBprograma.pid;
+	enviarDatos(socket_UMV, tam, (void*)datos_pid,logs);
+
+	datos_crearSeg* datosAEnviar;
+	tam->length = sizeof(datos_crearSeg);
+	datosAEnviar->pid = PCBprograma.pid;
+
+	int continuamos = 1;
+
+	while(continuamos >=0){
+	//envio segmento etiquetas_funciones
+	datosAEnviar->tamanio = PCBprograma.tamanio_indice_etiquetas_funciones;
+	tam->menu = CREAR_SEGMENTO;
+	enviarDatos(socket_UMV, tam, (void*)datosAEnviar, logs);
+	continuamos = recibirMenu(socket_UMV,tam,logs);
+	}
+
+	while(1){
+	//envio segmento codigo
+	datosAEnviar->tamanio = PCBprograma.tamanio_indice_codigo;
+	tam->menu = CREAR_SEGMENTO;
+	enviarDatos(socket_UMV,tam,(void*)datosAEnviar,logs);
+	continuamos = recibirMenu(socket_UMV,tam,logs);
+	}
+
+	while(1){
+	//envio contexto
+	datosAEnviar->tamanio = PCBprograma.tamanio_contexto;
+	tam->menu = CREAR_SEGMENTO;
+	enviarDatos(socket_UMV, tam, (void*)datosAEnviar,logs);
+	continuamos = recibirMenu(socket_UMV,tam,logs);
+	}
+
+	while(1){
+	//envio stack
+	datosAEnviar->tamanio = config_get_int_value(config,"TAMANIO_STACK");
+	tam->menu = CREAR_SEGMENTO;
+	enviarDatos(socket_UMV, tam, (void*)datosAEnviar, logs);
+	continuamos = recibirMenu(socket_UMV,tam,logs);
+	}
+}
+
+
+void conectarseUMV(registroPCB PCBprograma){
     int socket_UMV;
     char *ip = config_get_string_value(config,"IP");
     int port = config_get_int_value(config,"PUERTO_UMV");
@@ -114,5 +164,6 @@ void conectarseUMV(){
 		log_destroy(logs);
 	}else{
 		log_info(logs, "El kernel se conecto correctamente con la UMV");
+		intercambiarDatosUMV(socket_UMV,logs,PCBprograma);
 	}
 } // El socket de la uMV habria que cerrarlo una vez que se resfieren los datos y todo...

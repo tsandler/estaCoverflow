@@ -10,6 +10,11 @@
 
 #include "globales.h"
 
+typedef struct{
+	int tamanio;
+	int pid;
+}datos_crearSeg;
+
 
 
 #endif /* PLANIFICADOR_LARGO_PLAZO_H_ */

@@ -18,8 +18,7 @@ src/kernelSocket.d: ../src/kernelSocket.c ../src/kernelSocket.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/sockets.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../commons/config.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../commons/log.h \
- /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/estructurasParser.h \
- /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../parser/parser.h
+ ../src/manejoCPU.h
 
 ../src/kernelSocket.h:
 
@@ -63,6 +62,4 @@ src/kernelSocket.d: ../src/kernelSocket.c ../src/kernelSocket.h \
 
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../commons/log.h:
 
-/home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/estructurasParser.h:
-
-/home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../parser/parser.h:
+../src/manejoCPU.h:
