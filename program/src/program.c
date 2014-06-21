@@ -11,17 +11,16 @@
 #include "globales.h"
 #include "functions.h"
 #include <commons/string.h>
-
+#include <string.h>
 int main(int argc, char **argv) {
 
 	inicializarVariables();
 
-/*	if (!archivoDeConfiguracionValido()){
+	if (!archivoDeConfiguracionValido()){
 		log_error(logs, "El archivo de configuracion no tiene todos los campos necesarios");
 		liberarEstructuras();
 		return 0;
-	}*/
-
+	}
 
 	socket_kernel = conectarKernel();
 	if (socket_kernel < 0){
@@ -31,11 +30,11 @@ int main(int argc, char **argv) {
 	}
 	log_info(logs, "El proceso se conecto correctamente con el kernel");
 
-	char* programa = obtenerPrograma("facil.ansisop");
+	char* programa = obtenerPrograma(argv[1]);
 	enviarProgramaAlKernel(programa);
 
 	while (tam->menu != FINALIZAR){
-		recibirSentencia();
+		char* sentencia = recibirSentencia();
 		printf("%s/n", sentencia);
 	}
 

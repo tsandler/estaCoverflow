@@ -8,12 +8,14 @@
 #ifndef FUNCTIONS_H_
 #define FUNCTIONS_H_
 
+#include <sys/stat.h>
 #include "globales.h"
 #include <commons/config.h>
-#include <sys/stat.h>
+#include <commons/string.h>
+
 
 void enviarProgramaAlKernel(char* programa);
-void recibirSentencia();
+char* recibirSentencia();
 char* obtenerPrograma(char* programa);
 int conectarKernel();
 void inicializarVariables();

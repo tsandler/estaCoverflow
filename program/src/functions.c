@@ -17,14 +17,17 @@ void enviarProgramaAlKernel(char* programa){
 }
 
 /* Funcion que recibe la sentencia a imprimir */
-void recibirSentencia(){
-	if (recibirDatos(socket_kernel, tam, (void*)&sentencia, logs))
+char* recibirSentencia(){
+	char* sent;
+	if (recibirDatos(socket_kernel, tam, (void*)&sent, logs))
 		log_info(logs, "La sentencia fue recibida correctamente");
 	else
 		log_error(logs, "Se produjo un error recibiendo la sentencia");
+
+	return string_from_format("%s", &sent);
 }
 
-/* FUncion que recibe el programa desde un path indicado */
+/* Funcion que recibe el programa desde un path indicado */
 char* obtenerPrograma(char* path){
 	struct stat stat_file;
 	stat(path, &stat_file);
@@ -41,8 +44,8 @@ char* obtenerPrograma(char* path){
 
 /* Funcion que se conecta al kernel y devuelve el socket al que conecto */
 int conectarKernel(){
-	char *ip = "127.0.0.1";//config_get_string_value(config, "IP");
-	int port = 5000;//config_get_int_value(config, "PUERTO_KERNEL");
+	char *ip = config_get_string_value(config, "IP");
+	int port = config_get_int_value(config, "PUERTO_KERNEL");
 	int socket = conectarCliente(ip, port, logs);
 	if (socket < 0)
 		log_error(logs, "El cliente no se pudo conectar correctamente");
@@ -52,10 +55,10 @@ int conectarKernel(){
 
 /* Funcion para inicializar las variables globales */
 void inicializarVariables(){
-	//path = getenv("ANSISOP_CONFIG");
-	//config = config_create(path);
+	char* path = getenv("ANSISOP_CONFIG");
+	config = config_create(path);
 	tam = malloc(sizeof(t_length));
-	logs = log_create("log", "program.c", 0, LOG_LEVEL_TRACE);
+	logs = log_create("log", "program.c", 1, LOG_LEVEL_TRACE);
 }
 
 /* Funcion para verificar si el archivo de configuracion es valido */
@@ -69,7 +72,6 @@ int archivoDeConfiguracionValido(){
 
 /* Funcion para liberar las estructuras usadas */
 void liberarEstructuras(){
-	free(path);
 	config_destroy(config);
 	log_destroy(logs);
 }

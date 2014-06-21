@@ -93,3 +93,11 @@
 [INFO] 17:44:57:797 program.c/(7867:7867): El cliente se conecto y envio la informacion correctamente
 [INFO] 17:45:13:714 program.c/(7871:7871): El cliente se conecto y envio la informacion correctamente
 [INFO] 17:46:15:396 program.c/(7883:7883): El cliente se conecto y envio la informacion correctamente
+[ERROR] 14:14:12:855 program.c/(20122:20122): Se produjo un problema al enviar el dato
+[ERROR] 14:14:12:855 program.c/(20122:20122): No se envio el numero
+[ERROR] 14:15:43:860 program.c/(20192:20192): Se produjo un problema al enviar el dato
+[ERROR] 14:15:43:861 program.c/(20192:20192): No se envio el numero
+[ERROR] 14:16:24:7 program.c/(20235:20235): Se produjo un problema al enviar el dato
+[ERROR] 14:16:24:7 program.c/(20235:20235): No se envio el numero
+[ERROR] 14:18:12:543 program.c/(20367:20367): Se produjo un problema al enviar el dato
+[ERROR] 14:18:12:543 program.c/(20367:20367): No se envio el numero
