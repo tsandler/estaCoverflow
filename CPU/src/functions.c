@@ -43,6 +43,7 @@ int recibirQuantum(){
 	return quantum;
 }
 
+/* Funcion que recibe el tamanio del stack seteado en archivo de configuracion del kernel */
 int recibirTamanioStack(){
 	int tamanio;
 	if(!recibirDatos(socket_kernel, tam, (void*)&tamanio, logs)){
@@ -52,15 +53,23 @@ int recibirTamanioStack(){
 	return tamanio;
 }
 
-int obtenerPosicion(char variable){
-	int x;
-	for (x=0;x<sizeof(stack); x++){
-		if (stack[x] == variable)
-			break;
+/* Funcion que carga el diccionario de variables para el contexto de ejecucion actual */
+void cargarDiccionario(){
+	t_puntero posicion = 0;
+	t_nombre_variable variable;
+	int i;
+	for (i=0; i < pcb->tamanio_contexto; i++){
+		memcpy(&variable, stack + posicion, 1);
+		char var[2];
+		var[0] = variable;
+		var[1] = '\0';
+		dictionary_put(diccionarioDeVariables, var, &posicion);
+		posicion += 5;
 	}
-	return x;
+	log_info(logs, "Se cargo el diccionario de variables");
 }
 
+/* Funcion que le pide el stack a la UMV */
 void pedirStack(int tamanio){
 	t_etiqueta* et = malloc(sizeof(t_etiqueta));
 	et->base = pcb->segmento_stack;
@@ -114,7 +123,20 @@ char* recibirSentencia(){
 	if (!recibirDatos(socket_umv, tam, (void*)&sentencia, logs))
 		log_error(logs, "Se produjo un error al recibir la sentencia.");
 
+	log_info(logs, "Sentencia recibida: %s", &sentencia);
 	return string_from_format("%s", &sentencia);
+}
+
+/* Funcion que depura la sentencia eliminando los \n finales */
+char* depurarSentencia(char* sentencia){
+	int i = strlen(sentencia);
+	while (string_ends_with(sentencia, "\n")){
+		i--;
+		sentencia = string_substring_until(sentencia, i);
+	}
+	string_append(&sentencia, "\0");
+	log_info(logs, "Sentencia depurada: %s", sentencia);
+	return sentencia;
 }
 
 /* Funcion que libera las estructuras usadas */
@@ -126,6 +148,7 @@ void liberarEstructuras(){
 	log_destroy(logs);
 }
 
+/* Funcion que se lanza en el llamado de la senial SIGUSR1 */
 void manejarSenial(){
 	seguir = 0;
 	log_debug(logs, "Se llamo a la senial SIGUSR1");

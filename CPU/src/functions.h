@@ -10,17 +10,21 @@
 
 #include <stdio.h>
 #include <commons/config.h>
+#include <commons/string.h>
 #include "globales.h"
 
 int conectarUMV();
 int conectarKernel();
+
+void cargarDiccionario();
 int recibirQuantum();
 int recibirTamanioStack();
-int obtenerPosicion(char variable);
-void liberarEstructuras();
-char* recibirSentencia();
 void pedirStack(int tamanio);
+char* recibirSentencia();
+char* depurarSentencia();
+
 int archivoDeConfiguracionValido();
 void manejarSenial();
+void liberarEstructuras();
 
 #endif /* FUNCTIONS_H_ */

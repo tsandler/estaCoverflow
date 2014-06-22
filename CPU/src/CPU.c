@@ -32,11 +32,11 @@ int main(int argc, char** argv){
 		return 0;
 	}
 
-	//TODO: falta cargar el diccionario de variables
 	socket_umv = conectarUMV();
 	socket_kernel = conectarKernel();
 	int quantum = recibirQuantum();
 	int tamanioStack = recibirTamanioStack();
+
 	if(socket_kernel < 0 || socket_umv < 0 || quantum < 0 || tamanioStack < 0){ //Si no se conecto al kernel o UMV no puede continuar y termina la ejecucion
 		log_error(logs, "El programa tuvo que finalizar insatisfactoriamente");
 		liberarEstructuras();
@@ -48,15 +48,13 @@ int main(int argc, char** argv){
 
 	inicializarFuncionesParser();
 
-	int cont;
-	char* sentencia;
 	int pc;
 	seguir = 1;
 
 	signal(SIGUSR1, manejarSenial);
 
 	while (seguir){
-		cont = 0;
+		int cont = 0;
 		if(!recibirDatos(socket_kernel, tam, (void*)pcb, logs))
 			log_error(logs, "Se produjo un error al recibir el PCB del kernel");
 
@@ -68,13 +66,15 @@ int main(int argc, char** argv){
 		desplazamiento = pcb->cursor_stack;
 
 		pedirStack(tamanioStack);
+		cargarDiccionario();
 
 		systemCall = false;
 
 		while (quantum > cont && !systemCall && seguir){
 			pc = pcb->program_counter;
 
-			sentencia = recibirSentencia();
+			char* sentencia = recibirSentencia();
+			sentencia = depurarSentencia(sentencia);
 
 			analizadorLinea(strdup(sentencia), &functions, &kernel_functions);
 
@@ -95,6 +95,8 @@ int main(int argc, char** argv){
 
 		if(!enviarDatos(socket_umv, tam, stack, logs))
 			log_error(logs, "Se produjo un error al devolverle el stack a la umv");
+
+		dictionary_clean(diccionarioDeVariables);
 	}
 
 	cerrarSocket(socket_kernel);
