@@ -30,13 +30,14 @@ void inicializarFuncionesParser(){
 /* Primitiva que almacena en el stack y en el diccionario de variables a una variable, dejandola sin inicializar*/
 t_puntero definirVariable(t_nombre_variable identificador_variable){
 	t_puntero* posicion = malloc(sizeof(t_puntero));
-	*posicion = desplazamiento;
-	memcpy(stack + desplazamiento, &identificador_variable, 1);
-	desplazamiento += 5;
+	*posicion = pcb->cursor_stack;
+	memcpy(stack + pcb->cursor_stack, &identificador_variable, 1);
+	pcb->cursor_stack += 5;
 	char variable[2];
 	variable[0] = identificador_variable;
 	variable[1] = '\0';
 	dictionary_put(diccionarioDeVariables, variable, posicion);
+	pcb->tamanio_contexto++;
 	log_info(logs, "La variable %c fue definida correctamente", identificador_variable);
 	return *posicion;
 }
@@ -128,6 +129,7 @@ void irAlLabel(t_nombre_etiqueta etiqueta){
 
 /* Primitiva que se invoca en los procedimientos, cambia el contexto de ejecucion a una etiqueta dada */
 void llamarSinRetorno(t_nombre_etiqueta etiqueta){
+	int desplazamiento = pcb->cursor_stack;
 	memcpy(stack+desplazamiento, &pcb->cursor_stack, 4);
 	desplazamiento += 4;
 	memcpy(stack+desplazamiento, &pcb->program_counter+1, 4);
@@ -141,6 +143,7 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta){
 /* Primitiva que se invoca en las funciones, recibe la direccion donde retornar el valor y la etiqueta a la cual tiene que ir */
 void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar){
 	llamarSinRetorno(etiqueta);
+	int desplazamiento = pcb->cursor_stack;
 	memcpy(stack+desplazamiento, &donde_retornar, 4);
 	desplazamiento += 4;
 

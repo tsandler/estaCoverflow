@@ -16,7 +16,6 @@
 
 void enviarProgramaAlKernel(char* programa);
 char* recibirSentencia();
-char* obtenerPrograma(char* programa);
 int conectarKernel();
 void inicializarVariables();
 int archivoDeConfiguracionValido();

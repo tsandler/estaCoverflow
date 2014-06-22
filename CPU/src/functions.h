@@ -21,7 +21,6 @@ int recibirQuantum();
 int recibirTamanioStack();
 void pedirStack(int tamanio);
 char* recibirSentencia();
-char* depurarSentencia();
 
 int archivoDeConfiguracionValido();
 void manejarSenial();

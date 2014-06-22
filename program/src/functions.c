@@ -7,8 +7,12 @@
 
 #include "functions.h"
 
+static char* _obtenerPrograma(char* programa);
+
 /* Funcion que envia el programa a ejecutar al kernel */
-void enviarProgramaAlKernel(char* programa){
+void enviarProgramaAlKernel(char* path){
+	char* programa = _obtenerPrograma(path);
+	tam->menu = ENVIO_SCRIPT;
 	tam->length = strlen(programa) + 1;
 	if (enviarDatos(socket_kernel, tam, programa, logs))
 		log_info(logs, "El script para procesar fue enviado");
@@ -16,19 +20,8 @@ void enviarProgramaAlKernel(char* programa){
 		log_error(logs, "Se produjo un error enviando el script para procesar");
 }
 
-/* Funcion que recibe la sentencia a imprimir */
-char* recibirSentencia(){
-	char* sent;
-	if (recibirDatos(socket_kernel, tam, (void*)&sent, logs))
-		log_info(logs, "La sentencia fue recibida correctamente");
-	else
-		log_error(logs, "Se produjo un error recibiendo la sentencia");
-
-	return string_from_format("%s", &sent);
-}
-
 /* Funcion que recibe el programa desde un path indicado */
-char* obtenerPrograma(char* path){
+char* _obtenerPrograma(char* path){
 	struct stat stat_file;
 	stat(path, &stat_file);
 	FILE* file = NULL;
@@ -42,15 +35,22 @@ char* obtenerPrograma(char* path){
 	return buffer;
 }
 
+/* Funcion que recibe la sentencia a imprimir */
+char* recibirSentencia(){
+	char* sent;
+	if (recibirDatos(socket_kernel, tam, (void*)&sent, logs))
+		log_info(logs, "La sentencia fue recibida correctamente");
+	else
+		log_error(logs, "Se produjo un error recibiendo la sentencia");
+
+	return string_from_format("%s", &sent);
+}
+
 /* Funcion que se conecta al kernel y devuelve el socket al que conecto */
 int conectarKernel(){
 	char *ip = config_get_string_value(config, "IP");
 	int port = config_get_int_value(config, "PUERTO_KERNEL");
-	int socket = conectarCliente(ip, port, logs);
-	if (socket < 0)
-		log_error(logs, "El cliente no se pudo conectar correctamente");
-
-	return socket;
+	return conectarCliente(ip, port, logs);
 }
 
 /* Funcion para inicializar las variables globales */

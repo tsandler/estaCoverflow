@@ -63,8 +63,6 @@ int main(int argc, char** argv){
 		if(!enviarDatos(socket_umv, tam, &pcb->pid, logs))
 			log_error(logs, "Se produjo un error enviando el pid a la UMV");
 
-		desplazamiento = pcb->cursor_stack;
-
 		pedirStack(tamanioStack);
 		cargarDiccionario();
 
@@ -74,7 +72,6 @@ int main(int argc, char** argv){
 			pc = pcb->program_counter;
 
 			char* sentencia = recibirSentencia();
-			sentencia = depurarSentencia(sentencia);
 
 			analizadorLinea(strdup(sentencia), &functions, &kernel_functions);
 

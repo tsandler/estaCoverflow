@@ -101,3 +101,5 @@
 [ERROR] 14:16:24:7 program.c/(20235:20235): No se envio el numero
 [ERROR] 14:18:12:543 program.c/(20367:20367): Se produjo un problema al enviar el dato
 [ERROR] 14:18:12:543 program.c/(20367:20367): No se envio el numero
+[ERROR] 16:06:50:242 program.c/(2371:2371): Error al conectar socket
+[ERROR] 16:06:50:242 program.c/(2371:2371): El programa tuvo que finalizar insatisfactoriamente porque no se conecto al kernel

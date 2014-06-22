@@ -12,6 +12,7 @@
 #include "functions.h"
 #include <commons/string.h>
 #include <string.h>
+
 int main(int argc, char **argv) {
 
 	inicializarVariables();
@@ -30,8 +31,7 @@ int main(int argc, char **argv) {
 	}
 	log_info(logs, "El proceso se conecto correctamente con el kernel");
 
-	char* programa = obtenerPrograma(argv[1]);
-	enviarProgramaAlKernel(programa);
+	enviarProgramaAlKernel(argv[1]);
 
 	while (tam->menu != FINALIZAR){
 		char* sentencia = recibirSentencia();

@@ -7,6 +7,8 @@
 
 #include "functions.h"
 
+static char* _depurarSentencia();
+
 /* Funcion que conecta a la CPU con la UMV */
 int conectarUMV(){
 	char *ip = config_get_string_value(config, "IP_UMV");
@@ -124,11 +126,13 @@ char* recibirSentencia(){
 		log_error(logs, "Se produjo un error al recibir la sentencia.");
 
 	log_info(logs, "Sentencia recibida: %s", &sentencia);
-	return string_from_format("%s", &sentencia);
+
+	char* s = string_from_format("%s", &sentencia);
+	return _depurarSentencia(s);
 }
 
 /* Funcion que depura la sentencia eliminando los \n finales */
-char* depurarSentencia(char* sentencia){
+static char* _depurarSentencia(char* sentencia){
 	int i = strlen(sentencia);
 	while (string_ends_with(sentencia, "\n")){
 		i--;

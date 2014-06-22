@@ -23,7 +23,6 @@ t_config* config;
 t_dictionary* diccionarioDeVariables;
 int socket_kernel, socket_umv;
 unsigned char* stack;
-int desplazamiento;
 int seguir;
 bool systemCall;
 
