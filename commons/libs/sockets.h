@@ -50,6 +50,9 @@ typedef enum{
 	RETORNO_DE_STACK,
 	SOY_CPU,
 	SOY_KERNEL,
+	ENVIO_SCRIPT,
+	ESCRIBIR_SEGMENTO,
+	CREAR_SEGMENTO,
 }t_menu;
 
 typedef struct t_length{
