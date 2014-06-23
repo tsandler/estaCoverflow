@@ -138,14 +138,9 @@ int openSocketServerPLP(int PORT) {
 
 				printf("%s",buf);
 				registroPCB* unPCB = armarPCB(buf,newfd);
-				sem_wait(&mutexNEW);
-				queue_push(NEW, unPCB);
-				printf("meti,en new hay %d \n", queue_size(NEW));
-				printf("meti,en new un peso: %d \n", unPCB->peso);
-				free(unPCB);
 
-					sem_post(&mutexNEW);
-					sem_post(&hayAlgo);
+				ponerCola(unPCB,NEW,mutexNEW,hayAlgo);
+
 
 					if (write(newfd, "I got your message \n", 18) < 0)
 						perror("ERROR writing to socket");

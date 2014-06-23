@@ -13,6 +13,7 @@
 #include <memory.h>
 #include <stdlib.h>
 #include <commons/collections/queue.h>
+#include <commons/collections/dictionary.h>
 #include <semaphore.h>
 #include <commons/log.h>
 #include <pthread.h>

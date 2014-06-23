@@ -7,19 +7,26 @@
 #include "globales.h"
 #include "planificador_corto_plazo.h"
 #include "planificador_largo_plazo.h"
+#include "manejoIO.h"
 
 t_config *config;
 t_queue *NEW;
 t_queue *READY;
-t_queue *BLOCK;
+
 t_queue *EXIT;
 sem_t mutexNEW;
 sem_t mutexREADY;
+sem_t mutexREADY;
+sem_t mutexEXEC;
+sem_t mutexEXIT;
+
 sem_t gradoProg;
 sem_t hayAlgo;
 sem_t hayAlgoEnReady;
-t_log *logs;
+sem_t hayAlgoEnExec;
 
+t_log *logs;
+t_dictionary * dispositivosIO;
 void plp(void* ptr);
 void pcp(void* ptr);
 
@@ -39,23 +46,35 @@ int main(int argc, char *argv[]) {
 
 	config = config_create(str3);
 	free(str3);
-	NEW = queue_create();
+
+	NEW = queue_create(); //COLAS
 	READY = queue_create();
 	BLOCK=queue_create();
 	EXIT=queue_create();
-	int gradoMultiprogramacion = config_get_int_value(config,"MULTIPROGRAMACION");
+
+	int gradoMultiprogramacion = config_get_int_value(config,"MULTIPROGRAMACION");  //CONFIG
+	char** dispositivos=config_get_array_value(config,"ID_HIO");
+
+
 	sem_init(&mutexNEW, 0, 1);
 	sem_init(&mutexREADY, 0, 1);
+	sem_init(&mutexEXEC, 0, 1);
+	sem_init(&mutexEXIT, 0, 1);
 	sem_init(&gradoProg, 0, gradoMultiprogramacion-1);
 	sem_init(&hayAlgo, 0, 0);
 	sem_init(&hayAlgoEnReady,0,0);
-	logs = log_create("log_Principal","kernel.c",0,LOG_LEVEL_TRACE);
+	sem_init(&hayAlgoEnExec,0,0);
+
+
+	dispositivosIO= dictionary_create(); // creo diccionario (?)
+
+	logs = log_create("log_Principal","kernel.c",0,LOG_LEVEL_TRACE); //LOG
 
 	pthread_t thread1, thread2;
 
 	int iret1, iret2;
 
-	iret1 = pthread_create(&thread1, NULL, plp, NULL );
+	iret1 = pthread_create(&thread1, NULL, plp, NULL );  //HILO PLP
 
 	if (iret1){
 		log_error(logs,"Error en la creacion del hilo PLP");
@@ -65,7 +84,7 @@ int main(int argc, char *argv[]) {
 
 	}
 
-	iret2 = pthread_create(&thread2, NULL, pcp, NULL );
+	iret2 = pthread_create(&thread2, NULL, pcp, NULL ); //HILO PCP
 
 	if (iret2){
 		log_error(logs, "Error en la creacion del hilo PCP");
@@ -75,9 +94,38 @@ int main(int argc, char *argv[]) {
 
 	}
 
+	int i=0;  // HILOS IO
+	t_io* io;
+	io=malloc(sizeof(t_io));
+
+
+	while(dispositivos[i] != NULL){
+
+		io->nombre=dispositivos[i];
+		io->cola=queue_create();
+		sem_init(&io->hayAlgo,0,0);
+		sem_init(&io->mutex,0,1);
+		dictionary_put(dispositivosIO, io->nombre, io);
+
+
+		pthread_t threadIO;
+		int hiloIO =pthread_create(&threadIO, NULL, manejoIO, (void*)io );  //HILO PLP
+i++;
+		if (iret1){
+			log_error(logs,"Error en la creacion del hilo PLP");
+			log_destroy(logs);
+
+			exit(EXIT_FAILURE);
+		}
+
+
+	}
+
 	pthread_join(thread1, NULL ); //esperar a q termine el otro
 
 	pthread_join(thread2, NULL );
+
+
 
 	sem_destroy(&hayAlgo);
 	sem_destroy(&mutexNEW);
@@ -93,3 +141,4 @@ int main(int argc, char *argv[]) {
 	return EXIT_SUCCESS;
 
 }
+
