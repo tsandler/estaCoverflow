@@ -1,5 +1,5 @@
-#include  "manejoCPU.h"
-#include <libs/colas.h>
+#include "manejoCPU.h"
+#include "colas.h"
 
 extern t_queue* READY;
 extern t_queue* EXIT;

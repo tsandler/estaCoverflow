@@ -21,7 +21,7 @@
 #include <libs/sockets.h>
 #include <pthread.h>
 #include "manejoCPU.h"
-#include <libs/colas.h>
+#include "colas.h"
 
 char* sendMessage(int sockfd, char *msg);
 char* recieveMessage(int sockfd);
