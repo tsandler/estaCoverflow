@@ -17,17 +17,17 @@
 typedef struct registroPCB{
     int pid;
 
-	int* segmento_stack;
-	int* cursor_stack;
+	int segmento_stack;
+	int cursor_stack;
 	int tamanio_contexto;
 
-	int* segmento_codigo;
+	int segmento_codigo;
 	int tamanio_indice_codigo ;
-	t_intructions* indice_codigo;
+	t_intructions indice_codigo;
 	int program_counter;
 
 	char* indice_etiquetas_funciones;
-	int* puntero_etiquetas_funciones;
+	int puntero_etiquetas_funciones;
 	int tamanio_indice_etiquetas_funciones;
 
 	int retrasoIO;

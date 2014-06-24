@@ -53,6 +53,7 @@ typedef enum{
 	ENVIO_SCRIPT,
 	ESCRIBIR_SEGMENTO,
 	CREAR_SEGMENTO,
+	DESTRUIR_SEGMENTO,
 }t_menu;
 
 typedef struct t_length{

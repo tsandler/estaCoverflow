@@ -123,76 +123,79 @@ void intercambiarDatosUMV(int socket_UMV, t_log* logs, registroPCB PCBprograma){
 	tam->length = sizeof(datos_crearSeg);
 
 	int datoRecibido;
-	int continuo = 1;
 
 	//envio segmento etiquetas_funciones
-	while(continuo){
-		datosAEnviar->tamanio = PCBprograma.tamanio_indice_etiquetas_funciones;
-		tam->menu = CREAR_SEGMENTO;
-		if(!enviarDatos(socket_UMV, tam, (void*)datosAEnviar, logs))
-				log_error( logs ,"Error en el envio de los datos");
-		if (!recibirDatos (socket_UMV,tam,(void*)datoRecibido,logs))
-			log_error (logs,"Error en el envio del Segmento Etiquetas_Funciones");
-		else{
-			if(datoRecibido > 0){
-			continuo = 0;
+	datosAEnviar->tamanio = PCBprograma.tamanio_indice_etiquetas_funciones;
+	tam->menu = CREAR_SEGMENTO;
+	if(!enviarDatos(socket_UMV, tam, (void*)datosAEnviar, logs))
+		log_error( logs ,"Error en el envio de los datos");
+	if (!recibirDatos (socket_UMV,tam,(void*)datoRecibido,logs))
+		log_error (logs,"Error en el envio del Segmento Etiquetas_Funciones");
+	else{
+		if(datoRecibido > 0)
 			PCBprograma.puntero_etiquetas_funciones = datoRecibido;
-			}
+		else{
+			log_error (logs, "La UMV se quedo sin memoria");
+			goto termino_ejecucion;
 		}
 	}
 
-	continuo = 1;
-	while(continuo){
-		//envio segmento Codigo
-		datosAEnviar->tamanio = PCBprograma.tamanio_indice_codigo;
-		tam->menu = CREAR_SEGMENTO;
-		if(!enviarDatos(socket_UMV, tam, (void*)datosAEnviar, logs))
-				log_error( logs ,"Error en el envio de los datos");
-		if (!recibirDatos (socket_UMV,tam,(void*)datoRecibido,logs))
-			log_error (logs,"Error en el envio del Segmento Indice_Codigo");
-		else{
-			if(datoRecibido > 0){
-			continuo = 0;
+
+	//envio segmento Codigo
+	datosAEnviar->tamanio = PCBprograma.tamanio_indice_codigo;
+	tam->menu = CREAR_SEGMENTO;
+	if(!enviarDatos(socket_UMV, tam, (void*)datosAEnviar, logs))
+		log_error( logs ,"Error en el envio de los datos");
+	if (!recibirDatos (socket_UMV,tam,(void*)datoRecibido,logs))
+		log_error (logs,"Error en el envio del Segmento Indice_Codigo");
+	else{
+		if(datoRecibido > 0)
 			PCBprograma.segmento_codigo = datoRecibido;
-			}
+		else{
+			log_error (logs, "La UMV se quedo sin memoria");
+			goto termino_ejecucion;
 		}
 	}
 
-	continuo = 1;
-	while(continuo){
+
 	//envio contexto
-		datosAEnviar->tamanio = PCBprograma.tamanio_contexto;
-		tam->menu = CREAR_SEGMENTO;
-		if(!enviarDatos(socket_UMV, tam, (void*)datosAEnviar,logs))
-			log_error(logs,"Error en el envio de los datos");
-		if(!recibirDatos(socket_UMV,tam,(void*)datoRecibido,logs))
-			log_error (logs, "Error en el envio del Contexto");
+	datosAEnviar->tamanio = PCBprograma.tamanio_contexto;
+	tam->menu = CREAR_SEGMENTO;
+	if(!enviarDatos(socket_UMV, tam, (void*)datosAEnviar,logs))
+		log_error(logs,"Error en el envio de los datos");
+	if(!recibirDatos(socket_UMV,tam,(void*)datoRecibido,logs))
+		log_error (logs, "Error en el envio del Contexto");
+	else{
+		if(datoRecibido > 0)
+			PCBprograma.program_counter = datoRecibido; //No estoy seguro si tengo que asignar esto lo podriamos charlar...habria que cambiar algo del PCB sino.
 		else{
-			if(datoRecibido > 0){
-				continuo = 0;
-				PCBprograma.program_counter = datoRecibido; //No estoy seguro si tengo que asignar esto lo podriamos charlar...habria que cambiar algo del PCB sino.
-			}
+			log_error(logs,"La UMV se quedo sin memoria");
+			goto termino_ejecucion;
 		}
 	}
 
-	continuo = 1;
-	while(continuo){
 	//envio stack
-		datosAEnviar->tamanio = config_get_int_value(config,"TAMANIO_STACK");
-		tam->menu = CREAR_SEGMENTO;
-		if(!enviarDatos(socket_UMV, tam, (void*)datosAEnviar, logs))
-			log_error(logs,"Error en el envio de los datos");
-		if(!recibirDatos(socket_UMV,tam,(void*)datoRecibido,logs))
-			log_error (logs, "Error en el envio del segmento Stack");
-		else{
-			if(datoRecibido > 0){
-			continuo = 0;
+	datosAEnviar->tamanio = config_get_int_value(config,"TAMANIO_STACK");
+	tam->menu = CREAR_SEGMENTO;
+	if(!enviarDatos(socket_UMV, tam, (void*)datosAEnviar, logs))
+		log_error(logs,"Error en el envio de los datos");
+	if(!recibirDatos(socket_UMV,tam,(void*)datoRecibido,logs))
+		log_error (logs, "Error en el envio del segmento Stack");
+	else{
+		if(datoRecibido > 0)
 			PCBprograma.segmento_stack = datoRecibido;
-			}
+		else{
+			log_error(logs,"La UMV se quedo sin memoria");
+			goto termino_ejecucion;
 		}
+	goto termino;
 	}
-}
+termino_ejecucion:
+log_error (logs,"Se ha abortado el proceso de CREACION DE SEGMENTOS");
 
+termino:
+log_info(logs,"Se termino el proceso de CONEXION y CREACION DE SEGMENTOS");
+}
 
 void conectarseUMV(registroPCB PCBprograma, t_log *logs){
     int socket_UMV;
@@ -208,3 +211,21 @@ void conectarseUMV(registroPCB PCBprograma, t_log *logs){
 	}
 }
 // El socket de la uMV habria que cerrarlo una vez que se resfieren los datos y todo...
+
+void eliminarSegmentoUMV(int socket_UMV, t_log* logs,registroPCB PCBprograma){
+	t_length *tam;
+	tam = malloc(sizeof(t_length));
+	tam->menu = DESTRUIR_SEGMENTO;
+	while(1){
+		if(!enviarMenu(socket_UMV, tam, logs))//Le aviso a la UMV que soy el kernel
+			log_error(logs,"Error en la identificacion");
+		else
+			break;
+	}
+	tam->menu = PID_ACTUAL ;
+	int datos_pid = PCBprograma.pid;
+	if(!enviarDatos(socket_UMV, tam, (void*)datos_pid,logs))
+		log_error(logs,"Error en el envio del pid");
+	else
+		log_info (logs, "Se pidio la destruccion del SEGMENTO de forma EXITOSA");
+}
