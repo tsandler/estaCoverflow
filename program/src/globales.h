@@ -18,6 +18,6 @@ t_log *logs;
 t_length *tam;
 t_config *config;
 
-int socket_kernel;
+int socketKernel;
 
 #endif /* GLOBALES_H_ */

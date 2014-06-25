@@ -6,6 +6,7 @@
  */
 
 #include "kernelSocket.h"
+#include <commons/string.h>
 
 #define BROKEN "BROKEN"
 #define MAXBUFFSIZE 1024
@@ -75,7 +76,7 @@ int openSocketServerPLP(int PORT) {
 	//int nbytes;
 	/* para setsockopt()  */
 	int yes = 1;
-	t_length* tam;
+	t_length* tam = malloc(sizeof(t_length));
 
 	FD_ZERO(&master); //que se yo q hace pero tiene  estar
 	FD_ZERO(&read_fds);
@@ -130,23 +131,17 @@ int openSocketServerPLP(int PORT) {
 		} else {
 			printf("aceptado !...\n");
 
-			if (recibirDatos(newfd, tam, buf, logs) <= 0) // si es -1 no hay nada
+			if (recibirDatos(newfd, tam, (void*)&buf, logs)) {
+				char* s = string_from_format("%s", &buf);
+				log_debug(logs, "%s", &buf);
+				registroPCB* unPCB = armarPCB(s,newfd);
 
-			{
-//mostrar error en logs
-			} else {
-
-				printf("%s",buf);
-				registroPCB* unPCB = armarPCB(buf,newfd);
-
-				ponerCola(unPCB,NEW,mutexNEW,hayAlgo);
+				ponerCola(unPCB,NEW,mutexNEW, hayAlgo);
 
 
-					if (write(newfd, "I got your message \n", 18) < 0)
-						perror("ERROR writing to socket");
-					memset(&buf[0], 0, sizeof(buf));
-
-
+				if (write(newfd, "I got your message \n", 18) < 0)
+					perror("ERROR writing to socket");
+				memset(&buf[0], 0, sizeof(buf));
 			}
 		}
 	}

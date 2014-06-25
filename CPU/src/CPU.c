@@ -26,79 +26,78 @@ int main(int argc, char** argv){
 	diccionarioDeVariables = dictionary_create();
 	tam = malloc(sizeof(t_length));
 
-	if (!archivoDeConfiguracionValido()){
+	if (!archivo_de_configuracion_valido()){
 		log_error(logs, "El archivo de configuracion no tiene todos los campos necesarios");
-		liberarEstructuras();
+		liberar_estructuras();
 		return 0;
 	}
 
-	socket_umv = conectarUMV();
-	socket_kernel = conectarKernel();
-	int quantum = recibirQuantum();
-	int tamanioStack = recibirTamanioStack();
+	socketUMV = conectar_UMV();
+	socketKernel = conectar_kernel();
+	int quantum = recibir_quantum();
+	int tamanioStack = recibir_tamanio_stack();
 
-	if(socket_kernel < 0 || socket_umv < 0 || quantum < 0 || tamanioStack < 0){ //Si no se conecto al kernel o UMV no puede continuar y termina la ejecucion
+	if(socketKernel < 0 || socketUMV < 0 || quantum < 0 || tamanioStack < 0){ //Si no se conecto al kernel o UMV no puede continuar y termina la ejecucion
 		log_error(logs, "El programa tuvo que finalizar insatisfactoriamente");
-		liberarEstructuras();
+		liberar_estructuras();
 		return 0;
 	}
 	tam->menu = SOY_CPU;
-	enviarMenu(socket_kernel, tam, logs);
-	enviarMenu(socket_umv, tam, logs);
+	enviarMenu(socketKernel, tam, logs);
+	enviarMenu(socketUMV, tam, logs);
 
-	inicializarFuncionesParser();
+	inicializar_funciones_parser();
 
 	int pc;
 	seguir = 1;
 
-	signal(SIGUSR1, manejarSenial);
+	signal(SIGUSR1, manejar_senial);
 
 	while (seguir){
 		int cont = 0;
-		if(!recibirDatos(socket_kernel, tam, (void*)pcb, logs))
+		if(!recibirDatos(socketKernel, tam, (void*)pcb, logs))
 			log_error(logs, "Se produjo un error al recibir el PCB del kernel");
 
 		tam->menu = PID_ACTUAL;
 		tam->length = sizeof(pcb->pid);
-		if(!enviarDatos(socket_umv, tam, &pcb->pid, logs))
+		if(!enviarDatos(socketUMV, tam, &pcb->pid, logs))
 			log_error(logs, "Se produjo un error enviando el pid a la UMV");
 
-		pedirStack(tamanioStack);
-		cargarDiccionario();
+		pedir_stack(tamanioStack);
+		cargar_diccionario();
 
 		systemCall = false;
 
 		while (quantum > cont && !systemCall && seguir){
 			pc = pcb->program_counter;
 
-			char* sentencia = recibirSentencia();
+			char* sentencia = recibir_sentencia();
 
 			analizadorLinea(strdup(sentencia), &functions, &kernel_functions);
 
-			cont++;
-
 			if (pc == pcb->program_counter)
 				pcb->program_counter++;
+			cont++;
 		}
-
-		tam->menu = CONCLUYO_UN_QUANTUM;
-		tam->length = sizeof(registroPCB);
-
-		if (!enviarDatos(socket_kernel, tam, pcb, logs))
-			log_error(logs, "Se produjo un error al notificar al pcp que concluyo un quantum.");
+		if (tam->menu != ENTRADA_SALIDA){
+			tam->menu = CONCLUYO_UN_QUANTUM;
+			tam->length = sizeof(registroPCB);
+			if (!enviarDatos(socketKernel, tam, pcb, logs))
+				log_error(logs, "Se produjo un error al notificar al pcp que concluyo un quantum.");
+		}
 
 		tam->menu = ESCRIBIR_SEGMENTO;
 		tam->length = tamanioStack;
 
-		if(!enviarDatos(socket_umv, tam, stack, logs))
+		if(!enviarDatos(socketUMV, tam, stack, logs))
 			log_error(logs, "Se produjo un error al devolverle el stack a la umv");
 
 		dictionary_clean(diccionarioDeVariables);
 	}
 
-	cerrarSocket(socket_kernel);
-	cerrarSocket(socket_umv);
-	liberarEstructuras();
+	cerrarSocket(socketKernel);
+	cerrarSocket(socketUMV);
+	liberar_estructuras();
 
 	return 0;
 }

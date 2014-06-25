@@ -7,21 +7,21 @@
 
 #include "functions.h"
 
-static char* _obtenerPrograma(char* programa);
+static char* _obtener_programa(char* programa);
 
 /* Funcion que envia el programa a ejecutar al kernel */
-void enviarProgramaAlKernel(char* path){
-	char* programa = _obtenerPrograma(path);
+void enviar_programa_al_kernel(char* path){
+	char* programa = _obtener_programa(path);
 	tam->menu = ENVIO_SCRIPT;
 	tam->length = strlen(programa) + 1;
-	if (enviarDatos(socket_kernel, tam, programa, logs))
+	if (enviarDatos(socketKernel, tam, programa, logs))
 		log_info(logs, "El script para procesar fue enviado");
 	else
 		log_error(logs, "Se produjo un error enviando el script para procesar");
 }
 
 /* Funcion que recibe el programa desde un path indicado */
-char* _obtenerPrograma(char* path){
+static char* _obtener_programa(char* path){
 	struct stat stat_file;
 	stat(path, &stat_file);
 	FILE* file = NULL;
@@ -36,25 +36,26 @@ char* _obtenerPrograma(char* path){
 }
 
 /* Funcion que recibe la sentencia a imprimir */
-char* recibirSentencia(){
+char* recibir_sentencia(){
 	char* sent;
-	if (recibirDatos(socket_kernel, tam, (void*)&sent, logs))
+	if (recibirDatos(socketKernel, tam, (void*)&sent, logs)){
 		log_info(logs, "La sentencia fue recibida correctamente");
-	else
+		tam->menu = FINALIZAR;
+	}else
 		log_error(logs, "Se produjo un error recibiendo la sentencia");
 
 	return string_from_format("%s", &sent);
 }
 
 /* Funcion que se conecta al kernel y devuelve el socket al que conecto */
-int conectarKernel(){
+int conectar_kernel(){
 	char *ip = config_get_string_value(config, "IP");
 	int port = config_get_int_value(config, "PUERTO_KERNEL");
 	return conectarCliente(ip, port, logs);
 }
 
 /* Funcion para inicializar las variables globales */
-void inicializarVariables(){
+void inicializar_variables(){
 	char* path = getenv("ANSISOP_CONFIG");
 	config = config_create(path);
 	tam = malloc(sizeof(t_length));
@@ -62,7 +63,7 @@ void inicializarVariables(){
 }
 
 /* Funcion para verificar si el archivo de configuracion es valido */
-int archivoDeConfiguracionValido(){
+int archivo_de_configuracion_valido(){
 	if (!config_has_property(config, "IP"))
 		return 0;
 	if (!config_has_property(config, "PUERTO_KERNEL"))
@@ -71,7 +72,7 @@ int archivoDeConfiguracionValido(){
 }
 
 /* Funcion para liberar las estructuras usadas */
-void liberarEstructuras(){
+void liberar_estructuras(){
 	config_destroy(config);
 	log_destroy(logs);
 }

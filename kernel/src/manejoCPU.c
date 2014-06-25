@@ -33,14 +33,14 @@ void manejoCPU(int fd) {
 	while (1) {
 		registroPCB* PCBrecibido=malloc(sizeof(registroPCB));
 		registroPCB* PCBPOP=malloc(sizeof(registroPCB));
-		recibirDatos(fd, tam, PCBrecibido, logs);
+		recibirMenu(fd, tam, logs);
 		//como recibo, debo sacarlo del exec, NO SE COMO USAR ESTA FC.
 		//list_remove_by_condition(EXEC, bool(*condition)(void*));
 
 
 		switch (tam->menu) {
 
-		case OBTENER_VALOR_COMPARTIDA:
+		/*case OBTENER_VALOR_COMPARTIDA: // char*
 			//proceso el pcb y lo pongo en cola de ready de nuevo
 			ponerCola(PCBrecibido, READY, mutexREADY, hayAlgoEnReady);
 			//saco otro pcb para enviarlo y ejecutarlo
@@ -51,7 +51,7 @@ void manejoCPU(int fd) {
 			sem_post(&mutex);
 
 			break;
-		case ASIGNAR_VALOR_COMPARTIDA:
+		case ASIGNAR_VALOR_COMPARTIDA: //char*
 			ponerCola(PCBrecibido, READY, mutexREADY, hayAlgoEnReady);
 			PCBPOP = sacarCola(READY, mutexREADY, hayAlgoEnReady);
 			sem_wait(&mutex);	//envio datos y pongo en exec atomicamente
@@ -59,7 +59,7 @@ void manejoCPU(int fd) {
 			enviarDatos(fd, tam, PCBPOP, logs);
 			sem_post(&mutex);
 			break;
-		case PEDIR_INDICE_ETIQUETAS:
+		case IMPRIMIR: //int
 			ponerCola(PCBrecibido, READY, mutexREADY, hayAlgoEnReady);
 			PCBPOP = sacarCola(READY, mutexREADY, hayAlgoEnReady);
 			sem_wait(&mutex);	//envio datos y pongo en exec atomicamente
@@ -67,7 +67,7 @@ void manejoCPU(int fd) {
 			enviarDatos(fd, tam, PCBPOP, logs);
 			sem_post(&mutex);
 			break;
-		case IMPRIMIR:
+		case IMPRIMIR_TEXTO: //char*
 			ponerCola(PCBrecibido, READY, mutexREADY, hayAlgoEnReady);
 			PCBPOP = sacarCola(READY, mutexREADY, hayAlgoEnReady);
 			sem_wait(&mutex);	//envio datos y pongo en exec atomicamente
@@ -75,15 +75,7 @@ void manejoCPU(int fd) {
 			enviarDatos(fd, tam, PCBPOP, logs);
 			sem_post(&mutex);
 			break;
-		case IMPRIMIR_TEXTO:
-			ponerCola(PCBrecibido, READY, mutexREADY, hayAlgoEnReady);
-			PCBPOP = sacarCola(READY, mutexREADY, hayAlgoEnReady);
-			sem_wait(&mutex);	//envio datos y pongo en exec atomicamente
-			ponerCola(unPCB,EXEC, mutexEXEC, hayAlgoEnExec);
-			enviarDatos(fd, tam, PCBPOP, logs);
-			sem_post(&mutex);
-			break;
-		case ENTRADA_SALIDA:
+		case ENTRADA_SALIDA: //char* (dispositivo), int (tiempo)
 
 			// deberiamos filtrar de alguna manera a q io va. arreglar con cpu.
 
@@ -94,7 +86,7 @@ void manejoCPU(int fd) {
 			enviarDatos(fd, tam, PCBPOP, logs);
 			sem_post(&mutex);
 			break;
-		case WAIT:
+		case WAIT: //char*
 			ponerCola(PCBrecibido, READY, mutexREADY, hayAlgoEnReady);
 			PCBPOP = sacarCola(READY, mutexREADY, hayAlgoEnReady);
 			sem_wait(&mutex);	//envio datos y pongo en exec atomicamente
@@ -102,15 +94,16 @@ void manejoCPU(int fd) {
 			enviarDatos(fd, tam, PCBPOP, logs);
 			sem_post(&mutex);
 			break;
-		case SIGNAL:
+		case SIGNAL: //char*
 			ponerCola(PCBrecibido, READY, mutexREADY, hayAlgoEnReady);
 			PCBPOP = sacarCola(READY, mutexREADY, hayAlgoEnReady);
 			sem_wait(&mutex);	//envio datos y pongo en exec atomicamente
 			ponerCola(unPCB,EXEC, mutexEXEC, hayAlgoEnExec);
 			enviarDatos(fd, tam, PCBPOP, logs);
 			sem_post(&mutex);
-			break;
+			break;*/
 		case CONCLUYO_UN_QUANTUM:
+			recibirDato(fd, tam->length, (void*)PCBrecibido, logs);
 			ponerCola(PCBrecibido, READY, mutexREADY, hayAlgoEnReady);
 			PCBPOP = sacarCola(READY, mutexREADY, hayAlgoEnReady);
 			sem_wait(&mutex);	//envio datos y pongo en exec atomicamente
@@ -120,30 +113,6 @@ void manejoCPU(int fd) {
 			break;
 		case FINALIZAR:
 			queue_push(EXIT, PCBrecibido);
-			break;
-		case LEER_SEGMENTO:
-			ponerCola(PCBrecibido, READY, mutexREADY, hayAlgoEnReady);
-			PCBPOP = sacarCola(READY, mutexREADY, hayAlgoEnReady);
-			sem_wait(&mutex);	//envio datos y pongo en exec atomicamente
-			ponerCola(unPCB,EXEC, mutexEXEC, hayAlgoEnExec);
-			enviarDatos(fd, tam, PCBPOP, logs);
-			sem_post(&mutex);
-			break;
-		case PEDIR_SENTENCIA:
-			ponerCola(PCBrecibido, READY, mutexREADY, hayAlgoEnReady);
-			PCBPOP = sacarCola(READY, mutexREADY, hayAlgoEnReady);
-			sem_wait(&mutex);	//envio datos y pongo en exec atomicamente
-			ponerCola(unPCB,EXEC, mutexEXEC, hayAlgoEnExec);
-			enviarDatos(fd, tam, PCBPOP, logs);
-			sem_post(&mutex);
-			break;
-		case RETORNO_DE_STACK:
-			ponerCola(PCBrecibido, READY, mutexREADY, hayAlgoEnReady);
-			PCBPOP = sacarCola(READY, mutexREADY, hayAlgoEnReady);
-			sem_wait(&mutex);	//envio datos y pongo en exec atomicamente
-			ponerCola(unPCB,EXEC, mutexEXEC, hayAlgoEnExec);
-			enviarDatos(fd, tam, PCBPOP, logs);
-			sem_post(&mutex);
 			break;
 		default:
 			printf("ERROR en recv desde la CPU");

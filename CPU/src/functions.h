@@ -13,17 +13,17 @@
 #include <commons/string.h>
 #include "globales.h"
 
-int conectarUMV();
-int conectarKernel();
+int conectar_UMV();
+int conectar_kernel();
 
-void cargarDiccionario();
-int recibirQuantum();
-int recibirTamanioStack();
-void pedirStack(int tamanio);
-char* recibirSentencia();
+void cargar_diccionario();
+int recibir_quantum();
+int recibir_tamanio_stack();
+void pedir_stack(int tamanio);
+char* recibir_sentencia();
 
-int archivoDeConfiguracionValido();
-void manejarSenial();
-void liberarEstructuras();
+int archivo_de_configuracion_valido();
+void manejar_senial();
+void liberar_estructuras();
 
 #endif /* FUNCTIONS_H_ */

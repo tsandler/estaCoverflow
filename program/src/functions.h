@@ -14,11 +14,11 @@
 #include <commons/string.h>
 
 
-void enviarProgramaAlKernel(char* programa);
-char* recibirSentencia();
-int conectarKernel();
-void inicializarVariables();
-int archivoDeConfiguracionValido();
-void liberarEstructuras();
+void enviar_programa_al_kernel(char* programa);
+char* recibir_sentencia();
+int conectar_kernel();
+void inicializar_variables();
+int archivo_de_configuracion_valido();
+void liberar_estructuras();
 
 #endif /* FUNCTIONS_H_ */

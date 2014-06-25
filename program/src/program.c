@@ -15,31 +15,31 @@
 
 int main(int argc, char **argv) {
 
-	inicializarVariables();
+	inicializar_variables();
 
-	if (!archivoDeConfiguracionValido()){
+	if (!archivo_de_configuracion_valido()){
 		log_error(logs, "El archivo de configuracion no tiene todos los campos necesarios");
-		liberarEstructuras();
+		liberar_estructuras();
 		return 0;
 	}
 
-	socket_kernel = conectarKernel();
-	if (socket_kernel < 0){
+	socketKernel = conectar_kernel();
+	if (socketKernel < 0){
 		log_error(logs, "El programa tuvo que finalizar insatisfactoriamente porque no se conecto al kernel");
-		liberarEstructuras();
+		liberar_estructuras();
 		return 0;
 	}
 	log_info(logs, "El proceso se conecto correctamente con el kernel");
 
-	enviarProgramaAlKernel(argv[1]);
+	enviar_programa_al_kernel(argv[1]);
 
 	while (tam->menu != FINALIZAR){
-		char* sentencia = recibirSentencia();
+		char* sentencia = recibir_sentencia();
 		printf("%s/n", sentencia);
 	}
 
-	cerrarSocket(socket_kernel);
-	liberarEstructuras();
+	cerrarSocket(socketKernel);
+	liberar_estructuras();
 
 	return 0;
 }

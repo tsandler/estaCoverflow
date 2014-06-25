@@ -32,11 +32,11 @@ void pcp(void* ptr);
 
 
 
-int main(int argc, char *argv[]) {
+int main(int argc, char **argv) {
 
 /////////////////////////////////////////////////////////////////////////
 	char* str2;
-	str2 = "/home/utnso/git/tp-2014-1c-out-of-range/kernel/";
+	str2 = "/home/utnso/workspace/tp-2014-1c-out-of-range/kernel/";
 	char * str3 = (char *) malloc(
 			1 + strlen("config.cnf") + strlen(str2));
 	strcpy(str3, str2);
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
 
 /////////////////////////////////////////////////////////////////////////
 
-	config = config_create(str3);
+	config = config_create("config.cnf");
 	free(str3);
 
 	NEW = queue_create(); //COLAS
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
 
 	dispositivosIO= dictionary_create(); // creo diccionario (?)
 
-	logs = log_create("log_Principal","kernel.c",0,LOG_LEVEL_TRACE); //LOG
+	logs = log_create("log_Principal","kernel.c",1,LOG_LEVEL_TRACE); //LOG
 
 	pthread_t thread1, thread2;
 
@@ -95,11 +95,10 @@ int main(int argc, char *argv[]) {
 	}
 
 	int i=0;  // HILOS IO
-	t_io* io;
-	io=malloc(sizeof(t_io));
-
 
 	while(dispositivos[i] != NULL){
+		t_io* io;
+		io=malloc(sizeof(t_io));
 
 		io->nombre=dispositivos[i];
 		io->cola=queue_create();

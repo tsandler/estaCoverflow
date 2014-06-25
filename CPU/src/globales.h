@@ -21,7 +21,7 @@ t_length* tam;
 registroPCB *pcb;
 t_config* config;
 t_dictionary* diccionarioDeVariables;
-int socket_kernel, socket_umv;
+int socketKernel, socketUMV;
 unsigned char* stack;
 int seguir;
 bool systemCall;

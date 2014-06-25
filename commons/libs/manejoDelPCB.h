@@ -11,7 +11,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../parser/metadata_program.h"
-
+#include "sockets.h"
+#include "../commons/log.h"
+#include "../commons/config.h"
+//#include <kernel/src/planificador_largo_plazo.h>
 
 
 typedef struct registroPCB{
@@ -23,10 +26,10 @@ typedef struct registroPCB{
 
 	int segmento_codigo;
 	int tamanio_indice_codigo ;
-	t_intructions indice_codigo;
+	int indice_codigo;
 	int program_counter;
 
-	char* indice_etiquetas_funciones;
+	int indice_etiquetas_funciones;
 	int puntero_etiquetas_funciones;
 	int tamanio_indice_etiquetas_funciones;
 
