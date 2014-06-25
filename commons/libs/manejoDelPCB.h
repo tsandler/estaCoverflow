@@ -14,7 +14,7 @@
 #include "sockets.h"
 #include "../commons/log.h"
 #include "../commons/config.h"
-//#include <kernel/src/planificador_largo_plazo.h>
+
 
 
 typedef struct registroPCB{
@@ -39,6 +39,6 @@ typedef struct registroPCB{
 
 }registroPCB;
 
-registroPCB* armarPCB(char* program, int fd);
+
 
 #endif /* MANEJODELPCB_H_ */
