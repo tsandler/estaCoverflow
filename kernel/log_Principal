@@ -1,0 +1,49 @@
+[INFO] 17:47:13:0 kernel.c/(7130:7164): El grado de multiprogramacion es : 4 
+
+[INFO] 17:47:13:0 kernel.c/(7130:7164): En la cola New hay: 0 
+
+[INFO] 17:47:14:521 kernel.c/(7130:7164): Se saco el programa segun SJN
+[INFO] 17:50:19:900 kernel.c/(7255:7287): El grado de multiprogramacion es : 4 
+
+[INFO] 17:50:19:900 kernel.c/(7255:7287): En la cola New hay: 0 
+
+[DEBUG] 17:53:11:957 kernel.c/(7489:7520): #!/usr/bin/ansisop
+begin
+	variables a, b
+	a = 3
+	b = 5
+	a = b + 12
+end
+
+
+
+[DEBUG] 17:56:56:310 kernel.c/(7716:7785): #!/usr/bin/ansisop
+begin
+	variables a, b
+	a = 3
+	b = 5
+	a = b + 12
+end
+
+
+
+[DEBUG] 17:58:57:286 kernel.c/(7907:7939): #!/usr/bin/ansisop
+begin
+	variables a, b
+	a = 3
+	b = 5
+	a = b + 12
+end
+
+
+
+[DEBUG] 18:00:06:666 kernel.c/(8059:8097): #!/usr/bin/ansisop
+begin
+	variables a, b
+	a = 3
+	b = 5
+	a = b + 12
+end
+
+
+
