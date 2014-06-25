@@ -26,13 +26,8 @@ void pcp(void* ptr) {
 		exit(EXIT_FAILURE);
 	}
 
-/*	int iret4 = pthread_create(&thread4, NULL, manejoCPU,(void*)port);
 
-	if (iret4) {
-		//log_info(logs,"Error en la creacion del hilo manejocpu");
-		exit(EXIT_FAILURE);
-	}
 
-*/
+
 }
 

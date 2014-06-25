@@ -54,6 +54,7 @@ int main(int argc, char **argv) {
 
 	int gradoMultiprogramacion = config_get_int_value(config,"MULTIPROGRAMACION");  //CONFIG
 	char** dispositivos=config_get_array_value(config,"ID_HIO");
+	char** dispRetardo=config_get_array_value(config,"HIO");
 
 
 	sem_init(&mutexNEW, 0, 1);
@@ -101,6 +102,8 @@ int main(int argc, char **argv) {
 		io=malloc(sizeof(t_io));
 
 		io->nombre=dispositivos[i];
+		int a = atoi(dispRetardo[i]);
+		io->retardo=a;
 		io->cola=queue_create();
 		sem_init(&io->hayAlgo,0,0);
 		sem_init(&io->mutex,0,1);

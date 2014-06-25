@@ -11,6 +11,7 @@ typedef struct t_io{
 	sem_t hayAlgo;
 	sem_t mutex;
 	t_queue* cola;
+	int retardo;
 }t_io;
 
 void manejoIO(t_io* io);

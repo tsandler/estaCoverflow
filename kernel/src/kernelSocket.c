@@ -214,31 +214,19 @@ int openSocketServerPCP(int PORT) {
 		} else {
 			printf("aceptado !...\n");
 
-			if ((nbytes = recv(newfd, buf, sizeof(buf), 0)) <= 0) // si es -1 no hay nada
-
-					{
-
-				if (nbytes == 0) {
-					printf("No hay nada en el archivo :S");
-				}
-
-				else
-					perror("recvPCP() error ...");
-
-			} else {
 
 				pthread_t thread;
 				int iret1 = pthread_create(&thread, NULL, manejoCPU,(void*)newfd);
 
 						if (iret1){
-							log_info(logs, "Error en la creacion del hilo openSocketServerPLP");
+							log_info(logs, "Error en la creacion del hilo CPU");
 							exit(EXIT_FAILURE);
 						}
-				if (write(newfd, "I got your message", 18) < 0)
+				if (write(newfd, "I got your CPU", 18) < 0)
 					perror("ERROR writing to socket");
 				memset(&buf[0], 0, sizeof(buf));
 
-			}
+
 		}
 
 	}
