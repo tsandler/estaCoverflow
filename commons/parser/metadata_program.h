@@ -25,7 +25,7 @@
 	#include <stdlib.h>
 	#include <string.h>
 
-	#include "../commons/string.h"
+	#include <commons/string.h>
 
 	typedef struct {
 		t_puntero_instruccion	start;
@@ -46,7 +46,7 @@
 
 t_metadata_program* metadata_desde_literal(const char*);
 void metadata_destruir(t_metadata_program*);
-t_puntero_instruccion metadata_buscar_etiqueta(const t_nombre_etiqueta objetivo, char *etiquetas, const t_size etiquetas_size);
+t_puntero_instruccion metadata_buscar_etiqueta(const t_nombre_etiqueta objetivo, const char *etiquetas, const t_size etiquetas_size);
 
 // compatibilidad hacia atras
 t_metadata_program* metadatada_desde_literal(const char*);

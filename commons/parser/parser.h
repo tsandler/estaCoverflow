@@ -23,9 +23,10 @@
 	#include <stdlib.h>
 	#include <string.h>
 
-	#include "../commons/collections/dictionary.h"
-	#include "../commons/string.h"
-	#include "../commons/error.h"
+	#include <commons/collections/dictionary.h>
+	#include <commons/string.h>
+	#include <commons/string.h>
+	#include <commons/error.h>
 
 	//Tipos de datos
 	typedef u_int32_t t_puntero;
