@@ -25,7 +25,7 @@
 	#include <stdlib.h>
 	#include <string.h>
 
-	#include <commons/string.h>
+	#include "../commons/string.h"
 
 	typedef struct {
 		t_puntero_instruccion	start;
