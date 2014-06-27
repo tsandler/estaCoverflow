@@ -10,6 +10,10 @@ src/manejoIO.d: ../src/manejoIO.c ../src/manejoIO.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../parser/../commons/collections/node.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../parser/../commons/string.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../parser/../commons/error.h \
+ /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/sockets.h \
+ /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../commons/config.h \
+ /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../commons/collections/dictionary.h \
+ /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../commons/log.h \
  ../src/colas.h
 
 ../src/manejoIO.h:
@@ -35,5 +39,13 @@ src/manejoIO.d: ../src/manejoIO.c ../src/manejoIO.h \
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../parser/../commons/string.h:
 
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../parser/../commons/error.h:
+
+/home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/sockets.h:
+
+/home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../commons/config.h:
+
+/home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../commons/collections/dictionary.h:
+
+/home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../commons/log.h:
 
 ../src/colas.h:

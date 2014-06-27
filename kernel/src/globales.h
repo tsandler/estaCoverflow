@@ -23,7 +23,7 @@
 #include <commons/config.h>
 #include <commons/string.h>
 #include <libs/manejoDelPCB.h>
-
+#include "manejoSemaforos.h"
 
 
 

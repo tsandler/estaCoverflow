@@ -8,6 +8,7 @@
 #include "planificador_corto_plazo.h"
 #include "planificador_largo_plazo.h"
 #include "manejoIO.h"
+#include "manejoSemaforos.h"
 
 t_config *config;
 t_queue *NEW;
