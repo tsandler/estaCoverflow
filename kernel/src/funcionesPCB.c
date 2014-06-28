@@ -10,7 +10,7 @@
 #include "planificador_largo_plazo.h"
 #include <commons/log.h>
 
-
+extern int socketUMV;
 extern t_config* config;
 extern t_log* logs;
 int identificadorUnico = 0;
@@ -168,8 +168,8 @@ registroPCB* armarPCB(char* program, int fd){
 	identificadorUnico =+ 1;
     unPCB->pid = identificadorUnico;
 
-  //  int socket=conectarseUMV();
-  // intercambiarDatosUMV(socket,logs,unPCB, program);
+
+  // intercambiarDatosUMV(socketUMV,logs,unPCB, program);
 	return unPCB;
 
 

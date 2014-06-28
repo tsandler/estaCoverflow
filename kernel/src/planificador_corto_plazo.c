@@ -11,11 +11,11 @@
 extern t_config *config;
 extern t_queue *NEW;
 extern t_queue *READY;
+extern t_queue *EXIT;
 
 
 void pcp(void* ptr) {
 
-	//pthread_t thread1;
 	pthread_t thread3, thread4;
 	int port = config_get_int_value(config, "PUERTO_CPU");
 
@@ -25,6 +25,7 @@ void pcp(void* ptr) {
 		//log_info(logs,"Error en la creacion del hilo serverpcp");
 		exit(EXIT_FAILURE);
 	}
+
 
 
 

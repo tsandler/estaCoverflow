@@ -8,13 +8,19 @@
 
 extern t_queue *NEW;
 extern t_queue *READY;
+extern t_queue * EXIT;
 extern sem_t mutexNEW;
 extern sem_t mutexREADY;
+extern sem_t mutexEXIT;
+
 extern sem_t gradoProg;
 extern sem_t hayAlgo;
 extern sem_t hayAlgoEnReady;
+extern sem_t hayAlgoEnExit;
 extern t_log *logs;
 extern t_config *config;
+
+extern int socketUMV;
 
 /*
  *
@@ -50,7 +56,7 @@ registroPCB *queue_pop_min(t_queue *self) {
 
 
 void deNewAReady(void){
-	puts("de new a ready");
+	puts("Corriendo hilo de New a Ready \n");
 	while(1){
 
 			sem_wait(&hayAlgo);
@@ -79,11 +85,25 @@ void deNewAReady(void){
 
 }
 
+void manejoExit(){
+	puts("Corriendo Hilo manejoExit \n");
+	registroPCB * unPCB= malloc(sizeof(registroPCB));
+
+	while(1){
+
+		unPCB=sacarCola(EXIT,&mutexEXIT,&hayAlgoEnExit);
+		//eliminarSegmentoUMV(socketUMV,  logs,unPCB);
+		sem_post(&gradoProg);
+	}
+
+}
+
 
 void plp(void* ptr){
 
 	pthread_t thread4;
 	pthread_t thread5;
+	pthread_t thread6;
 	int port=config_get_int_value(config, "PUERTO_PROG");
 
 
@@ -96,15 +116,24 @@ void plp(void* ptr){
 			exit(EXIT_FAILURE);
 		}
 
-	int iret2 = pthread_create(&thread5, NULL, (void*)deNewAReady,(void*)port);
+	int iret2 = pthread_create(&thread5, NULL, (void*)deNewAReady,NULL);
 
 		if (iret2){
 			log_info(logs,"Error en la creacion del hilo deNewAReady");
 			exit (EXIT_FAILURE);
 		}
+
+		int iret3 = pthread_create(&thread6, NULL, (void*)manejoExit,NULL);
+
+			if (iret3){
+				log_info(logs,"Error en la creacion del hilo manejoExit");
+				exit (EXIT_FAILURE);
+			}
+
 		pthread_join(thread4, NULL ); //esperar a q termine el otro
 
 		pthread_join(thread5, NULL );
+		pthread_join(thread6, NULL );
 
 }
 
