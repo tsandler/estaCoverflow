@@ -19,8 +19,9 @@ src/planificador_largo_plazo.d: ../src/planificador_largo_plazo.c \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../commons/collections/dictionary.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../commons/log.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/sockets.h \
- ../src/manejoCPU.h ../src/colas.h \
+ ../src/manejoCPU.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/config.h \
+ ../src/colas.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/string.h \
  ../src/manejoSemaforos.h
 
@@ -68,9 +69,9 @@ src/planificador_largo_plazo.d: ../src/planificador_largo_plazo.c \
 
 ../src/manejoCPU.h:
 
-../src/colas.h:
-
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/config.h:
+
+../src/colas.h:
 
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/string.h:
 

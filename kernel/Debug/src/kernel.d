@@ -18,10 +18,11 @@ src/kernel.d: ../src/kernel.c ../src/globales.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../commons/collections/dictionary.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../commons/log.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/sockets.h \
- ../src/manejoCPU.h ../src/colas.h \
+ ../src/manejoCPU.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/config.h \
+ ../src/colas.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/string.h \
- ../src/manejoSemaforos.h ../src/manejoIO.h
+ ../src/manejoSemaforos.h ../src/manejoIO.h ../src/funcionesPCB.h
 
 ../src/globales.h:
 
@@ -67,12 +68,14 @@ src/kernel.d: ../src/kernel.c ../src/globales.h \
 
 ../src/manejoCPU.h:
 
-../src/colas.h:
-
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/config.h:
+
+../src/colas.h:
 
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/string.h:
 
 ../src/manejoSemaforos.h:
 
 ../src/manejoIO.h:
+
+../src/funcionesPCB.h:

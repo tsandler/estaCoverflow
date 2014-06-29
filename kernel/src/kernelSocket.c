@@ -44,7 +44,7 @@ int openSocketServerPLP(int PORT) {
 
 	if (setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int))
 			== -1) {
-		perror("errpr em setsockoptPCP!");
+		perror("error en setsockoptPCP!");
 		exit(1);
 	}
 
@@ -78,19 +78,17 @@ int openSocketServerPLP(int PORT) {
 			exit(1);
 		}
 */
-
-		printf("En PLP(): Waiting connection...\n");
+		log_info(logs,"En PLP(): Waiting Connection...");
 		socklen_t clilen;
 		clilen = sizeof(clientaddr);
 		if ((newfd = accept(listener, (struct sockaddr *) &clientaddr, &clilen))
 				== -1) {
 			perror("error en acceptPLP()...!");
 		} else {
-			printf("aceptado !...\n");
-
+			log_info(logs, "aceptado!...");
 			if (recibirDatos(newfd, tam, (void*)&buf, logs)==1) {
 				puts("llego");
-				printf( "%s", &buf);
+				log_info(logs,"%s",&buf);
 				registroPCB* unPCB = armarPCB(&buf,newfd);
 
 				ponerCola(unPCB,NEW,&mutexNEW, &hayAlgo);
@@ -128,7 +126,7 @@ int openSocketServerPCP(int PORT) {
 
 	if (setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int))
 			== -1) {
-		perror("errpr em setsockoptPCP!");
+		perror("error en setsockoptPCP!");
 		exit(1);
 	}
 
@@ -156,7 +154,7 @@ int openSocketServerPCP(int PORT) {
 
 		read_fds = master;
 
-		printf("En PCP(): Waiting connection...\n");
+		log_info(logs,"En PCP(): Waiting conection ...");
 		if (select(listener + 1, &read_fds, NULL, NULL, NULL ) == -1) {
 			perror("selectPCP() salio mal...");
 			exit(1);
@@ -168,8 +166,7 @@ int openSocketServerPCP(int PORT) {
 				== -1) {
 			perror("error en acceptPCP()...!");
 		} else {
-			printf("aceptado !...\n");
-
+			log_info(logs, "aceptado !...");
 
 				pthread_t thread;
 				int iret1 = pthread_create(&thread, NULL, manejoCPU,(void*)newfd);

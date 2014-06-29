@@ -12,7 +12,7 @@ extern t_config *config;
 extern t_queue *NEW;
 extern t_queue *READY;
 extern t_queue *EXIT;
-
+extern t_log *logs;
 
 void pcp(void* ptr) {
 
@@ -22,7 +22,7 @@ void pcp(void* ptr) {
 	int iret3 = pthread_create(&thread3, NULL, openSocketServerPCP,(void*)port);
 
 	if (iret3) {
-		//log_info(logs,"Error en la creacion del hilo serverpcp");
+		log_info(logs,"Error en la creacion del hilo serverpcp");
 		exit(EXIT_FAILURE);
 	}
 

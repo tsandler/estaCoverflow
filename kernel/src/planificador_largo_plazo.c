@@ -137,5 +137,3 @@ void plp(void* ptr){
 
 }
 
-
-//GONZALO//

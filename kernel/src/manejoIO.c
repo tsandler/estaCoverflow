@@ -1,13 +1,12 @@
 #include "manejoIO.h"
 #include "colas.h"
 extern t_queue* READY;
-
+extern t_log *logs;
 
 
 void manejoIO(t_io* io){
 
-
-	printf("%s corriendo  dispositivo \n", io->nombre);
+	log_info(logs,"%s corriendo dispositivo",io->nombre);
 while(1){
 
 	registroPCB* unPCB=malloc(sizeof(registroPCB));

@@ -16,6 +16,7 @@ src/manejoCPU.d: ../src/manejoCPU.c ../src/manejoCPU.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../commons/log.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/sockets.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/log.h \
+ /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/config.h \
  ../src/colas.h ../src/manejoIO.h
 
 ../src/manejoCPU.h:
@@ -53,6 +54,8 @@ src/manejoCPU.d: ../src/manejoCPU.c ../src/manejoCPU.h \
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/sockets.h:
 
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/log.h:
+
+/home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/config.h:
 
 ../src/colas.h:
 

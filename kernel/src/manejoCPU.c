@@ -19,12 +19,15 @@ extern t_config * config;
 extern sem_t mutexSemaforos;
 extern sem_t mutexMandarColaEXEC;
 
+
 extern t_dictionary * dispositivosIO;
 registroPCB* PCBrecibido;
 
 bool *condicion(registroPCB* pcb) {
 	return pcb->pid == PCBrecibido->pid;
-}
+};
+
+//	ESO NO TENDRIA QUE ESTAR CON LA MODIFICACION DE LA FUNCION QUE HICE.. Miramos y vemos cual dejamos (sacar registro pid)
 
 void manejoCPU(int fd) {
 
@@ -50,12 +53,14 @@ void manejoCPU(int fd) {
 			LOG_LEVEL_TRACE);
 
 	unPCB = sacarCola(READY, &mutexREADY, &hayAlgoEnReady); //para mandar a exec
+	log_info(logs, "Se saco de la cola Ready el proceso %i",unPCB->pid);
 
 	enviarDatos(fd, tam, quantum, logs);
 	enviarDatos(fd, tam, retardo, logs);
 
 	sem_wait(&mutexMandarColaEXEC);	//envio datos y pongo en exec atomicamente
 	ponerCola(unPCB, EXEC, &mutexEXEC, &hayAlgoEnExec);
+	log_info(logs, "Se Coloco en la cola Ready el PCB %i",unPCB->pid);
 	enviarDatos(fd, tam, unPCB, logs);
 	sem_post(&mutexMandarColaEXEC);
 
@@ -80,7 +85,9 @@ void manejoCPU(int fd) {
 
 			sem_wait(&mutexVarCompartidas);
 			dictionary_remove(variablesCompartidas, variable);
+			log_info(logs,"Se saco la variable compartida %s",variable);
 			dictionary_put(variablesCompartidas, variable, valorRecibido);
+			log_info(logs,"Se coloco la variable compartida %s y su valor es %i",variable,valorRecibido);
 			sem_post(&mutexVarCompartidas);
 			break;
 
@@ -96,7 +103,7 @@ void manejoCPU(int fd) {
 			recibirDato(fd, tam->length, textoAImprimir, logs);
 			recibirDatos(fd, tam, PCBrecibido, logs);
 			enviarDatos(PCBrecibido->fd, tam, textoAImprimir, logs);
-
+			log_info(logs,"el texto a imprimir es %s",textoAImprimir);
 			break;
 
 		case ENTRADA_SALIDA: //char* (dispositivo), int (tiempo)
@@ -106,14 +113,16 @@ void manejoCPU(int fd) {
 			recibirDatos(fd, tam, PCBrecibido, logs);
 			sem_wait(&mutexEXEC);
 			EXEC = list_filter(EXEC, *condicion); //saco de la cola exec
+			log_info(logs,"Se saco de la cola EXEC el proceso %i",PCBrecibido->pid);
 			sem_post(&mutexEXEC);
 			t_io*io = dictionary_get(dispositivosIO, dispositivo);
 			PCBrecibido->retrasoIO = tiempo;
 			ponerCola(PCBrecibido, io->cola, &io->mutex, &io->hayAlgo); //lo mando al io
-
+			log_info(logs,"Se coloco en la Cola de IO el proceso %i",PCBrecibido->pid);
 			PCBPOP = sacarCola(READY, &mutexREADY, &hayAlgoEnReady); //mando PCB nuevo nuevo.
 			sem_wait(&mutexMandarColaEXEC);	//envio datos y pongo en exec atomicamente
 			ponerCola(PCBPOP, EXEC, &mutexEXEC, &hayAlgoEnExec);
+			log_info(logs,"Se coloco en la Cola Ready el proceso %i",PCBPOP->pid );
 			enviarDatos(fd, tam, PCBPOP, logs);
 			sem_post(&mutexMandarColaEXEC);
 
@@ -124,16 +133,18 @@ void manejoCPU(int fd) {
 			recibirDato(fd, tam->length, nombreSem, logs);
 
 			//ESTO DEBE SER ATOMICO
-
+			log_info(logs, "El semaforo se llama %s",nombreSem);
 			sem_wait(&mutexSemaforos);
 			valorSem = dictionary_get(semaforos, nombreSem);
 			if (valorSem <= 0) {
 				habilitado = false;
+				log_info(logs,"y su valor es %i",valorSem);
 				enviarDatos(fd, tam, habilitado, logs);
 			} else {
 				valorSem = valorSem - 1;
 				habilitado = true;
 				enviarDatos(fd, tam, habilitado, logs);
+				log_info(logs,"y su valor es %i",valorSem);
 				dictionary_remove(semaforos, nombreSem);
 				dictionary_put(semaforos, nombreSem, valorSem);
 			}
@@ -142,9 +153,11 @@ void manejoCPU(int fd) {
 			break;
 		case SIGNAL: //char*
 			recibirDato(fd, tam->length, nombreSem, logs);
+			log_info(logs, "El semaforo es %s",nombreSem);
 			sem_wait(&mutexSemaforos);
 			valorSem = dictionary_get(semaforos, nombreSem);
 			valorSem = valorSem + 1;
+			log_info(logs,"y su valor es %i",valorSem);
 			dictionary_remove(semaforos, nombreSem);
 			dictionary_put(semaforos, nombreSem, valorSem);
 			sem_post(&mutexSemaforos);
@@ -153,17 +166,21 @@ void manejoCPU(int fd) {
 		case CONCLUYO_UN_QUANTUM:
 
 			recibirDato(fd, tam->length, PCBrecibido, logs);
+			log_info(logs,"Se saca de EXEC el proceso %i",PCBrecibido->pid);
 			//saco de exec el PCBrecibido
 
 			sem_wait(&mutexEXEC);
 			EXEC = list_filter(EXEC, *condicion); //saco de la cola exec
+			log_info(logs,"se Saco de la cola EXEC el procecso %i",PCBrecibido->pid);
 			sem_post(&mutexEXEC);
 
 			ponerCola(PCBrecibido, READY, &mutexREADY, &hayAlgoEnReady); //lo pongo en ready
+			log_info(logs,"Se coloco en la cola Ready el proceso %i",PCBrecibido->pid);
 			PCBPOP = sacarCola(READY, &mutexREADY, &hayAlgoEnReady); //saco de ready
-
+			log_info(logs,"Se saco de la cola Ready el proceso %i",PCBrecibido->pid);
 			sem_wait(&mutexMandarColaEXEC);	//envio datos y pongo en exec atomicamente
 			ponerCola(PCBPOP, EXEC, &mutexEXEC, &hayAlgoEnExec);
+			log_info(logs,"Se coloco en la cola EXEC el proceso %i",PCBrecibido->pid);
 			enviarDatos(fd, tam, PCBPOP, logs);
 			sem_post(&mutexMandarColaEXEC);
 			break;
@@ -172,31 +189,33 @@ void manejoCPU(int fd) {
 			recibirDato(fd, tam->length, PCBrecibido, logs);
 			sem_wait(&mutexEXEC);
 			EXEC = list_filter(EXEC, *condicion); //saco de la cola exec
+			log_info(logs,"Se saco de la cola EXEC el proceso %i",PCBrecibido->pid);
 			sem_post(&mutexEXEC);
 
 			ponerCola(PCBrecibido, EXIT, &mutexEXIT, &hayAlgoEnExit); //la pongo en exit
-
+			log_info(logs,"Se agrego a la cola EXIT el proceso %i",PCBrecibido->pid);
 			enviarMenu(PCBrecibido->fd, tam, logs); //aviso al programa q finalizo.
+			log_info(logs,"El programa ah finalizado");
 
 			PCBPOP = sacarCola(READY, &mutexREADY, &hayAlgoEnReady); //mando de nuevo.
 			sem_wait(&mutexMandarColaEXEC);	//envio datos y pongo en exec atomicamente
 			ponerCola(PCBPOP, EXEC, &mutexEXEC, &hayAlgoEnExec);
+			log_info(logs,"Se coloco en la Cola EXEC el proceso %i",PCBPOP->pid);
 			enviarDatos(fd, tam, PCBPOP, logs);
 			sem_post(&mutexMandarColaEXEC);
 			break;
 
 		default:
-			printf(
-					"Se cayo esta CPU, se interrumpio el proceso con el PID: %d \n",
-					unPCB->fd);
+			log_info(logs,"Se interrumpio el proceso con el PID: %d debido a que la CPU esta caida",unPCB->pid); // antes habias puesto unPCB->fd creo que te confundistes sino lo cambiamos
 			sem_wait(&mutexEXEC);
 			EXEC = list_filter(EXEC, *condicion); //saco de la cola exec
+			log_info(logs,"Se saco de la cola Exec el proceso %d",unPCB->pid);
 			sem_post(&mutexEXEC);
 
 			//lo mando a exit de una.
 
 			ponerCola(unPCB,EXIT,&mutexEXIT,&hayAlgoEnExit);
-
+			log_info(logs,"Se mando a la cola EXIT el proceso %i",unPCB->pid);
 			break;
 		}
 	}

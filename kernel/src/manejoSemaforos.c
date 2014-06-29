@@ -11,6 +11,7 @@
 
 
 extern t_config *config;
+extern t_log *logs;
 
 char** nombre_semaforos;
 char** valores_semaforos;
@@ -35,8 +36,11 @@ void crearSemaforos(char** nombre_semaforos, char** valores_semaforos){
 				valor_semaforo = *valores_semaforos[i];
 				nombre_semaforo = *nombre_semaforos[i];
 				char* nombre_sem = string_from_format("\\" , nombre_semaforo);
-				if((sem_cont  = sem_open(nombre_sem, O_CREAT ,0644, valor_semaforo)) == (sem_t*)-1)
+				if((sem_cont  = sem_open(nombre_sem, O_CREAT ,0644, valor_semaforo)) == (sem_t*)-1){
 					 perror ("No se puede crear el semaforo"); exit(1);
+				}else{
+					log_info(logs,"Se Creo el semaforo %s con un valor de %i",nombre_semaforo,valor_semaforo); //hay que ver si anda
+				};
 			};
 		}
 	}else{

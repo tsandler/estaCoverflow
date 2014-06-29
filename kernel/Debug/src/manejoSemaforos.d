@@ -18,8 +18,9 @@ src/manejoSemaforos.d: ../src/manejoSemaforos.c ../src/globales.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../commons/collections/dictionary.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../commons/log.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/sockets.h \
- ../src/manejoCPU.h ../src/colas.h \
+ ../src/manejoCPU.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/config.h \
+ ../src/colas.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/string.h \
  ../src/manejoSemaforos.h
 
@@ -67,9 +68,9 @@ src/manejoSemaforos.d: ../src/manejoSemaforos.c ../src/globales.h \
 
 ../src/manejoCPU.h:
 
-../src/colas.h:
-
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/config.h:
+
+../src/colas.h:
 
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/string.h:
 
