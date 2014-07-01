@@ -27,7 +27,6 @@ bool *condicion(registroPCB* pcb) {
 	return pcb->pid == PCBrecibido->pid;
 };
 
-//	ESO NO TENDRIA QUE ESTAR CON LA MODIFICACION DE LA FUNCION QUE HICE.. Miramos y vemos cual dejamos (sacar registro pid)
 
 void manejoCPU(int fd) {
 
