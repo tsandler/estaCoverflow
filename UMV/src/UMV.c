@@ -9,7 +9,6 @@
  */
 
 #include "functions.h"
-#include "testeo.h"
 
 int main(int argc, char** argv){
 

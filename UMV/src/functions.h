@@ -57,4 +57,7 @@ void generar_archivo(unsigned char* resultado, int nroOp);
 void funcion_kernel(estructura_hilo* hilo);
 void funcion_CPU(estructura_hilo* hilo);
 
+void compactar();
+
+
 #endif /* FUNCTIONS_H_ */
