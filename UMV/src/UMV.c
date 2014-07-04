@@ -11,10 +11,8 @@
 #include "functions.h"
 #include "testeo.h"
 
-void *consola();
-
-
 int main(int argc, char** argv){
+
 	logs = log_create("log","UMV.c",1,LOG_LEVEL_TRACE);
 	/*if (argc < 2){
 		log_error(logs, "No se envio ningun parametro");
@@ -23,68 +21,57 @@ int main(int argc, char** argv){
 	}*/
 	config = config_create("config");
 	if(!archivo_config_valido()){
-		log_error(logs,"Error en los parametros. Aborta el programa");
+		log_error(logs,"El archivo de configuracion no tiene todos los campos necesarios");
 		log_destroy(logs);
 		config_destroy(config);
+		return 0;
 	}
 	inicializar_var_config();
 	inicializar_umv(tamanioUMV);
-	log_info(logs,"Se inicializo la umv");
+	log_debug(logs,"Ya se creo la umv");
 
-	test_crea_elimina_UMV();
+	//////////////////////
 
+	log_debug(logs,"Levanto el hilo: Consola");
+	pthread_create(&pthread_consola, NULL, (void*)consola, NULL);
+
+	estructura_hilo* hilo = malloc(sizeof(estructura_hilo));
+	t_length* tam = malloc(sizeof(t_length));
+	int socket = crearServidor(puerto, logs);
+	if(!socket)
+		log_error(logs,"No se creo el servidor");
+	else
+		log_info(logs,"Se creo el servidor");
+	int dato;
+	log_debug(logs,"Entra al while para aceptar conexion");
+
+	while(1){
+		hilo->socket = aceptarConexion(socket, logs);
+		if(!hilo->socket)
+			log_error(logs,"Error al aceptar la conexion");
+		else
+			log_info(logs,"Se acepto la conexion");
+
+		if(!recibirDatos(hilo->socket, tam, (void*)&dato, logs))
+			log_error(logs, "Se produjo un error haciendo el handshake");
+
+		switch(tam->menu){
+			case SOY_KERNEL:
+				log_debug(logs,"Se conecto: Kernel");
+				pthread_create(&pthread_kernel, NULL, (void*)funcion_kernel, hilo);
+				break;
+			case SOY_CPU:
+				log_debug(logs,"Se conecto: CPU");
+				pthread_create(&pthread_CPU, NULL, (void*)funcion_CPU, hilo);
+				break;
+			default:
+				log_error(logs,"se conecto algo q no es cpu o kernel");
+				break;
+		}
+	}
+	pthread_join(pthread_consola,NULL);
 	eliminarUMV();
 	log_destroy(logs);
 	config_destroy(config);
 	return 0;
-}
-
-
-void *consola(){
-	int pid, cambioAlgoritmo ,nroOp, operacion, retardoNuevo;
-
-	printf("Seleccione la operación segun...\n");
-	printf("OPERACION = 1\n");
-	printf("RETARDO = 2\n");
-	printf("ALGORITMO = 3\n");
-	printf("COMPACTACION = 4\n");
-	printf("DUMP = 5\n");
-	printf("Operacion solicitada: ");
-	scanf("%d",&operacion);
-
-	switch(operacion){
-		case CAMBIO_PROCESO_ACTIVO:
-			printf("Ingrese nuevo pid: ");
-			scanf("%d",&pid);
-			cambio_proceso_activo(pid);
-			break;
-		case OPERACION:
-			printf("Ingrese operacion segun...");
-			printf("LEER_SEGMENTO = 1\n");
-			printf("ESCRIBIR_SEGMENTO = 2\n");
-			printf("CREAR_SEGMENTO = 3\n");
-			printf("ELIMINAR_SEGMENTOS = 4\n");
-			printf("Ingrese operacion: ");
-			scanf("%d",&nroOp);
-			ejec_operacion(nroOp);
-
-			break;
-		case CAMBIAR_RETARDO:
-			printf("Ingrese nuevo retardo: ");
-			scanf("%d",&retardoNuevo);
-			cambiar_retardo(retardoNuevo);
-			break;
-		case CAMBIAR_ALGORITMO:
-			printf("Ingrese opcion segun...");
-			printf("FIRST_FIT = 0\n");
-			printf("WORST_FIT = 1\n");
-			printf("Opcion:  ");
-			scanf("%d",&cambioAlgoritmo);
-			cambiarAlgoritmo(cambioAlgoritmo);
-			break;
-		case DUMP:
-			dump();
-			break;
-	}
-	return NULL;
 }

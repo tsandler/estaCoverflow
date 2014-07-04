@@ -1,9 +1,97 @@
 #include "functions.h"
 
 
+
+void funcion_CPU(estructura_hilo* hilo){
+	int pid;
+	t_length* tam = malloc(sizeof(t_length));
+	datos_acceso* etiq;
+	unsigned char* codigo;
+
+	if(!recibirMenu(hilo->socket, tam, logs))
+		log_error(logs, "Se produjo un error recibiendo el menu");
+
+	switch(tam->menu){
+		case PID_ACTUAL:
+			if(!recibirDato(hilo->socket, tam->length, (void*)&pid, logs))
+				log_error(logs, "Se produjo un error recibiendo el pid");
+			cambio_proceso_activo(pid);
+			break;
+		case ESCRIBIR_SEGMENTO:
+			if(!recibirDato(hilo->socket,tam->length,(void*)&codigo,logs))
+				log_error(logs,"Se produjo un error recibiendo el codigo");
+
+			if(!recibirDatos(hilo->socket,tam,(void*)etiq,logs))
+				log_error(logs,"Se produjo un error recibiendo la esctructura");
+
+			escribir_segmento(etiq->base,etiq->tamanio,etiq->offset,(void*)codigo);
+			break;
+//		case PEDIR_SENTENCIA:	//FIXME: Es necesario hacer esta distincion???
+//			if(!recibirDato(hilo->socket,tam->length,(void*)etiq,logs))
+//				log_error(logs,"Se produjo un error recibiendo la esctructura");
+//			codigo = leer_segmento(etiq->base,etiq->tamanio,etiq->offset);
+//			//tam->menu = TE_MANDO_EL_SEGMENTO;
+//			tam->length = etiq->tamanio;
+//			if(!enviarDatos(hilo->socket, tam, codigo, logs))
+//				log_error(logs,"Error al enviarse el codigo");
+//			break;
+		case LEER_SEGMENTO:
+			if(!recibirDato(hilo->socket,tam->length,(void*)&etiq,logs))
+				log_error(logs,"Se produjo un error recibiendo la esctructura");
+			codigo = leer_segmento(etiq->base,etiq->tamanio,etiq->offset);
+			//tam->menu = TE_MANDO_EL_SEGMENTO;
+			tam->length = etiq->tamanio;
+			enviarDatos(hilo->socket, tam, codigo, logs);
+			break;
+		default:
+			log_error(logs,"operacion invalida para CPU");
+	}
+}
+
+void funcion_kernel(estructura_hilo* hilo){
+	int pid;
+	t_length* tam = malloc(sizeof(t_length));
+	datos_acceso* etiq;
+	unsigned char* codigo;
+
+	if(!recibirMenu(hilo->socket, tam, logs))
+			log_error(logs, "Se produjo un error recibiendo el menu");
+	datos_crearSeg* pidTam = malloc(sizeof(datos_crearSeg));
+	switch(tam->menu){
+		case PID_ACTUAL:
+			if(!recibirDato(hilo->socket, tam->length, (void*)&pid, logs))
+				log_error(logs, "Se produjo un error recibiendo el pid");
+			cambio_proceso_activo(pid);
+			break;
+		case ESCRIBIR_SEGMENTO:
+			if(!recibirDato(hilo->socket,tam->length,(void*)&codigo,logs))
+				log_error(logs,"Se produjo un error recibiendo el codigo");
+			if(!recibirDatos(hilo->socket,tam,(void*)&etiq,logs))
+				log_error(logs,"Se produjo un error recibiendo la esctructura");
+			escribir_segmento(etiq->base,etiq->tamanio,etiq->offset,codigo);
+			break;
+		case CREAR_SEGMENTO:
+			if(!recibirDato(hilo->socket, tam->length, (void*)&pidTam, logs))
+				log_error(logs, "Se produjo un error recibiendo pid-tamanio");
+			int baseLog = crear_agregar_segmento(pidTam->pid,pidTam->tamanio);
+			tam->length = sizeof(int);
+//			tam->menu = TE MANDO LA BASE DEL SEGMENTO
+			enviarDatos(hilo->socket, tam, (void*)&baseLog, logs);
+			break;
+		case ELIMINAR_SEGMENTOS:
+			if(!recibirDato(hilo->socket, tam->length, (void*)&pid, logs))
+				log_error(logs, "Se produjo un error recibiendo el pid");
+			destruir_segmentos(pid);
+			break;
+		default:
+			log_error(logs,"operacion invalida para Kernel");
+	}
+}
+
+
 /* Funcion que solicita el bloque de memoria inicial para la UMV y
 crea estructuras para el manejo de la UMV. */
-void inicializar_umv(int tamanioUMV){  //ANDA :D
+void inicializar_umv(int tamanioUMV){
 
 	tablaPidSeg = dictionary_create();
 	listaHuecos = list_create();
@@ -14,13 +102,40 @@ void inicializar_umv(int tamanioUMV){  //ANDA :D
 }
 
 /*Funcion que elimina estructuras del manejo de la UMV liberando el bloque de memoria principal*/
-void eliminarUMV(){ //ANDA :D
+void eliminarUMV(){
+	log_debug(logs,"Comienza a eliminar umv");
+	dictionary_clean_and_destroy_elements(tablaPidSeg, (void*)vaciarLista);
+	log_debug(logs,"Ya elimino el diccionario");
+	list_clean_and_destroy_elements(listaHuecos, free);
+	free(listaHuecos);
+	free(tablaPidSeg);
+	log_debug(logs,"La umv fue eliminada");
+}
 
-	if(!dictionary_is_empty(tablaPidSeg))
-		dictionary_clean(tablaPidSeg);
-	dictionary_destroy(tablaPidSeg);
-	list_clean(listaHuecos);
-	list_destroy(listaHuecos);
+bool archivo_config_valido(){
+	if(!config_has_property(config, "TAMANIO_UMV"))
+		return 0;
+
+	if(!config_has_property(config, "RETARDO"))
+		return 0;
+
+	if(!config_has_property(config, "ALGORITMO"))
+		return 0;
+
+	if(!config_has_property(config, "PUERTO"))
+		return 0;
+	return 1;
+}
+
+void inicializar_var_config(){
+	puerto = config_get_int_value(config, "PUERTO");
+	tamanioUMV = config_get_int_value(config, "TAMANIO_UMV");
+	retardoActual = config_get_int_value(config,"RETARDO");
+	algoritmoActual = config_get_int_value(config,"ALGORITMO");
+}
+
+void vaciarLista(t_list* listaSeg){
+	list_clean_and_destroy_elements(listaSeg,free);
 }
 
 /* Funcion que crea y agrega un segmento a la lista de segmentos, segun pid. retorna la direccion logica del segmento */
@@ -120,8 +235,12 @@ char *obtener_proxima_dirFisica(int tamanio){
 	return NULL;
 }
 
+
+// llega base,offset y tamanio. yo devuelvo [offset,tamanio]
+//
+
 /*Funcion que lee un segmento de la umv y retorna un puntero a la posicion solicitada */
-char *leer_segmento(int dirLog, int tamanioALeer, int offset){ //solicitar_memoria_desde_una_pos();
+unsigned char *leer_segmento(int dirLog, int tamanioALeer, int offset){ //solicitar_memoria_desde_una_pos();
 
 	bool buscar_dirLogica(tablaSegUMV* unElem){
 		return dirLog == unElem->dirLogica;
@@ -131,7 +250,7 @@ char *leer_segmento(int dirLog, int tamanioALeer, int offset){ //solicitar_memor
 	tablaSegUMV* unElem= list_find(listaSeg,(void*)buscar_dirLogica);
 	if(unElem){
 		if( unElem->dirFisica + offset + tamanioALeer <= unElem->dirFisica + unElem->tamanioSegmento ){
-			char* destino = malloc(sizeof(char) * tamanioALeer);
+			unsigned char* destino = malloc(sizeof(char) * tamanioALeer);
 			char* desde = unElem->dirFisica + offset;
 			memcpy((void*)destino,(void*)desde,tamanioALeer);
 			return destino;
@@ -146,6 +265,7 @@ void escribir_segmento(int dirLog, int tamanioAEscribir, int offset, void* buffe
 	bool buscar_dirLogica(tablaSegUMV* unElem){
 		return dirLog == unElem->dirLogica;
 	}
+
 	t_list* listaSeg= dictionary_get(tablaPidSeg,string_itoa(pidActive));
 	tablaSegUMV* unElem= list_find(listaSeg,(void*)buscar_dirLogica);
 	if(unElem){
@@ -157,6 +277,7 @@ void escribir_segmento(int dirLog, int tamanioAEscribir, int offset, void* buffe
 			log_info(logs,"El segmento fue escrito");
 		}else{
 			log_error(logs,"SEGMENTATION FAULT");
+			printf("Segmentation fault");
 		}
 	}else{
 		log_error(logs,"La direccion logica no existe");
@@ -191,19 +312,38 @@ void cambio_proceso_activo(int pid){
 	pidActive = pid;
 }
 /*Funcion de la consola*/
-char* ejec_operacion(int nroOp){
-	int dirLogica=0 ,offset =0;
-	void* buffer = NULL;
+unsigned char* ejec_operacion(int nroOp){
+	int dirLogica=0, offset=0;
+	void* buffer = NULL; //FIXME: preguntar cómo se inicializa
 	int pid, tamanio=0, tamanioAEscribir=0, tamanioALeer=0;
+	int genArch;
 
 	switch(nroOp){
 		case LEER_SEGMENTO:
 			retardo(retardoActual);
-			return leer_segmento(dirLogica,tamanioALeer,offset);
+			printf("Ingresar pid: ");
+			scanf("%d",&pid);
+			//FIXME: cambiarpidActive?
+			printf("Ingresar tamanio a leer: ");
+			scanf("%d",&tamanio);
+			printf("Ingresar la direccion logica: ");
+			scanf("%d",&dirLogica);
+			printf("Ingresar offset: ");
+			scanf("%d",&offset);
+			unsigned char* resultado = leer_segmento(dirLogica,tamanioALeer,offset);
+			printf("Desea generar un archivo con el resultado? 0=no 1=si: ");
+			scanf("%d",&genArch);
+			if(genArch)
+				generar_archivo(resultado,nroOp);
+			return resultado;
 			break;
 		case ESCRIBIR_SEGMENTO:
 			retardo(retardoActual);
 			escribir_segmento(dirLogica,tamanioAEscribir,offset,buffer);
+			printf("Desea generar un archivo con el resultado? 0=no 1=si: ");
+			scanf("%d",&genArch);
+			if(genArch)
+				//generar_archivo(resultado,nroOp);
 			return NULL;
 			break;
 		case CREAR_SEGMENTO:
@@ -212,23 +352,47 @@ char* ejec_operacion(int nroOp){
 			scanf("%d",&pid);
 			printf("Ingresar tamanio: ");
 			scanf("%d",&tamanio);
-			return string_itoa(crear_agregar_segmento(pid,tamanio));
+			return (unsigned char*)crear_agregar_segmento(pid,tamanio);
 			break;
 		case ELIMINAR_SEGMENTOS:
 			retardo(retardoActual);
+			printf("Ingresar pid: ");
+			scanf("%d",&pid);
 			destruir_segmentos(pid);
 			break;
 		default:
 			log_error(logs,"OPERACION NO VALIDA");
 			break;
-	free(buffer);
 	}
 	return NULL;
 }
 
+void generar_archivo(unsigned char* resultado, int nroOp){
+	FILE* arch;
+	char* nombre;
+	log_debug(logs,"entra a generar archivo");
+
+	switch(nroOp){
+		case LEER_SEGMENTO:
+			log_debug(logs,"entra a leerSeg");
+			nombre ="leer";
+			arch = txt_open_for_append(nombre);
+			txt_write_in_file(arch,(char*)resultado);
+			break;
+		case ESCRIBIR_SEGMENTO:
+			log_debug(logs,"entra a escribirSeg");
+			nombre = "escribir";
+			arch = txt_open_for_append(nombre);
+			txt_write_in_file(arch,(char*)resultado);
+			break;
+		default:
+			break;
+	}
+}
+
 void dump(){
-	int nroOp;
-	printf("Segun indice...");
+	int nroOp, opArchivo;
+	printf("Segun indice...\n");
 	printf("ESTRUCTURAS_MEMORIA = 0\n");
 	printf("MEMORIA_PRINCIPAL = 1\n");
 	printf("CONTENIDO_MEM_PPAL = 2\n");
@@ -237,18 +401,20 @@ void dump(){
 	switch(nroOp){
 		case ESTRUCTURAS_MEMORIA:
 			imprime_estructuras_memoria();
-			/*if(opArchivo == GENERAR_ARCHIVO)
-				generar_archivo();*/
+			printf("Desea generar archivo <1/0>: ");
+			scanf("%d",&opArchivo);
+//			if(opArchivo == GENERAR_ARCHIVO)
+//				generar_archivo(unsigned char* resultado, int nroOp); TODO: generarArchivo
 			break;
 		case MEMORIA_PRINCIPAL:
 			imprime_estado_mem_ppal();
-			/*if(opArchivo == GENERAR_ARCHIVO)
-				generar_archivo();*/
+//			if(opArchivo == GENERAR_ARCHIVO)
+//				generar_archivo();
 			break;
 		case CONTENIDO_MEM_PPAL:
 			//TODO: dump: contenido memoria ppal y generar archivo
-			/*if(opArchivo == GENERAR_ARCHIVO)
-				generar_archivo();*/
+//			if(opArchivo == GENERAR_ARCHIVO)
+//				generar_archivo();
 			break;
 		default:
 			log_error(logs,"COMANDO NO VALIDO");
@@ -258,25 +424,23 @@ void dump(){
 
 
 /* Funcion que representa al funcionamiento del algoritmo first-fit de asignacion de memoria*/
-char *first_fit(int tamanio){ //TODO: manejo de memory overload
+char *first_fit(int tamanio){ //
+
 	bool filtra_por_tamanio(nodoHuecos* unElem){
 		return unElem->tamanioSegmento >= tamanio;
 	}
-	//
-	log_debug(logs,"Imprime lista Huecos antes de hacer cambios");
-	imprime_listahuecos(listaHuecos);
-	//
 	nodoHuecos* unElem = list_remove_by_condition(listaHuecos,(void*)filtra_por_tamanio);
-	char* nuevaDirFisica=malloc(sizeof(char)*tamanio); //TODO: preguntar si es necesario inicializar
-	memcpy(nuevaDirFisica,unElem->dirFisica,tamanio);
-	unElem->dirFisica = unElem->dirFisica + tamanio;
-	unElem->tamanioSegmento = unElem->tamanioSegmento - tamanio;
-	list_add(listaHuecos,(void*)unElem);
-	//
-	log_debug(logs,"Imprime lista huecos desp de hacer cambios");
-	imprime_listahuecos(listaHuecos);
-	//
-	return nuevaDirFisica;
+
+	if(!unElem){
+		//llamar a compactar
+		unElem = list_remove_by_condition(listaHuecos,(void*)filtra_por_tamanio);
+		if(!unElem){
+			log_error(logs,"Memory overload");
+			printf("Memory overload");
+			return string_itoa(-1);
+		}
+	}
+	return manejo_memoria(unElem,tamanio);
 }
 
 /* Funcion que representa al funcionamiento del algoritmo worst-fit de asignacion de memoria*/
@@ -284,13 +448,26 @@ char *worst_fit(int tamanio){
 	list_sort(listaHuecos, (void*)sort_mayor_hueco);
 	nodoHuecos* unElem = list_remove(listaHuecos,0);
 
+	if(!unElem){
+		//llamar a compactar
+		list_sort(listaHuecos, (void*)sort_mayor_hueco);
+		nodoHuecos* unElem = list_remove(listaHuecos,0);
+		if(!unElem){
+			log_error(logs,"Memory overload");
+			printf("Memory overload");
+			return string_itoa(-1);
+		}
+	}
+	return manejo_memoria(unElem,tamanio);
+}
+
+char *manejo_memoria(nodoHuecos* unElem, int tamanio){
 	char* nuevaDirFisica=malloc(sizeof(char)*tamanio);
 	memcpy(nuevaDirFisica,unElem->dirFisica,tamanio);
 	unElem->dirFisica = unElem->dirFisica + tamanio;
 	unElem->tamanioSegmento = unElem->tamanioSegmento - tamanio;
 	list_add(listaHuecos,(void*)unElem);
-
-	return unElem->dirFisica;
+	return nuevaDirFisica;
 }
 
 /* Funcion que retorna el mayor idSegmento entre dos elementos */
@@ -331,6 +508,7 @@ void imprime_estructuras_memoria(){
 	}
 	printf("Reporte de: Tablas de segmentos de todos los procesos\n");
 	dictionary_iterator(tablaPidSeg,(void*)itera_diccionario);
+
 }
 
 void imprime_estado_mem_ppal(){
@@ -339,27 +517,60 @@ void imprime_estado_mem_ppal(){
 	imprime_listahuecos();
 }
 
-bool archivo_config_valido(){
-	if(!config_has_property(config, "TAMANIO_UMV"))
-		return 0;
 
-	if(!config_has_property(config, "RETARDO"))
-		return 0;
+void consola(){
+	log_debug(logs,"Entra a consola");
+	int pid, cambioAlgoritmo ,nroOp, operacion, retardoNuevo;
+	int i=1;
+	while(i){
+		printf("\nSeleccione la operación segun...\n");
+		printf("OPERACION = 1\n");
+		printf("RETARDO = 2\n");
+		printf("ALGORITMO = 3\n");
+		printf("COMPACTACION = 4\n");
+		printf("DUMP = 5\n");
+		printf("Operacion solicitada: ");
+		scanf("%d",&operacion);
 
-	if(!config_has_property(config, "ALGORITMO"))
-		return 0;
+		switch(operacion){
+			case CAMBIO_PROCESO_ACTIVO:
+				printf("Ingrese nuevo pid: ");
+				scanf("%d",&pid);
+				cambio_proceso_activo(pid);
+				break;
+			case OPERACION:
+				printf("Ingrese operacion segun...\n");
+				printf("LEER_SEGMENTO = 1\n");
+				printf("ESCRIBIR_SEGMENTO = 2\n");
+				printf("CREAR_SEGMENTO = 3\n");
+				printf("ELIMINAR_SEGMENTOS = 4\n");
+				printf("Ingrese operacion: ");
+				scanf("%d",&nroOp);
+				ejec_operacion(nroOp);
 
-	if(!config_has_property(config, "PUERTO_KERNEL"))
-		return 0;
+				break;
+			case CAMBIAR_RETARDO:
+				printf("Ingrese nuevo retardo: ");
+				scanf("%d",&retardoNuevo);
+				cambiar_retardo(retardoNuevo);
+				break;
+			case CAMBIAR_ALGORITMO:
+				printf("Ingrese opcion segun...\n");
+				printf("FIRST_FIT = 0\nWORST_FIT = 1\n");
+				printf("Opcion: ");
+				scanf("%d",&cambioAlgoritmo);
+				cambiarAlgoritmo(cambioAlgoritmo);
+				break;
+			case DUMP:
+				dump();
+				break;
+			default:
+				printf("Operacion invalida\n");
+				break;
+		}
+		printf("Realizar otra operacion? s=1:");
+		scanf("%d",&i);
 
-	if(!config_has_property(config, "PUERTO_CPU"))
-		return 0;
-	return 1;
-}
-
-void inicializar_var_config(){
-	tamanioUMV = config_get_int_value(config, "TAMANIO_UMV");
-	retardoActual = config_get_int_value(config,"RETARDO");
-	algoritmoActual = config_get_int_value(config,"ALGORITMO");
+	}
 }
 
