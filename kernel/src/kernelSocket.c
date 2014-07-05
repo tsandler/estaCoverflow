@@ -37,15 +37,17 @@ int openSocketServerPLP(int PORT) {
 	FD_ZERO(&read_fds);
 
 	if ((listener = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-		perror("Server-socketPCP() error lol!");
+		log_error(logs,"Error en el Server-Socket-PLP");
+		perror("Server-socketPLP() error lol!");
 		/*just exit lol!*/
-		exit(1);
+		exit(EXIT_FAILURE);//exit(1);
 	}
 
 	if (setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int))
 			== -1) {
-		perror("error en setsockoptPCP!");
-		exit(1);
+		log_error(logs,"Error en SET socket open PLP");
+		perror("error en setsockoptPLP!");
+		exit(EXIT_FAILURE);//exit(1);
 	}
 
 	serveraddr.sin_family = AF_INET;
@@ -55,13 +57,16 @@ int openSocketServerPLP(int PORT) {
 
 	if (bind(listener, (struct sockaddr *) &serveraddr, sizeof(serveraddr))
 			== -1) {
+		log_error(logs,"El BIND del PLP salio mal");
 		perror("Bind salio mal!");
-		exit(1);
+		exit(EXIT_FAILURE);//exit(1);
 	}
 
-	if (listen(listener, 10) == -1) // LA MAXIMA CANTDAD DE CONEXIONES ES 10
-			{
+	if (listen(listener, 10) == -1){ // LA MAXIMA CANTDAD DE CONEXIONES ES 10
+
+		log_error(logs,"Ocurrio un error mientras el PLP hacia LISTEN");
 		perror("error en listenPCP()!");
+		exit(EXIT_FAILURE);
 		exit(1);
 	}
 
@@ -84,7 +89,9 @@ int openSocketServerPLP(int PORT) {
 		clilen = sizeof(clientaddr);
 		if ((newfd = accept(listener, (struct sockaddr *) &clientaddr, &clilen))
 				== -1) {
+			log_error(logs,"Error cuando el PCP tenia que aceptar lo recibido");
 			perror("error en acceptPLP()...!");
+			exit(EXIT_FAILURE);
 		} else {
 			log_info(logs, "Conexion entrante aceptada :&i",clilen);
 			if (recibirDatos(newfd, tam, (void*)&buf, logs)==1) {
@@ -93,6 +100,7 @@ int openSocketServerPLP(int PORT) {
 				registroPCB* unPCB = armarPCB(&buf,newfd);
 
 				ponerCola(unPCB,NEW,&mutexNEW, &hayAlgo);
+				log_info(logs,"Se coloco en la cola NEW el programa %i",unPCB->pid);
 
 
 
@@ -120,15 +128,17 @@ int openSocketServerPCP(int PORT) {
 	FD_ZERO(&read_fds);
 
 	if ((listener = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+		log_error(logs,"Error en Server-Socket PCP()");
 		perror("Server-socketPCP() error lol!");
 		/*just exit lol!*/
-		exit(1);
+		exit(EXIT_FAILURE);//exit(1);
 	}
 
 	if (setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int))
 			== -1) {
+		log_error(logs,"Error en el Set sockopt PCP");
 		perror("error en setsockoptPCP!");
-		exit(1);
+		exit(EXIT_FAILURE);//exit(1);
 	}
 
 	serveraddr.sin_family = AF_INET;
@@ -138,14 +148,16 @@ int openSocketServerPCP(int PORT) {
 
 	if (bind(listener, (struct sockaddr *) &serveraddr, sizeof(serveraddr))
 			== -1) {
+		log_error(logs,"Error en el BIND");
 		perror("Bind salio mal!");
-		exit(1);
+		exit(EXIT_FAILURE);//exit(1);
 	}
 
 	if (listen(listener, 10) == -1) // LA MAXIMA CANTDAD DE CONEXIONES ES 10
 			{
+		log_error(logs,"Error en el listen del PCP");
 		perror("error en listenPCP()!");
-		exit(1);
+		exit(EXIT_FAILURE);//exit(1);
 	}
 
 	FD_SET(listener, &master);
@@ -157,15 +169,18 @@ int openSocketServerPCP(int PORT) {
 		printf("En PCP(): Waiting conection ...\n");
 		log_info(logs,"En PCP(): Waiting conection ...");
 		if (select(listener + 1, &read_fds, NULL, NULL, NULL ) == -1) {
+			log_error(logs,"El select del PCP salio mal...");
 			perror("selectPCP() salio mal...");
-			exit(1);
+			exit(EXIT_FAILURE);//exit(1);
 		}
 
 		socklen_t clilen;
 		clilen = sizeof(clientaddr);
 		if ((newfd = accept(listener, (struct sockaddr *) &clientaddr, &clilen))
 				== -1) {
+			log_error(logs,"Error en cuando el PCP queria aceptar la conexion");
 			perror("error en acceptPCP()...!");
+			exit(EXIT_FAILURE);//tendria que poner esto aca o no se pone nada y se permite que siga ejecutando
 		} else {
 			// log_info(logs, "aceptado !..."); este log es innecesario
 

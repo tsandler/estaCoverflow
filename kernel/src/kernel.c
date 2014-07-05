@@ -34,12 +34,13 @@ t_dictionary * dispositivosIO;
 t_dictionary * variablesCompartidas;
 t_dictionary * semaforos;
 int socketUMV;
+int socketCPU; // LO PUSE PARA CERRARLO MAS ABAJO CUALQUIER COSA VEMOS SI LO CERRAMOS DIRECTAMENTE EN EL PCP....
 void plp(void* ptr);
 void pcp(void* ptr);
 
 int main(int argc, char **argv) {
 
-	config = config_create("config.cnf");
+	config = config_create("config");
 
 	NEW = queue_create(); //COLAS
 	READY = queue_create();
@@ -78,7 +79,9 @@ int main(int argc, char **argv) {
 	int iret1, iret2;
 
 
-	//socketUMV=conectarseUMV();//  HASTA PROBAR LA UMV QUE QUEDE ASI
+	log_info(logs,"Conectandose con la UMV...");
+	socketUMV = conectarseUMV();
+
 
 	iret1 = pthread_create(&thread1, NULL, plp, NULL );  //HILO PLP
 
@@ -166,6 +169,9 @@ int main(int argc, char **argv) {
 
 	log_destroy(logs);
 	config_destroy(config);
+	cerrar_socket(socketUMV);
+	cerrar_socket(socketCPU);
+
 
 	return EXIT_SUCCESS;
 
