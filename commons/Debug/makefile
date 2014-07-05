@@ -10,7 +10,6 @@ RM := rm -rf
 -include sources.mk
 -include parser/so-ansisop-parser-dummy/build/subdir.mk
 -include parser/parser/build/parser/subdir.mk
--include parser/parser-dummy/subdir.mk
 -include parser/subdir.mk
 -include libs/subdir.mk
 -include commons/collections/subdir.mk
