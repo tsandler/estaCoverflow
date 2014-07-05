@@ -78,7 +78,8 @@ int openSocketServerPLP(int PORT) {
 			exit(1);
 		}
 */
-		log_info(logs,"En PLP(): Waiting Connection...");
+		printf("En PLP(): Waiting conection ...\n");
+		log_info(logs,"En PLP(): Waiting Connection...\n");
 		socklen_t clilen;
 		clilen = sizeof(clientaddr);
 		if ((newfd = accept(listener, (struct sockaddr *) &clientaddr, &clilen))
@@ -88,7 +89,7 @@ int openSocketServerPLP(int PORT) {
 			log_info(logs, "Conexion entrante aceptada :&i",clilen);
 			if (recibirDatos(newfd, tam, (void*)&buf, logs)==1) {
 				puts("llego");
-				log_info(logs,"%s",&buf);
+				log_info(logs,"%s \n",&buf);
 				registroPCB* unPCB = armarPCB(&buf,newfd);
 
 				ponerCola(unPCB,NEW,&mutexNEW, &hayAlgo);
@@ -153,7 +154,7 @@ int openSocketServerPCP(int PORT) {
 	for (;;) {
 
 		read_fds = master;
-
+		printf("En PCP(): Waiting conection ...\n");
 		log_info(logs,"En PCP(): Waiting conection ...");
 		if (select(listener + 1, &read_fds, NULL, NULL, NULL ) == -1) {
 			perror("selectPCP() salio mal...");

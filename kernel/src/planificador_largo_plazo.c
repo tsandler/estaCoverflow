@@ -80,7 +80,7 @@ void deNewAReady(void){
 
 			log_info(logs,"En la cola Ready Hay %i \n", queue_size(READY));
 			queue_push(READY,unPCB);
-			log_info(logs,"En la cola Ready se agrego el programa %d, ahora hay un total de %i",unPCB->pid,queue_size(READY));
+			log_info(logs,"En la cola Ready se agrego el programa %d, ahora hay un total de %i \n",unPCB->pid,queue_size(READY));
 			sem_post(&hayAlgoEnReady);
 			sem_post(&mutexREADY);
 

@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
 	int iret1, iret2;
 
 
-	// socketUMV=conectarseUMV();  HASTA PROBAR LA UMV QUE QUEDE ASI
+	//socketUMV=conectarseUMV();//  HASTA PROBAR LA UMV QUE QUEDE ASI
 
 	iret1 = pthread_create(&thread1, NULL, plp, NULL );  //HILO PLP
 
