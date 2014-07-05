@@ -47,3 +47,21 @@ end
 
 
 
+[INFO] 21:46:27:787 kernel.c/(2394:2399): Scanner corriendo dispositivo
+[INFO] 21:46:27:788 kernel.c/(2394:2398): Impresora corriendo dispositivo
+[INFO] 21:46:27:788 kernel.c/(2394:2397): Disco corriendo dispositivo
+[INFO] 21:46:27:790 kernel.c/(2394:2400): En PCP(): Waiting conection ...
+[INFO] 21:46:27:791 kernel.c/(2394:2401): En PLP(): Waiting Connection...
+[INFO] 23:00:31:977 kernel.c/(4125:4132): Disco corriendo dispositivo
+[INFO] 23:00:31:979 kernel.c/(4125:4133): Impresora corriendo dispositivo
+[INFO] 23:00:31:979 kernel.c/(4125:4134): Scanner corriendo dispositivo
+[INFO] 23:00:31:979 kernel.c/(4125:4135): En PLP(): Waiting Connection...
+[INFO] 23:00:31:980 kernel.c/(4125:4138): En PCP(): Waiting conection ...
+[INFO] 23:01:35:555 kernel.c/(4219:4228): Scanner corriendo dispositivo
+[INFO] 23:01:35:559 kernel.c/(4219:4227): Impresora corriendo dispositivo
+[INFO] 23:01:35:559 kernel.c/(4219:4226): Disco corriendo dispositivo
+[INFO] 23:02:18:241 kernel.c/(4248:4258): En PCP(): Waiting conection ...
+[INFO] 23:02:18:242 kernel.c/(4248:4255): En PLP(): Waiting Connection...
+[INFO] 23:02:18:243 kernel.c/(4248:4260): Impresora corriendo dispositivo
+[INFO] 23:02:18:243 kernel.c/(4248:4261): Scanner corriendo dispositivo
+[INFO] 23:02:18:256 kernel.c/(4248:4259): Disco corriendo dispositivo

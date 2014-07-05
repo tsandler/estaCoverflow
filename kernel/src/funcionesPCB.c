@@ -29,7 +29,7 @@ void intercambiarDatosUMV(int socket_UMV, t_log* logs, registroPCB* PCBprograma,
 		break;
 	}
 /*	tam->menu = PID_ACTUAL ;
-	int datos_pid = PCBprograma.pid;
+	int datos_pid = PCBprograma.pid;								/////SACAMOS ESTO???////
 	if(!enviarDatos(socket_UMV, tam, (void*)datos_pid,logs))
 			log_error(logs,"Error en el envio del pid");*/
 
@@ -81,7 +81,7 @@ void intercambiarDatosUMV(int socket_UMV, t_log* logs, registroPCB* PCBprograma,
 		if(!enviarDatos(socket_UMV, tam, (void*)datosAEnviar,logs))
 			log_error(logs,"Error en el envio de los datos");
 		if(!enviarDatos(socket_UMV, tam, buf,logs))
-					log_error(logs,"Error en el envio de los datos");
+			log_error(logs,"Error en el envio de los datos");
 
 	//envio stack
 	datosAEnviar->tamanio = config_get_int_value(config,"TAMANIO_STACK");

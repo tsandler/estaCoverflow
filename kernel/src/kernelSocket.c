@@ -73,7 +73,7 @@ int openSocketServerPLP(int PORT) {
 		read_fds = master;
 
 /*		printf("En SelectPLP(): Waiting connection...\n");
-		if (select(listener + 1, &read_fds, NULL, NULL, NULL ) == -1) {
+		if (select(listener + 1, &read_fds, NULL, NULL, NULL ) == -1) {    //QUE HACEMOS CON ESTO???//
 			perror("selectPCP() salio mal...");
 			exit(1);
 		}
@@ -85,7 +85,7 @@ int openSocketServerPLP(int PORT) {
 				== -1) {
 			perror("error en acceptPLP()...!");
 		} else {
-			log_info(logs, "aceptado!...");
+			log_info(logs, "Conexion entrante aceptada :&i",clilen);
 			if (recibirDatos(newfd, tam, (void*)&buf, logs)==1) {
 				puts("llego");
 				log_info(logs,"%s",&buf);
@@ -166,7 +166,7 @@ int openSocketServerPCP(int PORT) {
 				== -1) {
 			perror("error en acceptPCP()...!");
 		} else {
-			log_info(logs, "aceptado !...");
+			// log_info(logs, "aceptado !..."); este log es innecesario
 
 				pthread_t thread;
 				int iret1 = pthread_create(&thread, NULL, manejoCPU,(void*)newfd);
