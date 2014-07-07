@@ -15,7 +15,6 @@ LIBRARIES :=
 SUBDIRS := \
 parser/so-ansisop-parser-dummy/build \
 parser \
-parser/parser-dummy \
 parser/parser/build/parser \
 libs \
 commons \

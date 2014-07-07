@@ -11,23 +11,43 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 #include <unistd.h>
 #include <commons/string.h>
 #include <commons/log.h>
 #include <commons/config.h>
 #include <commons/collections/dictionary.h>
 #include <commons/collections/list.h>
-#include <libs/estructurasParser.h>
+#include <commons/txt.h>
+#include <libs/sockets.h>
 
-
+pthread_t pthread_kernel, pthread_CPU, pthread_consola;
 t_log *logs;
 t_dictionary *tablaPidSeg;
 t_list *listaHuecos;
 t_config* config;
+t_length* tam;
 int tamanioUMV;
 int retardoActual;
 int algoritmoActual;
 int pidActive;
+int puerto;
+
+
+typedef struct{
+	int socket;
+}estructura_hilo;
+
+typedef struct{
+	int base;
+	int offset;
+	int tamanio;
+}datos_acceso;
+
+typedef struct{
+	int tamanio;
+	int pid;
+}datos_crearSeg;
 
 
 typedef struct tablaSegUMV{
@@ -54,11 +74,6 @@ typedef enum{
 	WORST_FIT = 1
 }t_algoritmo;
 
-typedef enum{
-	ESCRIBIR_SEGMENTO=2,
-	CREAR_SEGMENTO=3,
-	ELIMINAR_SEGMENTOS=4,
-}t_operacion;
 
 typedef enum{
 	CAMBIO_PROCESO_ACTIVO= 0,

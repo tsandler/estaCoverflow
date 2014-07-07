@@ -37,15 +37,18 @@ void crearSemaforos(char** nombre_semaforos, char** valores_semaforos){
 				nombre_semaforo = *nombre_semaforos[i];
 				char* nombre_sem = string_from_format("\\" , nombre_semaforo);
 				if((sem_cont  = sem_open(nombre_sem, O_CREAT ,0644, valor_semaforo)) == (sem_t*)-1){
-					 perror ("No se puede crear el semaforo"); exit(1);
+					log_error(logs,"No se pudo crear el semaforo %s",nombre_semaforo);
+					perror ("No se puede crear el semaforo");
+					exit(EXIT_FAILURE);//exit(1);
 				}else{
 					log_info(logs,"Se Creo el semaforo %s con un valor de %i",nombre_semaforo,valor_semaforo); //hay que ver si anda
 				};
 			};
 		}
 	}else{
+		log_error(logs,"La cantidad de nombres y de valores de semaforos son distintas");
 		perror ("La cantidad de nombres de semaforos es distinta a la cantidad de valores de semaforos" );
-		exit(1);
+		exit(EXIT_FAILURE);//exit(1);
 
 	}
 }

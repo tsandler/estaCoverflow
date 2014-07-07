@@ -16,7 +16,7 @@ void eliminarUMV();
 int crear_agregar_segmento(int pid, int tamanio);
 void destruir_segmentos(int pidInt);
 
-char *leer_segmento(int dirLog, int tamanioALeer, int offset);
+unsigned char *leer_segmento(int dirLog, int tamanioALeer, int offset);
 void escribir_segmento(int dirLog, int tamanioAEscribir, int offset, void* buffer);
 
 int obtener_proxima_dir_logica(int tamanio, char* pid);
@@ -30,11 +30,13 @@ void elimina_segmento_agrega_hueco(tablaSegUMV *unElem);
 
 char *first_fit(int tamanio);
 char *worst_fit(int tamanio);
+char *manejo_memoria(nodoHuecos* unElem, int tamanio);
 
+void consola();
+unsigned char* ejec_operacion(int nroOp);
 void retardo();
 void cambiar_retardo(int retardoNuevo);
 void cambio_proceso_activo(int pid);
-char* ejec_operacion(int nroOp);
 void cambiarAlgoritmo(int cambioAlgoritmo);
 void dump();
 
@@ -46,6 +48,16 @@ void imprime_estructuras_memoria();
 
 bool archivo_config_valido();
 void inicializar_var_config();
+void vaciarLista(t_list* listaSeg);
+//void eliminar_campos_listSeg(tablaSegUMV* unElem);
+//void eliminar_campos_listHuecos(nodoHuecos* unElem);
+
+void generar_archivo(unsigned char* resultado, int nroOp);
+
+void funcion_kernel(estructura_hilo* hilo);
+void funcion_CPU(estructura_hilo* hilo);
+
+void compactar();
 
 
 #endif /* FUNCTIONS_H_ */

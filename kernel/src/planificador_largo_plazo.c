@@ -34,7 +34,10 @@ registroPCB *queue_pop_min(t_queue *self) {
 	minPCB=queue_pop(self);
 
 
-	log_info(logs,"Se saco el programa segun SJN");
+	/* LOS DOS LOG SON INNECESARIOS CREO QUE IGUAL ES MEJOR CHARLALO ANTES DE BORRARLO DEFINITIVAMENTE*/
+	//log_info(logs,"Se saco el programa %i de la cola",minPCB->pid);
+	//log_info(logs,"Se saco el programa segun SJN");
+
 	int i=1;
 	while(i<tamanio){
 		registroPCB* otroPCB =malloc(sizeof(registroPCB));
@@ -69,15 +72,15 @@ void deNewAReady(void){
 			log_info(logs, "El grado de multiprogramacion es : %i \n",value);
 			log_info(logs,"En la cola New hay: %i \n",queue_size(NEW));
 			registroPCB* unPCB=queue_pop_min(NEW);
-			log_info(logs,"El pop saco el peso %d \n", unPCB->peso);
-			log_info(logs,"En la cola NEW hay %d \n",queue_size(NEW));
+			//log_info(logs,"El pop saco el peso %d \n", unPCB->peso); este log es innecesario
+			//log_info(logs,"En la cola NEW hay %d \n",queue_size(NEW));este log es tambien innecesario
 			sem_post(&mutexNEW);
 
 			sem_wait(&mutexREADY);
 
 			log_info(logs,"En la cola Ready Hay %i \n", queue_size(READY));
 			queue_push(READY,unPCB);
-			log_info(logs,"En la cola Ready Hay %d \n",queue_size(READY));
+			log_info(logs,"En la cola Ready se agrego el programa %d, ahora hay un total de %i \n",unPCB->pid,queue_size(READY));
 			sem_post(&hayAlgoEnReady);
 			sem_post(&mutexREADY);
 

@@ -30,7 +30,7 @@ bool *condicion(registroPCB* pcb) {
 
 void manejoCPU(int fd) {
 
-	puts("corriendo manejode la cpu");
+	puts("corriendo manejo de la cpu");
 	int tiempo;
 	char* dispositivo;
 	char* textoAImprimir;
@@ -59,7 +59,7 @@ void manejoCPU(int fd) {
 
 	sem_wait(&mutexMandarColaEXEC);	//envio datos y pongo en exec atomicamente
 	ponerCola(unPCB, EXEC, &mutexEXEC, &hayAlgoEnExec);
-	log_info(logs, "Se Coloco en la cola Ready el PCB %i",unPCB->pid);
+	log_info(logs, "Se Coloco en la cola EXEC el PCB %i",unPCB->pid);
 	enviarDatos(fd, tam, unPCB, logs);
 	sem_post(&mutexMandarColaEXEC);
 
@@ -92,9 +92,13 @@ void manejoCPU(int fd) {
 
 		case IMPRIMIR: //int
 			recibirDato(fd, tam->length, valorMostrar, logs);
+
+			//creo que esta funcion es asi, no estoy seguro... "GONZA ESTUBO AQUI"
+			recibirDatos(fd,tam,valorMostrar,logs);
+			enviarDatos(fd,tam,valorMostrar,logs);
+			log_info(logs,"el valor a imprimir es %i",valorMostrar);
 			// necesito el nombre de la variable TOBI TOBI TOBI ALSDJFLASJFLKDASJFLADSKJ
-			//	VER VER VER VER VER VER V E RV ROFL LMAO LOL
-			//AGUANTE PIKACHU
+
 
 			break;
 
@@ -205,7 +209,8 @@ void manejoCPU(int fd) {
 			break;
 
 		default:
-			log_info(logs,"Se interrumpio el proceso con el PID: %d debido a que la CPU esta caida",unPCB->pid); // antes habias puesto unPCB->fd creo que te confundistes sino lo cambiamos
+			log_error(logs,"Se interrumpio el proceso con el PID: %d debido a que la CPU esta caida",unPCB->pid); //antes habias puesto unPCB->fd
+																									 //creo que te confundistes sino lo cambiamos
 			sem_wait(&mutexEXEC);
 			EXEC = list_filter(EXEC, *condicion); //saco de la cola exec
 			log_info(logs,"Se saco de la cola Exec el proceso %d",unPCB->pid);
