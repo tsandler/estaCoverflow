@@ -37,7 +37,7 @@ int main(int argc, char** argv){
 	int quantum = recibir_quantum();
 	int tamanioStack = recibir_tamanio_stack();
 
-	if(socketKernel < 0 || socketUMV < 0 || quantum < 0 || tamanioStack < 0){ //Si no se conecto al kernel o UMV no puede continuar y termina la ejecucion
+	if(socketKernel < 0 || socketUMV < 0 || quantum < 0 || tamanioStack < 0){
 		log_error(logs, "El programa tuvo que finalizar insatisfactoriamente");
 		liberar_estructuras();
 		return 0;
@@ -55,9 +55,10 @@ int main(int argc, char** argv){
 
 	while (seguir){
 		int cont = 0;
-		if(!recibirDatos(socketKernel, tam, (void*)pcb, logs))
+		if(!recibirDatos(socketKernel, tam, (void*)pcb, logs)){
 			log_error(logs, "Se produjo un error al recibir el PCB del kernel");
-
+			break;
+		}
 		tam->menu = PID_ACTUAL;
 		tam->length = sizeof(pcb->pid);
 		if(!enviarDatos(socketUMV, tam, &pcb->pid, logs))
@@ -80,7 +81,8 @@ int main(int argc, char** argv){
 			cont++;
 		}
 		if (tam->menu != ENTRADA_SALIDA){
-			tam->menu = CONCLUYO_UN_QUANTUM;
+			if (tam->menu != FINALIZAR) //finalizo el programa
+				tam->menu = CONCLUYO_UN_QUANTUM;
 			tam->length = sizeof(registroPCB);
 			if (!enviarDatos(socketKernel, tam, pcb, logs))
 				log_error(logs, "Se produjo un error al notificar al pcp que concluyo un quantum.");

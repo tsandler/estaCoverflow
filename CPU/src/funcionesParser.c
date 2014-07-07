@@ -29,8 +29,8 @@ void inicializar_funciones_parser(){
 
 /* Primitiva que almacena en el stack y en el diccionario de variables a una variable, dejandola sin inicializar*/
 t_puntero definir_variable(t_nombre_variable identificador_variable){
-	/*t_puntero* posicion = malloc(sizeof(t_puntero));
-	*posicion = pcb->cursor_stack;
+	t_puntero* posicion = malloc(sizeof(t_puntero));
+	posicion = pcb->cursor_stack;
 	memcpy(stack + pcb->cursor_stack, &identificador_variable, 1);
 	pcb->cursor_stack += 5;
 	char variable[2];
@@ -38,8 +38,7 @@ t_puntero definir_variable(t_nombre_variable identificador_variable){
 	variable[1] = '\0';
 	dictionary_put(diccionarioDeVariables, variable, posicion);
 	pcb->tamanio_contexto++;
-	log_info(logs, "La variable %c fue definida correctamente", identificador_variable);*/
-	log_info(logs, "Variable %c", identificador_variable);
+	log_info(logs, "La variable %c fue definida correctamente", identificador_variable);
 	return 0;
 }
 
@@ -64,9 +63,8 @@ t_valor_variable dereferenciar(t_puntero direccion_variable){
 
 /* Primitiva que asigna el valor de una variable, almacenandola en el stack */
 void asignar(t_puntero direccion_variable, t_valor_variable valor ){
-	/*memcpy(stack + direccion_variable + 1, &valor, 4);
-	log_info(logs, "El valor %d fue asignado a la variable en la posicion %d", valor, direccion_variable);*/
-	log_info(logs, "Asignar");
+	memcpy(stack + direccion_variable + 1, &valor, 4);
+	log_info(logs, "El valor %d fue asignado a la variable en la posicion %d", valor, direccion_variable);
 }
 
 /* Primitiva que pide al kernel el valor de una variable compartida */
@@ -155,15 +153,20 @@ void llamar_con_retorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar){
 
 /* Primitiva que finaliza el contexto actual */
 void finalizar(){
-	memcpy(&pcb->program_counter, &pcb->cursor_stack - 4, 4);
-	memcpy(&pcb->cursor_stack, &pcb->cursor_stack - 8, 4);
-	log_info(logs, "Se llamo a la funcion finalizar");
+	if (pcb->tamanio_contexto * 5 < pcb->cursor_stack){
+		memcpy(&pcb->program_counter, stack + pcb->cursor_stack - 4, 4);
+		memcpy(&pcb->cursor_stack, stack + pcb->cursor_stack - 8, 4);
+		log_info(logs, "Finalizando el contexto actual");
+	}else{
+		tam->menu = FINALIZAR;
+		log_info(logs, "Finalizando el programa");
+	}
 }
 
 /* Primitiva que finaliza el contexto actual y asigna el valor a retornar en su posicion correspondiente en el stack */
 void retornar(t_valor_variable retorno){
 	t_puntero* posicion = malloc(sizeof(t_puntero));
-	memcpy(posicion, &pcb->cursor_stack - 4, 4);
+	memcpy(posicion, stack + pcb->cursor_stack - 4, 4);
 	asignar(*posicion, retorno);
 	pcb->cursor_stack -= 4;
 	finalizar();
