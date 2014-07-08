@@ -10,7 +10,7 @@
 #include "planificador_largo_plazo.h"
 #include <commons/log.h>
 
-extern int socketUMV;
+extern int socket_UMV;
 extern t_config* config;
 extern t_log* logs;
 int identificadorUnico = 0;
@@ -22,19 +22,21 @@ void intercambiarDatosUMV(int socket_UMV, t_log* logs, registroPCB* PCBprograma,
 	t_length *tam;
 	tam = malloc(sizeof(t_length));
 	tam->menu = SOY_KERNEL;
-	while(1){
-	if(!enviarMenu(socket_UMV, tam, logs))//Le aviso a la UMV que soy el kernel
-		log_error(logs,"Error en la identificacion ... (LA UMV NO RECIBE AL KERNEL)");
-	else
-		break;
-	}
+	log_debug(logs,"Entra al while para enviar menu");
+	//while(1){
+		if(!enviarMenu(socket_UMV, tam, logs))//Le aviso a la UMV que soy el kernel
+			log_error(logs,"Error en la identificacion ... (LA UMV NO RECIBE AL KERNEL)");
+	//	else
+	//		break;
+//	}
+	log_debug(logs,"ya se envio el menu");
 /*	tam->menu = PID_ACTUAL ;
 	int datos_pid = PCBprograma.pid;								/////SACAMOS ESTO???////
 	if(!enviarDatos(socket_UMV, tam, (void*)datos_pid,logs))
 			log_error(logs,"Error en el envio del pid");*/
 
 	datos_crearSeg* datosAEnviar;
-
+	datosAEnviar=malloc(sizeof(datos_crearSeg));
 	tam->length = sizeof(datos_crearSeg);
 
 	int datoRecibido;
@@ -109,19 +111,25 @@ void intercambiarDatosUMV(int socket_UMV, t_log* logs, registroPCB* PCBprograma,
 log_info(logs,"Se termino el proceso de CONEXION y CREACION DE SEGMENTOS");
 }
 
-int conectarseUMV(){
-    int socket_UMV;
+void conectarseUMV(){
     char *ip = config_get_string_value(config,"IP");
     int port = config_get_int_value(config,"PUERTO_UMV");
+	log_debug(logs,"el puerto es: %d", port);
     socket_UMV = conectarCliente(ip, port, logs);
 	if(socket_UMV < 0){
-		log_error(logs, "El cliente no se pudo conectar correctamente");
+		log_error(logs, "El cliente no se pudo conectar correctamente con la UMV");
 		log_destroy(logs);
-	}else{
+		exit(EXIT_FAILURE);
+	}else
 		log_info(logs, "El kernel se conecto correctamente con la UMV");
+	t_length *tam;
+		tam = malloc(sizeof(t_length));
+		tam->menu = SOY_KERNEL;
 
-		return socket_UMV;
-	}
+			if(!enviarMenu(socket_UMV, tam, logs))//Le aviso a la UMV que soy el kernel
+				log_error(logs,"Error en la identificacion ... (LA UMV NO RECIBE AL KERNEL)");
+
+		log_debug(logs,"ya se envio el menu");
 }
 // El socket de la UMV habria que cerrarlo una vez que se resfieren los datos y todo...
 
@@ -153,10 +161,12 @@ int algoritmoDePeso(int cantEtq, int cantfc, t_size cantInstruc){
 
 registroPCB* armarPCB(char* program, int fd){
 
-
+	log_debug(logs,"entra a metadata desde literal");
 	t_metadata_program* metadataP = metadata_desde_literal(program);
-
+	log_debug(logs,"sale de metadata desde literal");
+	log_debug(logs,"entra a algoritmo de peso");
 	int peso =algoritmoDePeso(metadataP->cantidad_de_etiquetas,metadataP->cantidad_de_funciones,metadataP->instrucciones_size);
+	log_debug(logs,"sale de algoritmo de peso");
 
 	registroPCB* unPCB;
 
@@ -171,11 +181,9 @@ registroPCB* armarPCB(char* program, int fd){
 	identificadorUnico =+ 1;
     unPCB->pid = identificadorUnico;
 
-
-  // intercambiarDatosUMV(socketUMV,logs,unPCB, program);  ESTO NO LO EJECUTO HASTA QUE NO PUEDA CONECTARSE DE FORMA EXITOSA
+    log_info(logs,"se creo el pcb. entra a intercambiar datos con la UMV");
+    intercambiarDatosUMV(socket_UMV,logs,unPCB, program);// ESTO NO LO EJECUTO HASTA QUE NO PUEDA CONECTARSE DE FORMA EXITOSA
 	return unPCB;                                        //CON LA UMV.
-
-
 }
 
 

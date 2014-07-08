@@ -31,8 +31,8 @@ int main(int argc, char** argv){
 
 	//////////////////////
 
-	log_debug(logs,"Levanto el hilo: Consola");
-	pthread_create(&pthread_consola, NULL, (void*)consola, NULL);
+//	log_debug(logs,"Levanto el hilo: Consola");
+//	pthread_create(&pthread_consola, NULL, (void*)consola, NULL);
 
 	estructura_hilo* hilo = malloc(sizeof(estructura_hilo));
 	t_length* tam = malloc(sizeof(t_length));
@@ -43,6 +43,7 @@ int main(int argc, char** argv){
 		log_info(logs,"Se creo el servidor");
 	int dato;
 	log_debug(logs,"Entra al while para aceptar conexion");
+	log_debug(logs,"el puerto es: %d",puerto);
 
 	while(1){
 		hilo->socket = aceptarConexion(socket, logs);
@@ -51,7 +52,7 @@ int main(int argc, char** argv){
 		else
 			log_info(logs,"Se acepto la conexion");
 
-		if(!recibirDatos(hilo->socket, tam, (void*)&dato, logs))
+		if(!recibirMenu(hilo->socket, tam, logs))
 			log_error(logs, "Se produjo un error haciendo el handshake");
 
 		switch(tam->menu){

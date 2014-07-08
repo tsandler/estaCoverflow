@@ -93,7 +93,7 @@ int openSocketServerPLP(int PORT) {
 			perror("error en acceptPLP()...!");
 			exit(EXIT_FAILURE);
 		} else {
-			log_info(logs, "Conexion entrante aceptada :&i",clilen);
+			log_info(logs, "Conexion entrante aceptada :%i",clilen);
 			if (recibirDatos(newfd, tam, (void*)&buf, logs)==1) {
 				puts("llego");
 				log_info(logs,"%s \n",&buf);
