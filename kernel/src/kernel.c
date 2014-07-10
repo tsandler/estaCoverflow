@@ -37,10 +37,29 @@ int socket_UMV;
 int socketCPU; // LO PUSE PARA CERRARLO MAS ABAJO CUALQUIER COSA VEMOS SI LO CERRAMOS DIRECTAMENTE EN EL PCP....
 void plp(void* ptr);
 void pcp(void* ptr);
+bool archivo_configuracion_valido();
+
 
 int main(int argc, char **argv) {
 
 	logs = log_create("log_Principal", "kernel.c", 1, LOG_LEVEL_TRACE); //LOG
+/*
+	if (argc < 2){
+			log_error(logs, "No se pasaron parametros.");
+			log_destroy(logs);
+			return 0;
+		}
+
+		config = config_create(argv[1]);
+
+	if (!archivo_configuracion_valido()){
+		log_error(logs, "El archivo de configuracion no tiene todos los campos necesarios");
+		config_destroy(config);
+		return 0;
+	}
+
+
+	*/
 
 	log_debug(logs,"inicia kernel");
 	config = config_create("config");
@@ -179,5 +198,50 @@ int main(int argc, char **argv) {
 
 	return EXIT_SUCCESS;
 
+}
+
+
+
+
+bool archivo_configuracion_valido(){
+	if(!config_has_property(config, "PUERTO_PROG"))
+		return 0;
+
+	if(!config_has_property(config, "PUERTO_CPU"))
+		return 0;
+
+	if(!config_has_property(config, "PUERTO_UMV"))
+		return 0;
+
+	if(!config_has_property(config, "IP"))
+		return 0;
+	if(!config_has_property(config, "QUANTUM"))
+			return 0;
+
+	if(!config_has_property(config, "RETARDO"))
+			return 0;
+
+	if(!config_has_property(config, "MULTIPROGRAMACION"))
+			return 0;
+
+	if(!config_has_property(config, "VALOR_SEMAFORO"))
+			return 0;
+
+	if(!config_has_property(config, "SEMAFOROS"))
+			return 0;
+
+	if(!config_has_property(config, "HIO"))
+			return 0;
+
+	if(!config_has_property(config, "ID_HIO"))
+			return 0;
+
+	if(!config_has_property(config, "VARIABLES_COMPARTIDAS"))
+			return 0;
+
+	if(!config_has_property(config, "VALOR_VARIABLES_COMPARTIDAS"))
+			return 0;
+
+	return 1;
 }
 
