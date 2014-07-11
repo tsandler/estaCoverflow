@@ -32,6 +32,11 @@ int retardoActual;
 int algoritmoActual;
 int pidActive;
 int puerto;
+// globales para compactar
+char* ramUMVInicial;
+char* ramAux;
+char* dirHueco;
+int tamHueco;
 
 
 typedef struct{

@@ -33,13 +33,35 @@ t_log *logs;
 t_dictionary * dispositivosIO;
 t_dictionary * variablesCompartidas;
 t_dictionary * semaforos;
-int socketUMV;
+int socket_UMV;
 int socketCPU; // LO PUSE PARA CERRARLO MAS ABAJO CUALQUIER COSA VEMOS SI LO CERRAMOS DIRECTAMENTE EN EL PCP....
 void plp(void* ptr);
 void pcp(void* ptr);
+bool archivo_configuracion_valido();
+
 
 int main(int argc, char **argv) {
 
+	logs = log_create("log_Principal", "kernel.c", 1, LOG_LEVEL_TRACE); //LOG
+/*
+	if (argc < 2){
+			log_error(logs, "No se pasaron parametros.");
+			log_destroy(logs);
+			return 0;
+		}
+
+		config = config_create(argv[1]);
+
+	if (!archivo_configuracion_valido()){
+		log_error(logs, "El archivo de configuracion no tiene todos los campos necesarios");
+		config_destroy(config);
+		return 0;
+	}
+
+
+	*/
+
+	log_debug(logs,"inicia kernel");
 	config = config_create("config");
 
 	NEW = queue_create(); //COLAS
@@ -48,16 +70,17 @@ int main(int argc, char **argv) {
 	EXIT = queue_create();
 	EXEC = queue_create();
 
-	int gradoMultiprogramacion = config_get_int_value(config,
-			"MULTIPROGRAMACION");  //CONFIG
+	log_debug(logs,"colas creadas");
+
+	int gradoMultiprogramacion = config_get_int_value(config,"MULTIPROGRAMACION");  //CONFIG
 	char** dispositivos = config_get_array_value(config, "ID_HIO");
 	char** dispRetardo = config_get_array_value(config, "HIO");
-	char** variablesComp = config_get_array_value(config,
-			"VARIABLES_COMPARTIDAS");
-	char** valorComp = config_get_array_value(config,
-			"VALOR_VARIABLES_COMPARTIDAS");
+	char** variablesComp = config_get_array_value(config,"VARIABLES_COMPARTIDAS");
+	char** valorComp = config_get_array_value(config,"VALOR_VARIABLES_COMPARTIDAS");
 	char** semaforosArray = config_get_array_value(config, "SEMAFOROS");
 	char** valorSemaforo = config_get_array_value(config, "VALOR_SEMAFORO");
+
+	log_debug(logs,"constantes inicializadas");
 
 	sem_init(&mutexNEW, 0, 1);
 	sem_init(&mutexREADY, 0, 1);
@@ -80,7 +103,7 @@ int main(int argc, char **argv) {
 
 
 	log_info(logs,"Conectandose con la UMV...");
-	socketUMV = conectarseUMV();
+	conectarseUMV();
 
 
 	iret1 = pthread_create(&thread1, NULL, plp, NULL );  //HILO PLP
@@ -169,11 +192,56 @@ int main(int argc, char **argv) {
 
 	log_destroy(logs);
 	config_destroy(config);
-	cerrar_socket(socketUMV);
+	cerrar_socket(socket_UMV);
 	cerrar_socket(socketCPU);
 
 
 	return EXIT_SUCCESS;
 
+}
+
+
+
+
+bool archivo_configuracion_valido(){
+	if(!config_has_property(config, "PUERTO_PROG"))
+		return 0;
+
+	if(!config_has_property(config, "PUERTO_CPU"))
+		return 0;
+
+	if(!config_has_property(config, "PUERTO_UMV"))
+		return 0;
+
+	if(!config_has_property(config, "IP"))
+		return 0;
+	if(!config_has_property(config, "QUANTUM"))
+			return 0;
+
+	if(!config_has_property(config, "RETARDO"))
+			return 0;
+
+	if(!config_has_property(config, "MULTIPROGRAMACION"))
+			return 0;
+
+	if(!config_has_property(config, "VALOR_SEMAFORO"))
+			return 0;
+
+	if(!config_has_property(config, "SEMAFOROS"))
+			return 0;
+
+	if(!config_has_property(config, "HIO"))
+			return 0;
+
+	if(!config_has_property(config, "ID_HIO"))
+			return 0;
+
+	if(!config_has_property(config, "VARIABLES_COMPARTIDAS"))
+			return 0;
+
+	if(!config_has_property(config, "VALOR_VARIABLES_COMPARTIDAS"))
+			return 0;
+
+	return 1;
 }
 

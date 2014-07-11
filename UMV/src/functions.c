@@ -1,5 +1,6 @@
 #include "functions.h"
 
+/*Funcion que llama el hilo cada vez que se conecta algun CPU a la UMV*/
 void funcion_CPU(estructura_hilo* hilo){
 	int pid;
 	t_length* tam = malloc(sizeof(t_length));
@@ -18,7 +19,7 @@ void funcion_CPU(estructura_hilo* hilo){
 					log_error(logs, "Se produjo un error recibiendo el pid");
 					break;
 				}
-				cambio_proceso_activo(pid);
+				cambiar_pid_activo(pid);
 				break;
 			case ESCRIBIR_SEGMENTO:
 				if(!recibirDato(hilo->socket,tam->length,(void*)&codigo,logs)){
@@ -59,6 +60,7 @@ void funcion_CPU(estructura_hilo* hilo){
 	}
 }
 
+/*Funcion que llama el hilo cuando se conecta el KERNEL a la UMV*/
 void funcion_kernel(estructura_hilo* hilo){
 	int pid;
 	t_length* tam = malloc(sizeof(t_length));
@@ -69,14 +71,16 @@ void funcion_kernel(estructura_hilo* hilo){
 			log_error(logs, "Se produjo un error recibiendo el menu");
 			break;
 		}
+
 		datos_crearSeg* pidTam = malloc(sizeof(datos_crearSeg));
+		printf("Menu: %d",tam->menu);
 		switch(tam->menu){
 			case PID_ACTUAL:
 				if(!recibirDato(hilo->socket, tam->length, (void*)&pid, logs)){
 					log_error(logs, "Se produjo un error recibiendo el pid");
 					break;
 				}
-				cambio_proceso_activo(pid);
+				cambiar_pid_activo(pid);
 				break;
 			case ESCRIBIR_SEGMENTO:
 				if(!recibirDato(hilo->socket,tam->length,(void*)&codigo,logs)){
@@ -106,8 +110,12 @@ void funcion_kernel(estructura_hilo* hilo){
 				}
 				destruir_segmentos(pid);
 				break;
+			case SOY_KERNEL:
+				log_debug(logs,"alal");
+				break;
 			default:
 				log_error(logs,"operacion invalida para Kernel");
+				retardo();
 				break;
 		}
 	}
@@ -123,6 +131,7 @@ void inicializar_umv(int tamanioUMV){
 	nodoHuecos* unElem= malloc(sizeof(nodoHuecos));
 	unElem->dirFisica=malloc(tamanioUMV);
 	unElem->tamanioSegmento=tamanioUMV;
+	ramUMVInicial = unElem->dirFisica;
 	list_add(listaHuecos,unElem);
 }
 
@@ -137,6 +146,7 @@ void eliminarUMV(){
 	log_debug(logs,"La umv fue eliminada");
 }
 
+/*Funcion que valida que el archivo de configuracion tenga todos los campos*/
 bool archivo_config_valido(){
 	if(!config_has_property(config, "TAMANIO_UMV"))
 		return 0;
@@ -152,6 +162,7 @@ bool archivo_config_valido(){
 	return 1;
 }
 
+/*Funcion que inicializa las variables globales respecto del config*/
 void inicializar_var_config(){
 	puerto = config_get_int_value(config, "PUERTO");
 	tamanioUMV = config_get_int_value(config, "TAMANIO_UMV");
@@ -159,11 +170,14 @@ void inicializar_var_config(){
 	algoritmoActual = config_get_int_value(config,"ALGORITMO");
 }
 
+
 void vaciarLista(t_list* listaSeg){
 	list_clean_and_destroy_elements(listaSeg,free);
 }
 
-/* Funcion que crea y agrega un segmento a la lista de segmentos, segun pid. retorna la direccion logica del segmento */
+/* Funcion que crea y agrega un segmento a la lista de segmentos, segun pid.
+   Retorna la direccion logica del segmento */
+
 int crear_agregar_segmento(int pidInt, int tamanio){
 	int nroSeg=0;
 	char* pid = string_itoa(pidInt);
@@ -246,7 +260,7 @@ int obtener_proxima_dir_logica(int tamanio, char* pid){
 		return 0;
 }
 
-
+/*Funcion que obtiene una nueva direccion fisica (segun algoritmo)*/
 char *obtener_proxima_dirFisica(int tamanio){
 	log_debug(logs,"Entra a obtener dir fisica");
 	switch(algoritmoActual){
@@ -260,9 +274,8 @@ char *obtener_proxima_dirFisica(int tamanio){
 	return NULL;
 }
 
+// FIXME: llega base,offset y tamanio. yo devuelvo [offset,tamanio]
 
-// llega base,offset y tamanio. yo devuelvo [offset,tamanio]
-//
 
 /*Funcion que lee un segmento de la umv y retorna un puntero a la posicion solicitada */
 unsigned char *leer_segmento(int dirLog, int tamanioALeer, int offset){ //solicitar_memoria_desde_una_pos();
@@ -286,6 +299,7 @@ unsigned char *leer_segmento(int dirLog, int tamanioALeer, int offset){ //solici
 	return NULL;
 }
 
+/*Funcion que escribe el buffer en un segmento determinado*/
 void escribir_segmento(int dirLog, int tamanioAEscribir, int offset, void* buffer){
 	bool buscar_dirLogica(tablaSegUMV* unElem){
 		return dirLog == unElem->dirLogica;
@@ -313,6 +327,7 @@ void retardo(){
 	usleep(retardoActual);
 }
 
+/*Funcion que cambia el retardo actual -en milisegundos-*/
 void cambiar_retardo(int retardoNuevo){
 	retardoActual = retardoNuevo;
 }
@@ -332,11 +347,13 @@ void cambiarAlgoritmo(int cambioAlgoritmo){
 	}
 }
 
-/*Funcion que cambia el proceso activo*/
-void cambio_proceso_activo(int pid){
+/*Funcion que cambia el id del proceso activo*/
+void cambiar_pid_activo(int pid){
 	pidActive = pid;
 }
-/*Funcion de la consola*/
+
+
+/*Funcion que llama la consola cuando debe ejecutar una operacion*/
 unsigned char* ejec_operacion(int nroOp){
 	int dirLogica=0, offset=0;
 	void* buffer = NULL; //FIXME: preguntar cómo se inicializa
@@ -346,9 +363,11 @@ unsigned char* ejec_operacion(int nroOp){
 	switch(nroOp){
 		case LEER_SEGMENTO:
 			retardo(retardoActual);
+			//////
 			printf("Ingresar pid: ");
 			scanf("%d",&pid);
-			//FIXME: cambiarpidActive?
+			cambiar_pid_activo(pid);
+			//////
 			printf("Ingresar tamanio a leer: ");
 			scanf("%d",&tamanio);
 			printf("Ingresar la direccion logica: ");
@@ -364,6 +383,12 @@ unsigned char* ejec_operacion(int nroOp){
 			break;
 		case ESCRIBIR_SEGMENTO:
 			retardo(retardoActual);
+			//////
+			printf("Ingresar pid: ");
+			scanf("%d",&pid);
+			cambiar_pid_activo(pid);
+			//////
+//			FIXME: como poner el buffer que se escribe
 			escribir_segmento(dirLogica,tamanioAEscribir,offset,buffer);
 			printf("Desea generar un archivo con el resultado? 0=no 1=si: ");
 			scanf("%d",&genArch);
@@ -561,7 +586,7 @@ void consola(){
 			case CAMBIO_PROCESO_ACTIVO:
 				printf("Ingrese nuevo pid: ");
 				scanf("%d",&pid);
-				cambio_proceso_activo(pid);
+				cambiar_pid_activo(pid);
 				break;
 			case OPERACION:
 				printf("Ingrese operacion segun...\n");
@@ -598,11 +623,55 @@ void consola(){
 
 	}
 }
-
-void compactar(){
-	// implementar la funcion que busque el siguiente puntero (sea hueco o lleno)
-	// usar la funcion iterator. recordar dejar el pid, para que haga pattern matching
-
-	//dictionary_iterator(tablaPidSeg, void(*closure)(char*,void*))
-
-}
+//
+//void compactar_memoria(){
+//	ramAux = ramUMVInicial;
+//	tamHueco = 0;
+//
+//	while(ramAux < ramUMVInicial + tamanioUMV){
+//		nodoHuecos* unElem = list_remove_by_condition(listaHuecos,(void*)buscar_ramSiguiente);
+//		if(unElem){
+//			buscar_hueco_para_compactar(unElem);
+//		}else{
+//			buscar_segmento_y_desplazarlo();
+//			tamHueco = 0;
+//		}
+//	}
+//}
+//
+//void buscar_hueco_para_compactar(nodoHuecos* unElem){
+//	char* dirHueco = unElem->dirFisica;
+//	do{
+//		tamHueco += unElem->tamanioSegmento;
+//		ramAux = unElem->dirFisica + unElem->tamanioSegmento;
+//		unElem = list_remove_by_condition(listaHuecos,(void*)buscar_ramSiguiente);
+//	}while(unElem);
+//}
+//
+//void buscar_segmento_y_desplazarlo(){
+//	dictionary_iterator(tablaPidSeg,busca_seg_en_diccionario);
+//}
+//
+//void busca_seg_en_diccionario(char* pid,t_list* listaSeg){
+//
+//	tablaSegUMV* unElem = list_find(listaSeg,buscar_ramAux);
+//
+//	if(tamHueco >= unElem->tamanioSegmento){
+//		nodoHuecos* nuevoElem;
+//		nuevoElem->dirFisica = unElem->dirFisica;
+//		nuevoElem->tamanioSegmento = unElem->tamanioSegmento;
+//		list_add(listaHuecos,nuevoElem);
+//	}else{
+//
+//	}
+//	ramAux = unElem->dirFisica + unElem->tamanioSegmento;
+//	unElem->dirFisica = memmove(dirHueco,unElem->dirFisica,unElem->tamanioSegmento);
+//}
+//
+//bool buscar_ramAux(tablaSegUMV* unElem){
+//	return unElem->dirFisica == ramAux;
+//}
+//
+//bool buscar_ramSiguiente(nodoHuecos* unElem){
+//	return unElem->dirFisica == ramAux;
+//}

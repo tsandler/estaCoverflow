@@ -20,7 +20,7 @@ extern sem_t hayAlgoEnExit;
 extern t_log *logs;
 extern t_config *config;
 
-extern int socketUMV;
+extern int socket_UMV;
 
 /*
  *
@@ -95,7 +95,7 @@ void manejoExit(){
 	while(1){
 
 		unPCB=sacarCola(EXIT,&mutexEXIT,&hayAlgoEnExit);
-		//eliminarSegmentoUMV(socketUMV,  logs,unPCB);
+		eliminarSegmentoUMV(socket_UMV,  logs,unPCB);
 		sem_post(&gradoProg);
 	}
 

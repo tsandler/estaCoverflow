@@ -36,7 +36,7 @@ void consola();
 unsigned char* ejec_operacion(int nroOp);
 void retardo();
 void cambiar_retardo(int retardoNuevo);
-void cambio_proceso_activo(int pid);
+void cambiar_pid_activo(int pid);
 void cambiarAlgoritmo(int cambioAlgoritmo);
 void dump();
 
@@ -57,7 +57,11 @@ void generar_archivo(unsigned char* resultado, int nroOp);
 void funcion_kernel(estructura_hilo* hilo);
 void funcion_CPU(estructura_hilo* hilo);
 
-void compactar();
+void compactar_memoria();
+void buscar_segmento_y_desplazarlo();
+bool buscar_ramAux(tablaSegUMV* unElem);
+void busca_seg_en_diccionario(char* pid,t_list* listaSeg);
+
 
 
 #endif /* FUNCTIONS_H_ */
