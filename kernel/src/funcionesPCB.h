@@ -14,7 +14,7 @@
 #include "sockets.h"
 #include "../commons/log.h"
 #include "../commons/config.h"
-//#include <kernel/src/planificador_largo_plazo.h>
+
 
 
 typedef struct registroPCB{

@@ -38,12 +38,16 @@ static char* _obtener_programa(char* path){
 /* Funcion que recibe la sentencia a imprimir */
 char* recibir_sentencia(){
 	char* sent;
-	if (recibirDatos(socketKernel, tam, (void*)&sent, logs)){
-		log_info(logs, "La sentencia fue recibida correctamente");
-		tam->menu = FINALIZAR;
-	}else
+	if (recibirMenu(socketKernel, tam, logs)){
+		if (tam->menu != FINALIZAR){
+			if(recibirDato(socketKernel, tam->length, (void*)sent, logs)){
+				log_info(logs, "La sentencia fue recibida correctamente");
+			}
+		}
+	}else{
 		log_error(logs, "Se produjo un error recibiendo la sentencia");
-
+		tam->menu = FINALIZAR;
+	}
 	return string_from_format("%s", &sent);
 }
 

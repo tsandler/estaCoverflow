@@ -49,10 +49,20 @@ int recibir_quantum(){
 int recibir_tamanio_stack(){
 	int tamanio;
 	if(!recibirDatos(socketKernel, tam, (void*)&tamanio, logs)){
-		log_error(logs, "Se produjo un error al recibir el quantum del kernel");
+		log_error(logs, "Se produjo un error al recibir el tamanio del stack");
 		tamanio = -1;
 	}
 	return tamanio;
+}
+
+/* Funcion que recibe el retardo a esperad luego de la ejecucion de cada sentencia */
+int recibir_retardo(){
+	int retardo;
+	if(!recibirDatos(socketKernel, tam, (void*)&retardo, logs)){
+		log_error(logs, "Se produjo un error al recibir el quantum del kernel");
+		retardo = -1;
+	}
+	return retardo;
 }
 
 /* Funcion que carga el diccionario de variables para el contexto de ejecucion actual */

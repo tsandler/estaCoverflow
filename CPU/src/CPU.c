@@ -36,6 +36,7 @@ int main(int argc, char** argv){
 	socketKernel = conectar_kernel();
 	int quantum = recibir_quantum();
 	int tamanioStack = recibir_tamanio_stack();
+	int retardo = recibir_retardo();
 
 	if(socketKernel < 0 || socketUMV < 0 || quantum < 0 || tamanioStack < 0){
 		log_error(logs, "El programa tuvo que finalizar insatisfactoriamente");

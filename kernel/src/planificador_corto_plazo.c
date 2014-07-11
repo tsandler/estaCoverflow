@@ -16,10 +16,10 @@ extern t_log *logs;
 
 void pcp(void* ptr) {
 
-	pthread_t thread3, thread4;
+	pthread_t thread3;//, thread4;
 	int port = config_get_int_value(config, "PUERTO_CPU");
 
-	int iret3 = pthread_create(&thread3, NULL, openSocketServerPCP,(void*)port);
+	int iret3 = pthread_create(&thread3, NULL, (void*)openSocketServerPCP,(void*)port);
 
 	if (iret3) {
 		log_info(logs,"Error en la creacion del hilo serverpcp");

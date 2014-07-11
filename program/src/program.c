@@ -35,7 +35,8 @@ int main(int argc, char **argv) {
 
 	while (tam->menu != FINALIZAR){
 		char* sentencia = recibir_sentencia();
-		printf("%s/n", sentencia);
+		if (tam->menu != FINALIZAR)
+			printf("%s/n", sentencia);
 	}
 
 	cerrarSocket(socketKernel);

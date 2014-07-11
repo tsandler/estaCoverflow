@@ -158,7 +158,7 @@ int main(int argc, char **argv) {
 	while (variablesComp[j] != NULL ) {
 
 		int valor = atoi(valorComp[j]);
-		dictionary_put(variablesCompartidas, variablesComp[j], valor);
+		dictionary_put(variablesCompartidas, variablesComp[j], &valor);
 
 		j++;
 	}
@@ -168,7 +168,7 @@ int main(int argc, char **argv) {
 	while (semaforosArray[h] != NULL ) {
 
 		int valorSem = atoi(valorSemaforo[h]);
-		dictionary_put(semaforos, semaforosArray[h], valorSem);
+		dictionary_put(semaforos, semaforosArray[h], &valorSem);
 		h++;
 	}
 	pthread_join(thread1, NULL ); //esperar a q termine el otro

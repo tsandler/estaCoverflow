@@ -182,6 +182,11 @@ void imprimir(t_valor_variable valor_mostrar){
 		log_error(logs, "Se produjo un error enviando el valor %d para imprimir", valor_mostrar);
 	else
 		log_info(logs, "Se envio el valor %d para imprimirlo", valor_mostrar);
+	tam->length = sizeof(int);
+	if (!enviarDatos(socketKernel, tam, &pcb->fd, logs))
+		log_error(logs, "Se produjo un error enviando el FD");
+	else
+		log_info(logs, "Se envio el FD");
 }
 
 /* Primitiva que envia al kernel un texto para mostrar por consola */
@@ -193,6 +198,11 @@ void imprimir_texto(char* texto){
 		log_error(logs, "Se produjo un error enviando el texto %s para imprimirlo", texto);
 	else
 		log_info(logs, "Se envio el texto %s para imprimirlo", texto);
+	tam->length = sizeof(int);
+	if (!enviarDatos(socketKernel, tam, &pcb->fd, logs))
+		log_error(logs, "Se produjo un error enviando el FD");
+	else
+		log_info(logs, "Se envio el FD");
 }
 
 /* Primitiva que le dice al kernel que fue a entrada y salida con un dispositivo por un determinado tiempo */
@@ -213,7 +223,7 @@ void entrada_salida(t_nombre_dispositivo dispositivo, int tiempo){
 /* Primitiva que envia la senial wait de un semaforo al kernel */
 void wait(t_nombre_semaforo identificador_semaforo){
 	tam->menu = WAIT;
-	tam->length = strlen(identificador_semaforo);
+	tam->length = strlen(identificador_semaforo) + 1;
 
 	if (!enviarDatos(socketKernel, tam, identificador_semaforo, logs))
 		log_error(logs, "Se produjo un error enviando la senial de wait al semaforo %s", identificador_semaforo);
@@ -229,7 +239,7 @@ void wait(t_nombre_semaforo identificador_semaforo){
 /* Primitiva que envia la senial de signal de un semaforo al kernel */
 void signal_parser(t_nombre_semaforo identificador_semaforo){
 	tam->menu = SIGNAL;
-	tam->length = strlen(identificador_semaforo);
+	tam->length = strlen(identificador_semaforo) + 1;
 
 	if (!enviarDatos(socketKernel, tam, identificador_semaforo, logs))
 		log_error(logs, "Se produjo un error enviando la senial de signal al semaforo %s", identificador_semaforo);

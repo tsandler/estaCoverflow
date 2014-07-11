@@ -24,6 +24,7 @@
 #include <commons/string.h>
 #include <libs/manejoDelPCB.h>
 #include "manejoSemaforos.h"
+#include <libs/sockets.h>
 
 
 

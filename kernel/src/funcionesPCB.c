@@ -35,8 +35,7 @@ void intercambiarDatosUMV(int socket_UMV, t_log* logs, registroPCB* PCBprograma,
 	if(!enviarDatos(socket_UMV, tam, (void*)datos_pid,logs))
 			log_error(logs,"Error en el envio del pid");*/
 
-	datos_crearSeg* datosAEnviar;
-	datosAEnviar=malloc(sizeof(datos_crearSeg));
+	datos_crearSeg* datosAEnviar=malloc(sizeof(datos_crearSeg));
 	tam->length = sizeof(datos_crearSeg);
 
 	int datoRecibido;
