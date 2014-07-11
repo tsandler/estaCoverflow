@@ -25,6 +25,8 @@ int socketKernel, socketUMV;
 unsigned char* stack;
 int seguir;
 bool systemCall;
+int ejecutando;
+int signalCall;
 
 AnSISOP_funciones functions;
 AnSISOP_kernel kernel_functions;

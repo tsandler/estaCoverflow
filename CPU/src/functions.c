@@ -154,5 +154,10 @@ void liberar_estructuras(){
 /* Funcion que se lanza en el llamado de la senial SIGUSR1 */
 void manejar_senial(){
 	seguir = 0;
+	if (!ejecutando){
+		cerrarSocket(socketKernel);
+		cerrarSocket(socketUMV);
+	}
+	signalCall = 1;
 	log_debug(logs, "Se llamo a la senial SIGUSR1");
 }

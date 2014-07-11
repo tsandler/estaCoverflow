@@ -55,6 +55,7 @@ int main(int argc, char** argv){
 
 	while (seguir){
 		int cont = 0;
+		ejecutando = 0;
 		if(!recibirDatos(socketKernel, tam, (void*)pcb, logs)){
 			log_error(logs, "Se produjo un error al recibir el PCB del kernel");
 			break;
@@ -68,8 +69,8 @@ int main(int argc, char** argv){
 		cargar_diccionario();
 
 		systemCall = false;
-
-		while (quantum > cont && !systemCall && seguir){
+		ejecutando = 1;
+		while (quantum > cont && !systemCall){
 			pc = pcb->program_counter;
 
 			char* sentencia = recibir_sentencia();
@@ -94,11 +95,13 @@ int main(int argc, char** argv){
 		if(!enviarDatos(socketUMV, tam, stack, logs))
 			log_error(logs, "Se produjo un error al devolverle el stack a la umv");
 
+		if (signalCall){
+			cerrarSocket(socketKernel);
+			cerrarSocket(socketUMV);
+		}
 		dictionary_clean(diccionarioDeVariables);
 	}
 
-	cerrarSocket(socketKernel);
-	cerrarSocket(socketUMV);
 	liberar_estructuras();
 
 	return 0;

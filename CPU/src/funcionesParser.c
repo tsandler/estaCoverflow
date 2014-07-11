@@ -30,7 +30,7 @@ void inicializar_funciones_parser(){
 /* Primitiva que almacena en el stack y en el diccionario de variables a una variable, dejandola sin inicializar*/
 t_puntero definir_variable(t_nombre_variable identificador_variable){
 	t_puntero* posicion = malloc(sizeof(t_puntero));
-	posicion = pcb->cursor_stack;
+	*posicion = pcb->cursor_stack;
 	memcpy(stack + pcb->cursor_stack, &identificador_variable, 1);
 	pcb->cursor_stack += 5;
 	char variable[2];
