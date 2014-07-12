@@ -384,3 +384,37 @@ end
 [DEBUG] 15:00:03:253 kernel.c/(11149:11157): se envio el crear_seg et_func
 [ERROR] 15:01:47:436 kernel.c/(11149:11157): [SOCKETS] Se produjo un problema al recibir el tamanio del dato
 [ERROR] 15:01:47:436 kernel.c/(11149:11157): Error en el envio del Segmento Etiquetas_Funciones
+[DEBUG] 15:29:15:989 kernel.c/(12381:12381): inicia kernel
+[DEBUG] 15:29:15:989 kernel.c/(12381:12381): colas creadas
+[DEBUG] 15:29:15:989 kernel.c/(12381:12381): constantes inicializadas
+[INFO] 15:29:15:990 kernel.c/(12381:12381): Conectandose con la UMV...
+[DEBUG] 15:29:15:990 kernel.c/(12381:12381): el puerto es: 6000
+[INFO] 15:29:15:990 kernel.c/(12381:12381): El kernel se conecto correctamente con la UMV
+[DEBUG] 15:29:15:990 kernel.c/(12381:12381): ya se envio el menu
+[INFO] 15:29:15:990 kernel.c/(12381:12387): Scanner corriendo dispositivo
+[INFO] 15:29:15:990 kernel.c/(12381:12386): Impresora corriendo dispositivo
+[INFO] 15:29:15:990 kernel.c/(12381:12385): Disco corriendo dispositivo
+[INFO] 15:29:15:991 kernel.c/(12381:12388): En PCP(): Waiting conection ...
+[INFO] 15:29:15:992 kernel.c/(12381:12389): En PLP(): Waiting Connection...
+
+[INFO] 15:29:33:903 kernel.c/(12381:12389): Conexion entrante aceptada :16
+[INFO] 15:29:33:903 kernel.c/(12381:12389): #!/usr/bin/ansisop
+begin
+	variables a, b
+	a = 3
+	b = 5
+	a = b + 12
+end
+
+
+ 
+
+[DEBUG] 15:29:33:903 kernel.c/(12381:12389): entra a metadata desde literal
+[DEBUG] 15:29:33:903 kernel.c/(12381:12389): sale de metadata desde literal
+[DEBUG] 15:29:33:903 kernel.c/(12381:12389): entra a algoritmo de peso
+[DEBUG] 15:29:33:904 kernel.c/(12381:12389): sale de algoritmo de peso
+[INFO] 15:29:33:904 kernel.c/(12381:12389): se creo el pcb. entra a intercambiar datos con la UMV
+[INFO] 15:29:33:904 kernel.c/(12381:12389): 1
+[DEBUG] 15:29:33:904 kernel.c/(12381:12389): se envio el crear_seg et_func
+[ERROR] 15:29:43:853 kernel.c/(12381:12389): [SOCKETS] Se produjo un problema al recibir el tamanio del dato
+[ERROR] 15:29:43:853 kernel.c/(12381:12389): Error en el envio del Segmento Etiquetas_Funciones

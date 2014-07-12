@@ -35,36 +35,33 @@ int conectar_kernel(){
 	return socket_kernel;
 }
 
-/* Funcion que recibe el quantum enviado por el kernel */
-int recibir_quantum(){
-	int quantum;
-	if(!recibirDatos(socketKernel, tam, (void*)&quantum, logs)){
-		log_error(logs, "Se produjo un error al recibir el quantum del kernel");
-		quantum = -1;
-	}else
-		log_info(logs, "Se recibio el quantum de %d", quantum);
-	return quantum;
-}
-
-/* Funcion que recibe el tamanio del stack seteado en archivo de configuracion del kernel */
-int recibir_tamanio_stack(){
-	int tamanio;
-	if(!recibirDatos(socketKernel, tam, (void*)&tamanio, logs)){
-		log_error(logs, "Se produjo un error al recibir el tamanio del stack");
-		tamanio = -1;
-	}else
-		log_info(logs, "Se recibio el tamanio del stack de %d", tamanio);
-	return tamanio;
-}
-
-/* Funcion que recibe el retardo a esperad luego de la ejecucion de cada sentencia */
-int recibir_retardo(){
-	int retardo;
-	if(!recibirDatos(socketKernel, tam, (void*)&retardo, logs)){
-		log_error(logs, "Se produjo un error al recibir el quantum del kernel");
-		retardo = -1;
+/* Funcion que recibe el quantum, el tamanio del stack o el retardo */
+int recibir(int dato){
+	int valor;
+	switch(dato){
+		case 1:
+			if(!recibirDatos(socketKernel, tam, (void*)&valor, logs)){
+				log_error(logs, "Se produjo un error al recibir el quantum del kernel");
+				valor = -1;
+			}else
+				log_info(logs, "Se recibio el quantum de %d", valor);
+			break;
+		case 2:
+			if(!recibirDatos(socketKernel, tam, (void*)&valor, logs)){
+				log_error(logs, "Se produjo un error al recibir el tamanio del stack");
+				valor = -1;
+			}else
+				log_info(logs, "Se recibio el tamanio del stack de %d", valor);
+			break;
+		case 3:
+			if(!recibirDatos(socketKernel, tam, (void*)&valor, logs)){
+				log_error(logs, "Se produjo un error al recibir el quantum del kernel");
+				valor = -1;
+			}else
+				log_info(logs, "Se recibio el retardo %d", valor);
+			break;
 	}
-	return retardo;
+	return valor;
 }
 
 /* Funcion que carga el diccionario de variables para el contexto de ejecucion actual */

@@ -17,9 +17,7 @@ int conectar_UMV();
 int conectar_kernel();
 
 void cargar_diccionario();
-int recibir_quantum();
-int recibir_tamanio_stack();
-int recibir_retardo();
+int recibir(int valor);
 void pedir_stack(int tamanio);
 char* recibir_sentencia();
 

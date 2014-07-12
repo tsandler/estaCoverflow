@@ -105,11 +105,11 @@ void funcion_kernel(estructura_hilo* hilo){
 				char* cod = string_from_format("%s", &buffer);
 
 				escribir_segmento(base,tamanio,offset,cod);
-				log_debug(logs,"ya se escribio el segmento");
+				log_debug(logs,"Ya se escribio el segmento");
 				break;
 
 			case CREAR_SEGMENTO:
-				log_debug(logs,"entra kernel a crear segmento");
+				log_debug(logs,"Entra kernel a crear segmento");
 				if(!recibirDato(hilo->socket, tam->length, (void*)pidTam, logs)){
 					log_error(logs, "Se produjo un error recibiendo pid-tamanio");
 					break;

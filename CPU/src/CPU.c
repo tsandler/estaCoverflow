@@ -35,18 +35,17 @@ int main(int argc, char** argv){
 
 	socketUMV = conectar_UMV();
 	socketKernel = conectar_kernel();
-	int quantum = recibir_quantum();
-	int tamanioStack = recibir_tamanio_stack();
-	int retardo = recibir_retardo();
-
-	if(socketKernel < 0 || socketUMV < 0 || quantum < 0 || tamanioStack < 0){
-		log_error(logs, "El programa tuvo que finalizar insatisfactoriamente");
+	if(socketKernel < 0 || socketUMV < 0){
+		log_error(logs, "El programa tuvo que finalizar insatisfactoriamente porque fallo alguna conexion");
 		liberar_estructuras();
 		return 0;
 	}
 	tam->menu = SOY_CPU;
 	enviarMenu(socketKernel, tam, logs);
 	enviarMenu(socketUMV, tam, logs);
+	int quantum = recibir(1);
+	int tamanioStack = recibir(2);
+	int retardo = recibir(3);
 
 	inicializar_funciones_parser();
 
@@ -63,7 +62,7 @@ int main(int argc, char** argv){
 			break;
 		}
 		tam->menu = PID_ACTUAL;
-		tam->length = sizeof(pcb->pid);
+		tam->length = sizeof(int);
 		if(!enviarDatos(socketUMV, tam, &pcb->pid, logs))
 			log_error(logs, "Se produjo un error enviando el pid a la UMV");
 

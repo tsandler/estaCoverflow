@@ -46,9 +46,11 @@ int main(int argc, char** argv){
 
 	do{
 		hilo->socket = aceptarConexion(socket, logs);
-		if(!hilo->socket)
-			log_error(logs,"Error al aceptar la conexion -kernel-");
-		else
+		if(!hilo->socket){
+			log_error(logs,"Error al aceptar la conexion -kernel");
+			log_destroy(logs);
+			return 0;
+		}else
 			log_info(logs,"Se acepto la conexion -kernel-");
 
 		if(!recibirMenu(hilo->socket, tam, logs))
