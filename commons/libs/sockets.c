@@ -80,11 +80,11 @@ int conectarCliente(char *ip, int port, t_log *logs){
 
 int enviarDatos(int socket, t_length* tam, void* datos, t_log* logs){
 	if (send (socket, tam, sizeof(t_length), 0) < 0){
-		log_error(logs, "Se produjo un problema al enviar el tamanio del dato");
+		log_error(logs, "[SOCKETS] Se produjo un problema al enviar el tamanio del dato");
 		return 0;
 	}
 	if (send (socket, datos, tam->length, 0) < 0){
-		log_error(logs, "Se produjo un problema al enviar el dato");
+		log_error(logs, "[SOCKETS] Se produjo un problema al enviar el dato");
 		return 0;
 	}
 	return 1;
