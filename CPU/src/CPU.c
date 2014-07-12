@@ -41,8 +41,8 @@ int main(int argc, char** argv){
 		return 0;
 	}
 	tam->menu = SOY_CPU;
-	enviarMenu(socketKernel, tam, logs);
 	enviarMenu(socketUMV, tam, logs);
+
 	int quantum = recibir(1);
 	int tamanioStack = recibir(2);
 	int retardo = recibir(3);
@@ -53,16 +53,18 @@ int main(int argc, char** argv){
 	seguir = 1;
 
 	signal(SIGUSR1, manejar_senial);
-
+	pcb = malloc(sizeof(registroPCB));
 	while (seguir){
 		int cont = 0;
 		ejecutando = 0;
+		log_debug(logs, "Recibiendo un PCB...");
 		if(!recibirDatos(socketKernel, tam, (void*)pcb, logs)){
 			log_error(logs, "Se produjo un error al recibir el PCB del kernel");
 			break;
 		}
 		tam->menu = PID_ACTUAL;
 		tam->length = sizeof(int);
+		log_debug(logs, "Enviando el pid %d a la UMV", pcb->pid);
 		if(!enviarDatos(socketUMV, tam, &pcb->pid, logs))
 			log_error(logs, "Se produjo un error enviando el pid a la UMV");
 

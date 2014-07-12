@@ -19,3 +19,132 @@
 [INFO] 14:53:15:754 CPU.c/(10994:10994): Se conecto con el kernel correctamente
 [INFO] 14:53:17:109 CPU.c/(10994:10994): Se recibio el quantum de 3
 [INFO] 14:53:18:458 CPU.c/(10994:10994): Se recibio el tamanio del stack de 300
+[ERROR] 16:34:27:855 CPU.c/(6312:6312): [SOCKETS] Error al conectar socket
+[ERROR] 16:34:27:855 CPU.c/(6312:6312): No se pudo conectar a la UMV correctamente
+[ERROR] 16:34:29:55 CPU.c/(6312:6312): [SOCKETS] Error al conectar socket
+[ERROR] 16:34:29:55 CPU.c/(6312:6312): No se pudo conectar a la kernel correctamente
+[ERROR] 16:38:43:35 CPU.c/(1739:1739): [SOCKETS] Error al conectar socket
+[ERROR] 16:38:43:36 CPU.c/(1739:1739): No se pudo conectar a la UMV correctamente
+[ERROR] 16:38:43:523 CPU.c/(1739:1739): [SOCKETS] Error al conectar socket
+[ERROR] 16:38:43:523 CPU.c/(1739:1739): No se pudo conectar a la kernel correctamente
+[ERROR] 16:39:04:985 CPU.c/(1785:1785): [SOCKETS] Error al conectar socket
+[ERROR] 16:39:04:985 CPU.c/(1785:1785): No se pudo conectar a la UMV correctamente
+[ERROR] 16:39:07:364 CPU.c/(1785:1785): [SOCKETS] Error al conectar socket
+[ERROR] 16:39:07:364 CPU.c/(1785:1785): No se pudo conectar a la kernel correctamente
+[ERROR] 16:40:23:711 CPU.c/(1827:1827): [SOCKETS] Error al conectar socket
+[ERROR] 16:40:23:711 CPU.c/(1827:1827): No se pudo conectar a la UMV correctamente
+[ERROR] 16:40:25:906 CPU.c/(1827:1827): [SOCKETS] Error al conectar socket
+[ERROR] 16:40:25:906 CPU.c/(1827:1827): No se pudo conectar a la kernel correctamente
+[INFO] 16:42:26:673 CPU.c/(1920:1920): Se conecto con la UMV correctamente
+[INFO] 16:42:28:532 CPU.c/(1920:1920): Se conecto con el kernel correctamente
+[INFO] 16:42:55:684 CPU.c/(1920:1920): Se recibio el quantum de 3
+[INFO] 16:43:01:211 CPU.c/(1920:1920): Se recibio el tamanio del stack de 300
+[INFO] 16:43:04:460 CPU.c/(1920:1920): Se recibio el retardo 2000
+[INFO] 16:46:31:286 CPU.c/(1991:1991): Se conecto con la UMV correctamente
+[INFO] 16:46:32:835 CPU.c/(1991:1991): Se conecto con el kernel correctamente
+[INFO] 16:46:47:167 CPU.c/(1991:1991): Se recibio el quantum de 3
+[INFO] 16:46:51:64 CPU.c/(1991:1991): Se recibio el tamanio del stack de 300
+[INFO] 16:46:52:291 CPU.c/(1991:1991): Se recibio el retardo 2000
+[INFO] 17:03:23:934 CPU.c/(2264:2264): Se conecto con la UMV correctamente
+[INFO] 17:03:23:941 CPU.c/(2264:2264): Se conecto con el kernel correctamente
+[INFO] 17:03:23:954 CPU.c/(2264:2264): Se recibio el quantum de 3
+[INFO] 17:03:23:955 CPU.c/(2264:2264): Se recibio el tamanio del stack de 300
+[INFO] 17:03:23:955 CPU.c/(2264:2264): Se recibio el retardo 2000
+[INFO] 17:06:00:946 CPU.c/(2336:2336): Se conecto con la UMV correctamente
+[ERROR] 17:06:01:291 CPU.c/(2336:2336): [SOCKETS] Error al conectar socket
+[ERROR] 17:06:01:291 CPU.c/(2336:2336): No se pudo conectar a la kernel correctamente
+[ERROR] 17:06:02:64 CPU.c/(2336:2336): El programa tuvo que finalizar insatisfactoriamente porque fallo alguna conexion
+[INFO] 17:06:37:264 CPU.c/(2385:2385): Se conecto con la UMV correctamente
+[INFO] 17:06:39:304 CPU.c/(2385:2385): Se conecto con el kernel correctamente
+[INFO] 17:06:49:545 CPU.c/(2385:2385): Se recibio el quantum de 3
+[INFO] 17:06:52:71 CPU.c/(2385:2385): Se recibio el tamanio del stack de 300
+[INFO] 17:06:53:982 CPU.c/(2385:2385): Se recibio el retardo 2000
+[ERROR] 17:10:07:640 CPU.c/(2459:2459): [SOCKETS] Error al conectar socket
+[ERROR] 17:10:07:640 CPU.c/(2459:2459): No se pudo conectar a la UMV correctamente
+[INFO] 17:10:39:782 CPU.c/(2505:2505): Se conecto con la UMV correctamente
+[INFO] 17:10:41:875 CPU.c/(2505:2505): Se conecto con el kernel correctamente
+[INFO] 17:10:52:968 CPU.c/(2505:2505): Se recibio el quantum de 3
+[INFO] 17:11:37:166 CPU.c/(2505:2505): Se recibio el tamanio del stack de 300
+[INFO] 17:11:38:714 CPU.c/(2505:2505): Se recibio el retardo 2000
+[INFO] 17:19:36:728 CPU.c/(2599:2599): Se conecto con la UMV correctamente
+[INFO] 17:19:36:734 CPU.c/(2599:2599): Se conecto con el kernel correctamente
+[INFO] 17:19:36:743 CPU.c/(2599:2599): Se recibio el quantum de 3
+[INFO] 17:19:36:743 CPU.c/(2599:2599): Se recibio el tamanio del stack de 300
+[INFO] 17:19:36:743 CPU.c/(2599:2599): Se recibio el retardo 2000
+[INFO] 17:22:17:245 CPU.c/(2696:2696): Se conecto con la UMV correctamente
+[INFO] 17:22:17:291 CPU.c/(2696:2696): Se conecto con el kernel correctamente
+[INFO] 17:22:17:305 CPU.c/(2696:2696): Se recibio el quantum de 3
+[INFO] 17:22:17:305 CPU.c/(2696:2696): Se recibio el tamanio del stack de 300
+[INFO] 17:22:17:305 CPU.c/(2696:2696): Se recibio el retardo 2000
+[DEBUG] 17:22:17:305 CPU.c/(2696:2696): Recibiendo un PCB...
+[DEBUG] 17:22:26:106 CPU.c/(2696:2696): Enviando el pid 1 a la UMV
+[INFO] 17:27:31:903 CPU.c/(2759:2759): Se conecto con la UMV correctamente
+[ERROR] 17:27:31:905 CPU.c/(2759:2759): [SOCKETS] Error al conectar socket
+[ERROR] 17:27:31:905 CPU.c/(2759:2759): No se pudo conectar a la kernel correctamente
+[ERROR] 17:27:31:905 CPU.c/(2759:2759): El programa tuvo que finalizar insatisfactoriamente porque fallo alguna conexion
+[INFO] 17:27:50:585 CPU.c/(2785:2785): Se conecto con la UMV correctamente
+[INFO] 17:27:50:587 CPU.c/(2785:2785): Se conecto con el kernel correctamente
+[INFO] 17:27:50:602 CPU.c/(2785:2785): Se recibio el quantum de 3
+[INFO] 17:27:50:602 CPU.c/(2785:2785): Se recibio el tamanio del stack de 300
+[INFO] 17:27:50:602 CPU.c/(2785:2785): Se recibio el retardo 2000
+[DEBUG] 17:27:50:603 CPU.c/(2785:2785): Recibiendo un PCB...
+[DEBUG] 17:27:52:88 CPU.c/(2785:2785): Enviando el pid 1 a la UMV
+[INFO] 17:29:42:327 CPU.c/(2813:2813): Se conecto con la UMV correctamente
+[INFO] 17:29:42:330 CPU.c/(2813:2813): Se conecto con el kernel correctamente
+[INFO] 17:29:42:344 CPU.c/(2813:2813): Se recibio el quantum de 3
+[INFO] 17:29:42:345 CPU.c/(2813:2813): Se recibio el tamanio del stack de 300
+[INFO] 17:29:42:345 CPU.c/(2813:2813): Se recibio el retardo 2000
+[DEBUG] 17:29:42:345 CPU.c/(2813:2813): Recibiendo un PCB...
+[DEBUG] 17:29:45:85 CPU.c/(2813:2813): Enviando el pid 1 a la UMV
+[INFO] 17:31:26:365 CPU.c/(2841:2841): Se conecto con la UMV correctamente
+[INFO] 17:31:26:370 CPU.c/(2841:2841): Se conecto con el kernel correctamente
+[INFO] 17:31:26:381 CPU.c/(2841:2841): Se recibio el quantum de 3
+[INFO] 17:31:26:381 CPU.c/(2841:2841): Se recibio el tamanio del stack de 300
+[INFO] 17:31:26:381 CPU.c/(2841:2841): Se recibio el retardo 2000
+[DEBUG] 17:31:26:381 CPU.c/(2841:2841): Recibiendo un PCB...
+[DEBUG] 17:31:30:521 CPU.c/(2841:2841): Enviando el pid 1 a la UMV
+[INFO] 17:33:54:641 CPU.c/(2871:2871): Se conecto con la UMV correctamente
+[INFO] 17:33:54:643 CPU.c/(2871:2871): Se conecto con el kernel correctamente
+[INFO] 17:33:54:676 CPU.c/(2871:2871): Se recibio el quantum de 3
+[INFO] 17:33:54:676 CPU.c/(2871:2871): Se recibio el tamanio del stack de 300
+[INFO] 17:33:54:676 CPU.c/(2871:2871): Se recibio el retardo 2000
+[DEBUG] 17:33:54:676 CPU.c/(2871:2871): Recibiendo un PCB...
+[DEBUG] 17:34:08:837 CPU.c/(2871:2871): Enviando el pid 1 a la UMV
+[INFO] 17:35:28:382 CPU.c/(2912:2912): Se conecto con la UMV correctamente
+[ERROR] 17:35:28:385 CPU.c/(2912:2912): [SOCKETS] Error al conectar socket
+[ERROR] 17:35:28:385 CPU.c/(2912:2912): No se pudo conectar a la kernel correctamente
+[ERROR] 17:35:28:385 CPU.c/(2912:2912): El programa tuvo que finalizar insatisfactoriamente porque fallo alguna conexion
+[INFO] 17:35:48:920 CPU.c/(2947:2947): Se conecto con la UMV correctamente
+[INFO] 17:35:50:196 CPU.c/(2947:2947): Se conecto con el kernel correctamente
+[INFO] 17:36:09:600 CPU.c/(2947:2947): Se recibio el quantum de 3
+[INFO] 17:36:12:765 CPU.c/(2947:2947): Se recibio el tamanio del stack de 300
+[INFO] 17:36:13:7 CPU.c/(2947:2947): Se recibio el retardo 2000
+[DEBUG] 17:36:16:216 CPU.c/(2947:2947): Recibiendo un PCB...
+[DEBUG] 17:38:48:956 CPU.c/(2947:2947): Enviando el pid 1 a la UMV
+[ERROR] 17:43:13:746 CPU.c/(3066:3066): [SOCKETS] Error al conectar socket
+[ERROR] 17:43:13:746 CPU.c/(3066:3066): No se pudo conectar a la UMV correctamente
+[INFO] 17:43:14:373 CPU.c/(3066:3066): Se conecto con el kernel correctamente
+[ERROR] 17:43:25:230 CPU.c/(3112:3112): [SOCKETS] Error al conectar socket
+[ERROR] 17:43:25:230 CPU.c/(3112:3112): No se pudo conectar a la UMV correctamente
+[INFO] 17:43:26:181 CPU.c/(3112:3112): Se conecto con el kernel correctamente
+[INFO] 17:45:06:292 CPU.c/(3193:3193): Se conecto con la UMV correctamente
+[INFO] 17:45:07:55 CPU.c/(3193:3193): Se conecto con el kernel correctamente
+[INFO] 17:45:14:655 CPU.c/(3193:3193): Se recibio el quantum de 3
+[INFO] 17:45:15:889 CPU.c/(3193:3193): Se recibio el tamanio del stack de 300
+[INFO] 17:45:17:317 CPU.c/(3193:3193): Se recibio el retardo 2000
+[DEBUG] 17:45:21:703 CPU.c/(3193:3193): Recibiendo un PCB...
+[DEBUG] 17:46:26:580 CPU.c/(3193:3193): Enviando el pid 1 a la UMV
+[INFO] 17:49:26:210 CPU.c/(3284:3284): Se conecto con la UMV correctamente
+[INFO] 17:49:26:279 CPU.c/(3284:3284): Se conecto con el kernel correctamente
+[INFO] 17:49:26:295 CPU.c/(3284:3284): Se recibio el quantum de 3
+[INFO] 17:49:26:295 CPU.c/(3284:3284): Se recibio el tamanio del stack de 300
+[INFO] 17:49:26:296 CPU.c/(3284:3284): Se recibio el retardo 2000
+[DEBUG] 17:49:26:296 CPU.c/(3284:3284): Recibiendo un PCB...
+[DEBUG] 17:49:31:213 CPU.c/(3284:3284): Enviando el pid 1 a la UMV
+[INFO] 17:51:09:585 CPU.c/(3313:3313): Se conecto con la UMV correctamente
+[INFO] 17:51:09:600 CPU.c/(3313:3313): Se conecto con el kernel correctamente
+[INFO] 17:51:09:620 CPU.c/(3313:3313): Se recibio el quantum de 3
+[INFO] 17:51:09:620 CPU.c/(3313:3313): Se recibio el tamanio del stack de 300
+[INFO] 17:51:09:620 CPU.c/(3313:3313): Se recibio el retardo 2000
+[DEBUG] 17:51:09:620 CPU.c/(3313:3313): Recibiendo un PCB...
+[DEBUG] 17:51:15:435 CPU.c/(3313:3313): Enviando el pid 1 a la UMV
