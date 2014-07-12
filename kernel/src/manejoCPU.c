@@ -29,8 +29,9 @@ bool condicion(registroPCB* pcb) {
 
 
 void manejoCPU(int fd) {
-
-	puts("corriendo manejo de la cpu");
+	t_log * logs = log_create("log_PCP_En_CPU", "manejoCPU.c", 1,
+				LOG_LEVEL_TRACE);
+	log_info(logs, "Corriendo manejo del CPU");
 	int tiempo;
 	char* dispositivo;
 	char* textoAImprimir;
@@ -47,17 +48,13 @@ void manejoCPU(int fd) {
 	PCBrecibido = malloc(sizeof(registroPCB));
 	registroPCB* PCBPOP = malloc(sizeof(registroPCB));
 	registroPCB* unPCB = malloc(sizeof(registroPCB));
-
-	t_log * logs = log_create("log_PCP_En_CPU", "manejoCPU.c", 0,
-			LOG_LEVEL_TRACE);
-
-	unPCB = sacarCola(READY, &mutexREADY, &hayAlgoEnReady); //para mandar a exec
-	log_info(logs, "Se saco de la cola Ready el proceso %i",unPCB->pid);
-	int stack = config_get_int_value(config,"TAMANIO_STACK");
 	tam->length = sizeof(int);
+	int stack = config_get_int_value(config,"TAMANIO_STACK");
 	enviarDatos(fd, tam, &quantum, logs);
 	enviarDatos(fd, tam, &stack,logs);
 	enviarDatos(fd, tam, &retardo, logs);
+	unPCB = sacarCola(READY, &mutexREADY, &hayAlgoEnReady); //para mandar a exec
+	log_info(logs, "Se saco de la cola Ready el proceso %i",unPCB->pid);
 
 	sem_wait(&mutexMandarColaEXEC);	//envio datos y pongo en exec atomicamente
 	ponerCola(unPCB, EXEC, &mutexEXEC, &hayAlgoEnExec);

@@ -1,0 +1,386 @@
+[DEBUG] 14:04:37:319 kernel.c/(6005:6005): inicia kernel
+[DEBUG] 14:04:37:321 kernel.c/(6005:6005): colas creadas
+[DEBUG] 14:05:14:309 kernel.c/(6052:6052): inicia kernel
+[DEBUG] 14:05:14:309 kernel.c/(6052:6052): colas creadas
+[DEBUG] 14:05:14:309 kernel.c/(6052:6052): constantes inicializadas
+[INFO] 14:05:14:309 kernel.c/(6052:6052): Conectandose con la UMV...
+[DEBUG] 14:05:14:309 kernel.c/(6052:6052): el puerto es: 6000
+[INFO] 14:05:14:310 kernel.c/(6052:6052): El kernel se conecto correctamente con la UMV
+[DEBUG] 14:05:14:310 kernel.c/(6052:6052): ya se envio el menu
+[INFO] 14:05:14:311 kernel.c/(6052:6058): Scanner corriendo dispositivo
+[INFO] 14:05:14:311 kernel.c/(6052:6057): Impresora corriendo dispositivo
+[INFO] 14:05:14:311 kernel.c/(6052:6056): Disco corriendo dispositivo
+[INFO] 14:05:14:312 kernel.c/(6052:6059): En PCP(): Waiting conection ...
+[INFO] 14:05:14:313 kernel.c/(6052:6060): En PLP(): Waiting Connection...
+
+[INFO] 14:05:38:960 kernel.c/(6052:6060): Conexion entrante aceptada :16
+[INFO] 14:05:38:961 kernel.c/(6052:6060): #!/usr/bin/ansisop
+begin
+	variables a, b
+	a = 3
+	b = 5
+	a = b + 12
+end
+
+
+ 
+
+[DEBUG] 14:05:38:961 kernel.c/(6052:6060): entra a metadata desde literal
+[DEBUG] 14:05:38:961 kernel.c/(6052:6060): sale de metadata desde literal
+[DEBUG] 14:05:38:961 kernel.c/(6052:6060): entra a algoritmo de peso
+[DEBUG] 14:05:38:962 kernel.c/(6052:6060): sale de algoritmo de peso
+[INFO] 14:05:38:962 kernel.c/(6052:6060): se creo el pcb. entra a intercambiar datos con la UMV
+[INFO] 14:05:38:962 kernel.c/(6052:6060): 1
+[DEBUG] 14:05:38:962 kernel.c/(6052:6060): se envio el crear_seg et_func
+[DEBUG] 14:05:38:962 kernel.c/(6052:6060): se envio el crear_seg tam_ind_cod
+[DEBUG] 14:05:39:40 kernel.c/(6052:6060): se recibio la base del segmento codigo
+[DEBUG] 14:05:39:40 kernel.c/(6052:6060): se envio el crear_seg stack
+[DEBUG] 14:05:39:120 kernel.c/(6052:6060): se envio el recibio el segmento stack
+[DEBUG] 14:05:39:120 kernel.c/(6052:6060): se envio el escribir segmento codigo
+[INFO] 14:05:39:120 kernel.c/(6052:6060): Se termino el proceso de CONEXION y CREACION DE SEGMENTOS
+[INFO] 14:05:39:120 kernel.c/(6052:6061): El grado de multiprogramacion es : 4 
+
+[INFO] 14:05:39:124 kernel.c/(6052:6061): En la cola New hay: 1 
+
+[INFO] 14:05:39:124 kernel.c/(6052:6061): En la cola Ready Hay 0 
+
+[INFO] 14:05:39:124 kernel.c/(6052:6061): En la cola Ready se agrego el programa 1, ahora hay un total de 1 
+
+[INFO] 14:05:39:124 kernel.c/(6052:6060): Se coloco en la cola NEW el programa 1
+[INFO] 14:05:39:124 kernel.c/(6052:6060): En PLP(): Waiting Connection...
+
+[INFO] 14:06:19:323 kernel.c/(6052:6060): Conexion entrante aceptada :16
+[INFO] 14:06:19:324 kernel.c/(6052:6060): #!/usr/bin/ansisop
+begin
+	variables a, b
+	a = 3
+	b = 5
+	a = b + 12
+end
+
+
+ 
+
+[DEBUG] 14:06:19:324 kernel.c/(6052:6060): entra a metadata desde literal
+[DEBUG] 14:06:19:324 kernel.c/(6052:6060): sale de metadata desde literal
+[DEBUG] 14:06:19:324 kernel.c/(6052:6060): entra a algoritmo de peso
+[DEBUG] 14:06:19:324 kernel.c/(6052:6060): sale de algoritmo de peso
+[INFO] 14:06:19:324 kernel.c/(6052:6060): se creo el pcb. entra a intercambiar datos con la UMV
+[INFO] 14:06:19:324 kernel.c/(6052:6060): 1
+[DEBUG] 14:06:19:324 kernel.c/(6052:6060): se envio el crear_seg et_func
+[DEBUG] 14:06:19:364 kernel.c/(6052:6060): se envio el crear_seg tam_ind_cod
+[DEBUG] 14:06:19:444 kernel.c/(6052:6060): se recibio la base del segmento codigo
+[DEBUG] 14:06:19:444 kernel.c/(6052:6060): se envio el crear_seg stack
+[DEBUG] 14:06:19:524 kernel.c/(6052:6060): se envio el recibio el segmento stack
+[DEBUG] 14:06:19:524 kernel.c/(6052:6060): se envio el escribir segmento codigo
+[INFO] 14:06:19:524 kernel.c/(6052:6060): Se termino el proceso de CONEXION y CREACION DE SEGMENTOS
+[INFO] 14:06:19:524 kernel.c/(6052:6061): El grado de multiprogramacion es : 3 
+
+[INFO] 14:06:19:524 kernel.c/(6052:6061): En la cola New hay: 1 
+
+[INFO] 14:06:19:524 kernel.c/(6052:6061): En la cola Ready Hay 1 
+
+[INFO] 14:06:19:524 kernel.c/(6052:6061): En la cola Ready se agrego el programa 1, ahora hay un total de 2 
+
+[INFO] 14:06:19:524 kernel.c/(6052:6060): Se coloco en la cola NEW el programa 1
+[INFO] 14:06:19:524 kernel.c/(6052:6060): En PLP(): Waiting Connection...
+
+[INFO] 14:06:51:200 kernel.c/(6052:6060): Conexion entrante aceptada :16
+[INFO] 14:06:51:201 kernel.c/(6052:6060): #!/usr/bin/ansisop
+begin
+	variables a, b
+	a = 3
+	b = 5
+	a = b + 12
+end
+
+
+ 
+
+[DEBUG] 14:06:51:201 kernel.c/(6052:6060): entra a metadata desde literal
+[DEBUG] 14:06:51:201 kernel.c/(6052:6060): sale de metadata desde literal
+[DEBUG] 14:06:51:201 kernel.c/(6052:6060): entra a algoritmo de peso
+[DEBUG] 14:06:51:201 kernel.c/(6052:6060): sale de algoritmo de peso
+[INFO] 14:06:51:201 kernel.c/(6052:6060): se creo el pcb. entra a intercambiar datos con la UMV
+[INFO] 14:06:51:201 kernel.c/(6052:6060): 1
+[DEBUG] 14:06:51:201 kernel.c/(6052:6060): se envio el crear_seg et_func
+[DEBUG] 14:06:51:240 kernel.c/(6052:6060): se envio el crear_seg tam_ind_cod
+[DEBUG] 14:06:51:320 kernel.c/(6052:6060): se recibio la base del segmento codigo
+[DEBUG] 14:06:51:320 kernel.c/(6052:6060): se envio el crear_seg stack
+[DEBUG] 14:06:51:400 kernel.c/(6052:6060): se envio el recibio el segmento stack
+[DEBUG] 14:06:51:400 kernel.c/(6052:6060): se envio el escribir segmento codigo
+[INFO] 14:06:51:400 kernel.c/(6052:6060): Se termino el proceso de CONEXION y CREACION DE SEGMENTOS
+[INFO] 14:06:51:400 kernel.c/(6052:6061): El grado de multiprogramacion es : 2 
+
+[INFO] 14:06:51:400 kernel.c/(6052:6061): En la cola New hay: 1 
+
+[INFO] 14:06:51:400 kernel.c/(6052:6061): En la cola Ready Hay 2 
+
+[INFO] 14:06:51:400 kernel.c/(6052:6061): En la cola Ready se agrego el programa 1, ahora hay un total de 3 
+
+[INFO] 14:06:51:400 kernel.c/(6052:6060): Se coloco en la cola NEW el programa 1
+[INFO] 14:06:51:400 kernel.c/(6052:6060): En PLP(): Waiting Connection...
+
+[INFO] 14:07:33:114 kernel.c/(6052:6059): En PCP(): Waiting conection ...
+[DEBUG] 14:11:35:109 kernel.c/(6535:6535): inicia kernel
+[DEBUG] 14:11:35:109 kernel.c/(6535:6535): colas creadas
+[DEBUG] 14:11:35:109 kernel.c/(6535:6535): constantes inicializadas
+[INFO] 14:11:35:110 kernel.c/(6535:6535): Conectandose con la UMV...
+[DEBUG] 14:11:35:110 kernel.c/(6535:6535): el puerto es: 6000
+[INFO] 14:11:35:110 kernel.c/(6535:6535): El kernel se conecto correctamente con la UMV
+[DEBUG] 14:11:35:110 kernel.c/(6535:6535): ya se envio el menu
+[INFO] 14:11:35:110 kernel.c/(6535:6541): Scanner corriendo dispositivo
+[INFO] 14:11:35:111 kernel.c/(6535:6540): Impresora corriendo dispositivo
+[INFO] 14:11:35:111 kernel.c/(6535:6539): Disco corriendo dispositivo
+[INFO] 14:11:35:113 kernel.c/(6535:6542): En PCP(): Waiting conection ...
+[INFO] 14:11:35:113 kernel.c/(6535:6543): En PLP(): Waiting Connection...
+
+[INFO] 14:13:32:438 kernel.c/(6535:6542): En PCP(): Waiting conection ...
+[DEBUG] 14:14:40:186 kernel.c/(6748:6748): inicia kernel
+[DEBUG] 14:14:40:187 kernel.c/(6748:6748): colas creadas
+[DEBUG] 14:14:40:187 kernel.c/(6748:6748): constantes inicializadas
+[INFO] 14:14:40:187 kernel.c/(6748:6748): Conectandose con la UMV...
+[DEBUG] 14:14:40:187 kernel.c/(6748:6748): el puerto es: 6000
+[INFO] 14:14:40:187 kernel.c/(6748:6748): El kernel se conecto correctamente con la UMV
+[DEBUG] 14:14:40:187 kernel.c/(6748:6748): ya se envio el menu
+[INFO] 14:14:40:188 kernel.c/(6748:6754): Scanner corriendo dispositivo
+[INFO] 14:14:40:188 kernel.c/(6748:6753): Impresora corriendo dispositivo
+[INFO] 14:14:40:189 kernel.c/(6748:6752): Disco corriendo dispositivo
+[INFO] 14:14:40:190 kernel.c/(6748:6755): En PCP(): Waiting conection ...
+[INFO] 14:14:40:190 kernel.c/(6748:6756): En PLP(): Waiting Connection...
+
+[INFO] 14:15:00:505 kernel.c/(6748:6755): En PCP(): Waiting conection ...
+[DEBUG] 14:17:08:152 kernel.c/(6873:6873): inicia kernel
+[DEBUG] 14:17:08:152 kernel.c/(6873:6873): colas creadas
+[DEBUG] 14:17:08:152 kernel.c/(6873:6873): constantes inicializadas
+[INFO] 14:17:08:152 kernel.c/(6873:6873): Conectandose con la UMV...
+[DEBUG] 14:17:08:152 kernel.c/(6873:6873): el puerto es: 6000
+[INFO] 14:17:08:153 kernel.c/(6873:6873): El kernel se conecto correctamente con la UMV
+[DEBUG] 14:17:08:154 kernel.c/(6873:6873): ya se envio el menu
+[INFO] 14:17:08:154 kernel.c/(6873:6879): Scanner corriendo dispositivo
+[INFO] 14:17:08:154 kernel.c/(6873:6878): Impresora corriendo dispositivo
+[INFO] 14:17:08:155 kernel.c/(6873:6877): Disco corriendo dispositivo
+[INFO] 14:17:08:156 kernel.c/(6873:6880): En PCP(): Waiting conection ...
+[INFO] 14:17:08:156 kernel.c/(6873:6881): En PLP(): Waiting Connection...
+
+[INFO] 14:17:19:279 kernel.c/(6873:6880): En PCP(): Waiting conection ...
+[DEBUG] 14:19:28:237 kernel.c/(7035:7035): inicia kernel
+[DEBUG] 14:19:28:238 kernel.c/(7035:7035): colas creadas
+[DEBUG] 14:19:28:238 kernel.c/(7035:7035): constantes inicializadas
+[INFO] 14:19:28:238 kernel.c/(7035:7035): Conectandose con la UMV...
+[DEBUG] 14:19:28:238 kernel.c/(7035:7035): el puerto es: 6000
+[INFO] 14:19:28:239 kernel.c/(7035:7035): El kernel se conecto correctamente con la UMV
+[DEBUG] 14:19:28:239 kernel.c/(7035:7035): ya se envio el menu
+[INFO] 14:19:28:241 kernel.c/(7035:7041): Scanner corriendo dispositivo
+[INFO] 14:19:28:241 kernel.c/(7035:7040): Impresora corriendo dispositivo
+[INFO] 14:19:28:241 kernel.c/(7035:7039): Disco corriendo dispositivo
+[INFO] 14:19:28:242 kernel.c/(7035:7042): En PCP(): Waiting conection ...
+[INFO] 14:19:28:243 kernel.c/(7035:7043): En PLP(): Waiting Connection...
+
+[INFO] 14:19:31:812 kernel.c/(7035:7042): En PCP(): Waiting conection ...
+[DEBUG] 14:21:35:675 kernel.c/(7292:7292): inicia kernel
+[DEBUG] 14:21:35:675 kernel.c/(7292:7292): colas creadas
+[DEBUG] 14:21:35:676 kernel.c/(7292:7292): constantes inicializadas
+[INFO] 14:21:35:676 kernel.c/(7292:7292): Conectandose con la UMV...
+[DEBUG] 14:21:35:676 kernel.c/(7292:7292): el puerto es: 6000
+[INFO] 14:21:35:676 kernel.c/(7292:7292): El kernel se conecto correctamente con la UMV
+[DEBUG] 14:21:35:677 kernel.c/(7292:7292): ya se envio el menu
+[INFO] 14:21:35:677 kernel.c/(7292:7298): Scanner corriendo dispositivo
+[INFO] 14:21:35:678 kernel.c/(7292:7297): Impresora corriendo dispositivo
+[INFO] 14:21:35:678 kernel.c/(7292:7296): Disco corriendo dispositivo
+[INFO] 14:21:35:679 kernel.c/(7292:7299): En PCP(): Waiting conection ...
+[INFO] 14:21:35:680 kernel.c/(7292:7300): En PLP(): Waiting Connection...
+
+[INFO] 14:21:46:738 kernel.c/(7292:7299): En PCP(): Waiting conection ...
+[DEBUG] 14:28:56:64 kernel.c/(7726:7726): inicia kernel
+[DEBUG] 14:28:56:64 kernel.c/(7726:7726): colas creadas
+[DEBUG] 14:28:56:64 kernel.c/(7726:7726): constantes inicializadas
+[INFO] 14:28:56:64 kernel.c/(7726:7726): Conectandose con la UMV...
+[DEBUG] 14:28:56:64 kernel.c/(7726:7726): el puerto es: 6000
+[INFO] 14:28:56:64 kernel.c/(7726:7726): El kernel se conecto correctamente con la UMV
+[DEBUG] 14:28:56:65 kernel.c/(7726:7726): ya se envio el menu
+[INFO] 14:28:56:65 kernel.c/(7726:7732): Scanner corriendo dispositivo
+[INFO] 14:28:56:65 kernel.c/(7726:7731): Impresora corriendo dispositivo
+[INFO] 14:28:56:66 kernel.c/(7726:7730): Disco corriendo dispositivo
+[INFO] 14:28:56:66 kernel.c/(7726:7733): En PCP(): Waiting conection ...
+[INFO] 14:28:56:67 kernel.c/(7726:7734): En PLP(): Waiting Connection...
+
+[INFO] 14:29:00:297 kernel.c/(7726:7733): En PCP(): Waiting conection ...
+[INFO] 14:29:15:96 kernel.c/(7726:7733): En PCP(): Waiting conection ...
+[INFO] 14:29:34:280 kernel.c/(7726:7733): En PCP(): Waiting conection ...
+[DEBUG] 14:30:56:471 kernel.c/(7940:7940): inicia kernel
+[DEBUG] 14:30:56:471 kernel.c/(7940:7940): colas creadas
+[DEBUG] 14:30:56:471 kernel.c/(7940:7940): constantes inicializadas
+[INFO] 14:30:56:471 kernel.c/(7940:7940): Conectandose con la UMV...
+[DEBUG] 14:30:56:471 kernel.c/(7940:7940): el puerto es: 6000
+[INFO] 14:30:56:472 kernel.c/(7940:7940): El kernel se conecto correctamente con la UMV
+[DEBUG] 14:30:56:472 kernel.c/(7940:7940): ya se envio el menu
+[INFO] 14:30:56:473 kernel.c/(7940:7946): Scanner corriendo dispositivo
+[INFO] 14:30:56:473 kernel.c/(7940:7945): Impresora corriendo dispositivo
+[INFO] 14:30:56:474 kernel.c/(7940:7944): Disco corriendo dispositivo
+[INFO] 14:30:56:474 kernel.c/(7940:7947): En PCP(): Waiting conection ...
+[INFO] 14:30:56:475 kernel.c/(7940:7948): En PLP(): Waiting Connection...
+
+[INFO] 14:30:59:210 kernel.c/(7940:7947): En PCP(): Waiting conection ...
+[DEBUG] 14:33:44:444 kernel.c/(8219:8219): inicia kernel
+[DEBUG] 14:33:44:444 kernel.c/(8219:8219): colas creadas
+[DEBUG] 14:33:44:444 kernel.c/(8219:8219): constantes inicializadas
+[INFO] 14:33:44:444 kernel.c/(8219:8219): Conectandose con la UMV...
+[DEBUG] 14:33:44:444 kernel.c/(8219:8219): el puerto es: 6000
+[INFO] 14:33:44:445 kernel.c/(8219:8219): El kernel se conecto correctamente con la UMV
+[DEBUG] 14:33:44:445 kernel.c/(8219:8219): ya se envio el menu
+[INFO] 14:33:44:445 kernel.c/(8219:8225): Scanner corriendo dispositivo
+[INFO] 14:33:44:445 kernel.c/(8219:8224): Impresora corriendo dispositivo
+[INFO] 14:33:44:446 kernel.c/(8219:8223): Disco corriendo dispositivo
+[INFO] 14:33:44:447 kernel.c/(8219:8226): En PCP(): Waiting conection ...
+[INFO] 14:33:44:447 kernel.c/(8219:8227): En PLP(): Waiting Connection...
+
+[INFO] 14:33:47:794 kernel.c/(8219:8226): En PCP(): Waiting conection ...
+[DEBUG] 14:36:17:141 kernel.c/(8505:8505): inicia kernel
+[DEBUG] 14:36:17:142 kernel.c/(8505:8505): colas creadas
+[DEBUG] 14:36:17:142 kernel.c/(8505:8505): constantes inicializadas
+[INFO] 14:36:17:142 kernel.c/(8505:8505): Conectandose con la UMV...
+[DEBUG] 14:36:17:142 kernel.c/(8505:8505): el puerto es: 6000
+[INFO] 14:36:17:143 kernel.c/(8505:8505): El kernel se conecto correctamente con la UMV
+[DEBUG] 14:36:17:143 kernel.c/(8505:8505): ya se envio el menu
+[INFO] 14:36:17:144 kernel.c/(8505:8511): Scanner corriendo dispositivo
+[INFO] 14:36:17:144 kernel.c/(8505:8510): Impresora corriendo dispositivo
+[INFO] 14:36:17:144 kernel.c/(8505:8509): Disco corriendo dispositivo
+[INFO] 14:36:17:144 kernel.c/(8505:8512): En PCP(): Waiting conection ...
+[INFO] 14:36:17:145 kernel.c/(8505:8513): En PLP(): Waiting Connection...
+
+[INFO] 14:36:20:865 kernel.c/(8505:8512): En PCP(): Waiting conection ...
+[DEBUG] 14:42:56:103 kernel.c/(9095:9095): inicia kernel
+[DEBUG] 14:42:56:103 kernel.c/(9095:9095): colas creadas
+[DEBUG] 14:42:56:103 kernel.c/(9095:9095): constantes inicializadas
+[INFO] 14:42:56:103 kernel.c/(9095:9095): Conectandose con la UMV...
+[DEBUG] 14:42:56:103 kernel.c/(9095:9095): el puerto es: 6000
+[INFO] 14:42:56:103 kernel.c/(9095:9095): El kernel se conecto correctamente con la UMV
+[DEBUG] 14:42:56:104 kernel.c/(9095:9095): ya se envio el menu
+[INFO] 14:42:56:109 kernel.c/(9095:9101): Scanner corriendo dispositivo
+[INFO] 14:42:56:109 kernel.c/(9095:9100): Impresora corriendo dispositivo
+[INFO] 14:42:56:109 kernel.c/(9095:9099): Disco corriendo dispositivo
+[INFO] 14:42:56:109 kernel.c/(9095:9102): En PCP(): Waiting conection ...
+[INFO] 14:42:56:109 kernel.c/(9095:9103): En PLP(): Waiting Connection...
+
+[INFO] 14:42:59:458 kernel.c/(9095:9102): En PCP(): Waiting conection ...
+[INFO] 14:44:20:15 kernel.c/(9095:9103): Conexion entrante aceptada :16
+[INFO] 14:44:20:15 kernel.c/(9095:9103): #!/usr/bin/ansisop
+begin
+	variables a, b
+	a = 3
+	b = 5
+	a = b + 12
+end
+
+
+ 
+
+[DEBUG] 14:44:20:15 kernel.c/(9095:9103): entra a metadata desde literal
+[DEBUG] 14:44:20:15 kernel.c/(9095:9103): sale de metadata desde literal
+[DEBUG] 14:44:20:15 kernel.c/(9095:9103): entra a algoritmo de peso
+[DEBUG] 14:44:20:15 kernel.c/(9095:9103): sale de algoritmo de peso
+[INFO] 14:44:20:15 kernel.c/(9095:9103): se creo el pcb. entra a intercambiar datos con la UMV
+[INFO] 14:44:20:15 kernel.c/(9095:9103): 1
+[DEBUG] 14:44:20:15 kernel.c/(9095:9103): se envio el crear_seg et_func
+[INFO] 14:46:00:297 kernel.c/(9095:9102): En PCP(): Waiting conection ...
+[ERROR] 14:47:21:723 kernel.c/(9095:9103): [SOCKETS] Se produjo un problema al recibir el tamanio del dato
+[ERROR] 14:47:21:723 kernel.c/(9095:9103): Error en el envio del Segmento Etiquetas_Funciones
+[DEBUG] 14:49:44:342 kernel.c/(10759:10759): inicia kernel
+[DEBUG] 14:49:44:343 kernel.c/(10759:10759): colas creadas
+[DEBUG] 14:49:44:343 kernel.c/(10759:10759): constantes inicializadas
+[INFO] 14:49:44:343 kernel.c/(10759:10759): Conectandose con la UMV...
+[DEBUG] 14:49:44:343 kernel.c/(10759:10759): el puerto es: 6000
+[INFO] 14:49:44:344 kernel.c/(10759:10759): El kernel se conecto correctamente con la UMV
+[DEBUG] 14:49:44:344 kernel.c/(10759:10759): ya se envio el menu
+[INFO] 14:49:44:344 kernel.c/(10759:10764): Scanner corriendo dispositivo
+[INFO] 14:49:44:346 kernel.c/(10759:10763): Impresora corriendo dispositivo
+[INFO] 14:49:44:346 kernel.c/(10759:10762): Disco corriendo dispositivo
+[INFO] 14:49:44:346 kernel.c/(10759:10765): En PCP(): Waiting conection ...
+[INFO] 14:49:44:346 kernel.c/(10759:10766): En PLP(): Waiting Connection...
+
+[INFO] 14:50:22:217 kernel.c/(10759:10765): En PCP(): Waiting conection ...
+[DEBUG] 14:52:45:666 kernel.c/(10935:10935): inicia kernel
+[DEBUG] 14:52:45:666 kernel.c/(10935:10935): colas creadas
+[DEBUG] 14:52:45:666 kernel.c/(10935:10935): constantes inicializadas
+[INFO] 14:52:45:666 kernel.c/(10935:10935): Conectandose con la UMV...
+[DEBUG] 14:52:45:666 kernel.c/(10935:10935): el puerto es: 6000
+[INFO] 14:52:45:667 kernel.c/(10935:10935): El kernel se conecto correctamente con la UMV
+[DEBUG] 14:52:45:667 kernel.c/(10935:10935): ya se envio el menu
+[INFO] 14:52:45:668 kernel.c/(10935:10941): Scanner corriendo dispositivo
+[INFO] 14:52:45:668 kernel.c/(10935:10940): Impresora corriendo dispositivo
+[INFO] 14:52:45:668 kernel.c/(10935:10939): Disco corriendo dispositivo
+[INFO] 14:52:45:669 kernel.c/(10935:10942): En PCP(): Waiting conection ...
+[INFO] 14:52:45:669 kernel.c/(10935:10943): En PLP(): Waiting Connection...
+
+[INFO] 14:53:15:753 kernel.c/(10935:10942): En PCP(): Waiting conection ...
+[DEBUG] 14:54:18:471 kernel.c/(11101:11101): inicia kernel
+[DEBUG] 14:54:18:471 kernel.c/(11101:11101): colas creadas
+[DEBUG] 14:54:18:471 kernel.c/(11101:11101): constantes inicializadas
+[INFO] 14:54:18:471 kernel.c/(11101:11101): Conectandose con la UMV...
+[DEBUG] 14:54:18:471 kernel.c/(11101:11101): el puerto es: 6000
+[INFO] 14:54:18:472 kernel.c/(11101:11101): El kernel se conecto correctamente con la UMV
+[DEBUG] 14:54:18:472 kernel.c/(11101:11101): ya se envio el menu
+[INFO] 14:54:18:473 kernel.c/(11101:11107): Scanner corriendo dispositivo
+[INFO] 14:54:18:473 kernel.c/(11101:11106): Impresora corriendo dispositivo
+[INFO] 14:54:18:473 kernel.c/(11101:11105): Disco corriendo dispositivo
+[INFO] 14:54:18:474 kernel.c/(11101:11108): En PCP(): Waiting conection ...
+[INFO] 14:54:18:475 kernel.c/(11101:11109): En PLP(): Waiting Connection...
+
+[INFO] 14:54:25:245 kernel.c/(11101:11108): En PCP(): Waiting conection ...
+[INFO] 14:55:09:699 kernel.c/(11101:11109): Conexion entrante aceptada :16
+[INFO] 14:55:09:699 kernel.c/(11101:11109): #!/usr/bin/ansisop
+begin
+	variables a, b
+	a = 3
+	b = 5
+	a = b + 12
+end
+
+
+ 
+
+[DEBUG] 14:55:09:699 kernel.c/(11101:11109): entra a metadata desde literal
+[DEBUG] 14:55:09:700 kernel.c/(11101:11109): sale de metadata desde literal
+[DEBUG] 14:55:09:700 kernel.c/(11101:11109): entra a algoritmo de peso
+[DEBUG] 14:55:09:700 kernel.c/(11101:11109): sale de algoritmo de peso
+[INFO] 14:55:09:700 kernel.c/(11101:11109): se creo el pcb. entra a intercambiar datos con la UMV
+[INFO] 14:55:09:700 kernel.c/(11101:11109): 1
+[DEBUG] 14:55:09:700 kernel.c/(11101:11109): se envio el crear_seg et_func
+[ERROR] 14:56:50:915 kernel.c/(11101:11109): [SOCKETS] Se produjo un problema al recibir el tamanio del dato
+[ERROR] 14:56:50:915 kernel.c/(11101:11109): Error en el envio del Segmento Etiquetas_Funciones
+[DEBUG] 14:58:26:135 kernel.c/(11149:11149): inicia kernel
+[DEBUG] 14:58:26:136 kernel.c/(11149:11149): colas creadas
+[DEBUG] 14:58:26:137 kernel.c/(11149:11149): constantes inicializadas
+[INFO] 14:58:26:137 kernel.c/(11149:11149): Conectandose con la UMV...
+[DEBUG] 14:58:26:137 kernel.c/(11149:11149): el puerto es: 6000
+[INFO] 14:58:26:138 kernel.c/(11149:11149): El kernel se conecto correctamente con la UMV
+[DEBUG] 14:58:26:138 kernel.c/(11149:11149): ya se envio el menu
+[INFO] 14:58:26:139 kernel.c/(11149:11155): Scanner corriendo dispositivo
+[INFO] 14:58:26:139 kernel.c/(11149:11154): Impresora corriendo dispositivo
+[INFO] 14:58:26:139 kernel.c/(11149:11153): Disco corriendo dispositivo
+[INFO] 14:58:26:140 kernel.c/(11149:11156): En PCP(): Waiting conection ...
+[INFO] 14:58:26:140 kernel.c/(11149:11157): En PLP(): Waiting Connection...
+
+[INFO] 14:58:30:37 kernel.c/(11149:11156): En PCP(): Waiting conection ...
+[INFO] 15:00:03:253 kernel.c/(11149:11157): Conexion entrante aceptada :16
+[INFO] 15:00:03:253 kernel.c/(11149:11157): #!/usr/bin/ansisop
+begin
+	variables a, b
+	a = 3
+	b = 5
+	a = b + 12
+end
+
+
+ 
+
+[DEBUG] 15:00:03:253 kernel.c/(11149:11157): entra a metadata desde literal
+[DEBUG] 15:00:03:253 kernel.c/(11149:11157): sale de metadata desde literal
+[DEBUG] 15:00:03:253 kernel.c/(11149:11157): entra a algoritmo de peso
+[DEBUG] 15:00:03:253 kernel.c/(11149:11157): sale de algoritmo de peso
+[INFO] 15:00:03:253 kernel.c/(11149:11157): se creo el pcb. entra a intercambiar datos con la UMV
+[INFO] 15:00:03:253 kernel.c/(11149:11157): 1
+[DEBUG] 15:00:03:253 kernel.c/(11149:11157): se envio el crear_seg et_func
+[ERROR] 15:01:47:436 kernel.c/(11149:11157): [SOCKETS] Se produjo un problema al recibir el tamanio del dato
+[ERROR] 15:01:47:436 kernel.c/(11149:11157): Error en el envio del Segmento Etiquetas_Funciones

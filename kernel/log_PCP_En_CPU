@@ -1,0 +1,3 @@
+[INFO] 14:25:02:42 manejoCPU.c/(7459:7529): Corriendo manejo del CPU
+[INFO] 14:40:25:165 manejoCPU.c/(8715:8960): Corriendo manejo del CPU
+[ERROR] 14:40:41:631 manejoCPU.c/(8715:8960): [SOCKETS] Se produjo un problema al enviar el dato

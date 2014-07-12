@@ -1,0 +1,15 @@
+[INFO] 14:07:33:114 manejoCPU.c/(6052:6232): Se saco de la cola Ready el proceso 1
+[INFO] 14:07:33:114 manejoCPU.c/(6052:6232): Se Coloco en la cola EXEC el PCB 1
+[ERROR] 14:07:33:115 manejoCPU.c/(6052:6232): Se interrumpio el proceso con el PID: 1 debido a que la CPU esta caida
+[INFO] 14:29:00:297 manejoCPU.c/(7726:7739): Corriendo manejo del CPU
+[INFO] 14:29:15:96 manejoCPU.c/(7726:7742): Corriendo manejo del CPU
+[INFO] 14:29:34:281 manejoCPU.c/(7726:7748): Corriendo manejo del CPU
+[INFO] 14:30:59:210 manejoCPU.c/(7940:7952): Corriendo manejo del CPU
+[INFO] 14:33:47:794 manejoCPU.c/(8219:8232): Corriendo manejo del CPU, socket: 9
+[INFO] 14:36:20:865 manejoCPU.c/(8505:8519): Corriendo manejo del CPU
+[INFO] 14:42:59:458 manejoCPU.c/(9095:9108): Corriendo manejo del CPU
+[INFO] 14:46:00:297 manejoCPU.c/(9095:9218): Corriendo manejo del CPU
+[INFO] 14:50:22:217 manejoCPU.c/(10759:10781): Corriendo manejo del CPU
+[INFO] 14:53:15:754 manejoCPU.c/(10935:11005): Corriendo manejo del CPU
+[INFO] 14:54:25:245 manejoCPU.c/(11101:11114): Corriendo manejo del CPU
+[INFO] 14:58:30:37 manejoCPU.c/(11149:11164): Corriendo manejo del CPU

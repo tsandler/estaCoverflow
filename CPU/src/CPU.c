@@ -16,13 +16,14 @@ int main(int argc, char** argv){
 
 	logs = log_create("log", "CPU.c", 1, LOG_LEVEL_TRACE);
 
-	if (argc < 2){
+/*	if (argc < 2){
 		log_error(logs, "No se pasaron parametros.");
 		log_destroy(logs);
 		return 0;
-	}
+	}*/
 
-	config = config_create(argv[1]);
+	//config = config_create(argv[1]);
+	config = config_create("config");
 	diccionarioDeVariables = dictionary_create();
 	tam = malloc(sizeof(t_length));
 
@@ -81,6 +82,8 @@ int main(int argc, char** argv){
 			if (pc == pcb->program_counter)
 				pcb->program_counter++;
 			cont++;
+			log_debug(logs, "Se concluyo un quantum");
+			usleep(retardo);
 		}
 		if (tam->menu != ENTRADA_SALIDA){
 			if (tam->menu != FINALIZAR) //finalizo el programa

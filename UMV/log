@@ -1,0 +1,32 @@
+[DEBUG] 14:49:31:102 UMV.c/(10734:10734): Ya se creo la umv
+[DEBUG] 14:49:32:39 UMV.c/(10734:10734): Levanto el hilo: Consola
+[DEBUG] 14:49:33:153 UMV.c/(10734:10749): Entra a consola
+[INFO] 14:49:36:716 UMV.c/(10734:10734): Se creo el servidor
+[DEBUG] 14:49:37:121 UMV.c/(10734:10734): Entra al do-while para conectar el kernel
+[INFO] 14:49:48:221 UMV.c/(10734:10734): Se acepto la conexion -kernel-
+[DEBUG] 14:49:54:4 UMV.c/(10734:10734): Se conecto: Kernel
+[DEBUG] 14:49:55:494 UMV.c/(10734:10775): Entra al hilo del kernel
+[DEBUG] 14:49:55:494 UMV.c/(10734:10775): 
+
+
+
+
+
+Entra al while para recibir menu -kernel-
+[INFO] 14:50:31:590 UMV.c/(10734:10734): Se acepto la conexion -cpu-
+[DEBUG] 15:08:33:811 UMV.c/(11374:11374): Ya se creo la umv
+[DEBUG] 15:08:34:319 UMV.c/(11374:11374): Levanto el hilo: Consola
+[DEBUG] 15:08:34:862 UMV.c/(11374:11388): Entra a consola
+[INFO] 15:08:38:426 UMV.c/(11374:11374): Se creo el servidor
+[DEBUG] 15:08:38:881 UMV.c/(11374:11374): Entra al do-while para conectar el kernel
+[INFO] 15:08:50:671 UMV.c/(11374:11374): Se acepto la conexion -kernel-
+[DEBUG] 15:08:57:346 UMV.c/(11374:11374): Se conecto: Kernel
+[DEBUG] 15:08:59:262 UMV.c/(11374:11405): Entra al hilo del kernel
+[DEBUG] 15:08:59:262 UMV.c/(11374:11405): 
+
+
+
+
+
+Entra al while para recibir menu -kernel-
+[INFO] 15:12:32:317 UMV.c/(11374:11374): Se acepto la conexion -cpu-

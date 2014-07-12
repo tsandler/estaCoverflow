@@ -41,7 +41,8 @@ int recibir_quantum(){
 	if(!recibirDatos(socketKernel, tam, (void*)&quantum, logs)){
 		log_error(logs, "Se produjo un error al recibir el quantum del kernel");
 		quantum = -1;
-	}
+	}else
+		log_info(logs, "Se recibio el quantum de %d", quantum);
 	return quantum;
 }
 
@@ -51,7 +52,8 @@ int recibir_tamanio_stack(){
 	if(!recibirDatos(socketKernel, tam, (void*)&tamanio, logs)){
 		log_error(logs, "Se produjo un error al recibir el tamanio del stack");
 		tamanio = -1;
-	}
+	}else
+		log_info(logs, "Se recibio el tamanio del stack de %d", tamanio);
 	return tamanio;
 }
 

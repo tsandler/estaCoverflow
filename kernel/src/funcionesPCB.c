@@ -52,7 +52,7 @@ void intercambiarDatosUMV(int socket_UMV, t_log* logs, registroPCB* PCBprograma,
 		log_error( logs ,"Error en el envio de los datos...(FALLO EN EL ENVIO DEL SEGMENTO ETIQUETAS_FUNCIONES)");
 		exit(EXIT_FAILURE);
 	}
-	log_debug(logs,"se envio el crear_seg et_func"); //maca
+	log_debug(logs,"se envio el crear_seg et_func"); //FIXME AHHHH
 	if (!recibirDatos (socket_UMV,tam,(void*)&datoRecibido,logs)){ //base
 		log_error (logs,"Error en el envio del Segmento Etiquetas_Funciones");
 		exit(EXIT_FAILURE);

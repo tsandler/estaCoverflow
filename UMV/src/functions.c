@@ -68,7 +68,6 @@ void funcion_kernel(estructura_hilo* hilo){
 	int pid;
 	t_length* tam = malloc(sizeof(t_length));
 	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
-	char* codigo;
 	datos_crearSeg* pidTam = malloc(sizeof(datos_crearSeg));
 	while(1){
 		log_debug(logs,"\n\n\n\n\n\nEntra al while para recibir menu -kernel-");
@@ -98,14 +97,14 @@ void funcion_kernel(estructura_hilo* hilo){
 				int offset=etiq->offset;
 				int tamanio=etiq->tamanio;
 				char buffer[1024];
-				if(!recibirDatos(hilo->socket,tam,buffer,logs)){
+				if(!recibirDatos(hilo->socket,tam,(void*)&buffer,logs)){
 					log_error(logs,"Se produjo un error recibiendo el codigo");
 					break;
 				}
 
-				//char* cod = string_from_format("%s", &codigo);
+				char* cod = string_from_format("%s", &buffer);
 
-				escribir_segmento(base,tamanio,offset,buffer);
+				escribir_segmento(base,tamanio,offset,cod);
 				log_debug(logs,"ya se escribio el segmento");
 				break;
 
