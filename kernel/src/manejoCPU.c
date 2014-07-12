@@ -218,7 +218,7 @@ void manejoCPU(int fd) {
 			log_error(logs,"Se interrumpio el proceso con el PID: %d debido a que la CPU esta caida",unPCB->pid); //antes habias puesto unPCB->fd
 																									 //creo que te confundistes sino lo cambiamos
 			sem_wait(&mutexEXEC);
-			EXEC = list_filter(EXEC, (void*)condicion); //saco de la cola exec
+			EXEC = list_filter(EXEC, (void*)condicion); //saco de la cola exec  //EL ERROR LO TIRA ACA
 			log_info(logs,"Se saco de la cola Exec el proceso %d",unPCB->pid);
 			sem_post(&mutexEXEC);
 

@@ -13,7 +13,7 @@
 extern int socket_UMV;
 extern t_config* config;
 extern t_log* logs;
-int identificadorUnico = 0;
+int identificadorUnico;
 extern int tamanioStack;
 
 

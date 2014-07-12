@@ -94,14 +94,18 @@ void funcion_kernel(estructura_hilo* hilo){
 					break;
 				}
 				log_debug(logs, "Etiqueta 1: %d\n%d\n%d\n", etiq->base, etiq->offset, etiq->tamanio);
-				if(!recibirDatos(hilo->socket,tam,(void*)&codigo,logs)){
+				int base=etiq->base;
+				int offset=etiq->offset;
+				int tamanio=etiq->tamanio;
+				char buffer[1024];
+				if(!recibirDatos(hilo->socket,tam,buffer,logs)){
 					log_error(logs,"Se produjo un error recibiendo el codigo");
 					break;
 				}
 
-				char* cod = string_from_format("%s", &codigo);
+				//char* cod = string_from_format("%s", &codigo);
 
-				escribir_segmento(etiq->base,etiq->tamanio,etiq->offset,cod);
+				escribir_segmento(base,tamanio,offset,buffer);
 				log_debug(logs,"ya se escribio el segmento");
 				break;
 
