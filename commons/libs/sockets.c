@@ -20,18 +20,18 @@ int crearServidor(int port, t_log *logs){
 
 	s = socket(PF_INET, SOCK_STREAM, 0);
 	if (s < 0){
-		log_error(logs, "No se pudo conectar con el socket.");
+		log_error(logs, "[SOCKETS] No se pudo conectar con el socket.");
 		return -1;
 	}
 
 	if (bind(s, (struct sockaddr*)&dir, sizeof(dir)) != 0){
-		log_error(logs, "Error al bindear el socket.");
+		log_error(logs, "[SOCKETS] Error al bindear el socket.");
 		close(s);
 		return -1;
 	}
 
 	if (listen(s, SOMAXCONN) != 0) {
-		log_error(logs, "Error al escuchar el socket.");
+		log_error(logs, "[SOCKETS] Error al escuchar el socket.");
 		close(s);
 		return -1;
 	}
@@ -44,7 +44,7 @@ int crearServidor(int port, t_log *logs){
 int aceptarConexion(int socket, t_log *logs){
 	int socket_conectado;
 	if ((socket_conectado = accept(socket, NULL, 0)) < 0) {
-		log_error(logs, "Error al aceptar conexion entrante");
+		log_error(logs, "[SOCKETS] Error al aceptar conexion entrante");
 		return -1;
 	}
 	return socket_conectado;
@@ -59,14 +59,14 @@ int conectarCliente(char *ip, int port, t_log *logs){
 
 	s = socket(PF_INET, SOCK_STREAM, 0);
 	if (s < 0){
-		log_error(logs, "No se pudo crear el socket");
+		log_error(logs, "[SOCKETS] No se pudo crear el socket");
 		return -1;
 	}
 	dir.sin_family = PF_INET;
 	dir.sin_port = htons(port);
 	dir.sin_addr.s_addr = inet_addr(ip);
 	if (connect(s, (struct sockaddr*) &dir, sizeof(dir))!= 0) {
-		log_error(logs, "Error al conectar socket");
+		log_error(logs, "[SOCKETS] Error al conectar socket");
 		close(s);
 		return -1;
 	}
@@ -94,7 +94,7 @@ int enviarDatos(int socket, t_length* tam, void* datos, t_log* logs){
 
 int enviarMenu(int socket, t_length* tam, t_log* logs){
 	if (send (socket, tam, sizeof(t_length), 0) < 0){
-		log_error(logs, "Se produjo un problema al enviar el menu");
+		log_error(logs, "[SOCKETS] Se produjo un problema al enviar el menu");
 		return 0;
 	}
 	return 1;
@@ -104,7 +104,7 @@ int enviarMenu(int socket, t_length* tam, t_log* logs){
 
 int recibirMenu(int socket, t_length* tam, t_log* logs){
 	if (recv (socket, tam, sizeof(t_length), MSG_WAITALL) < 0){
-		log_error(logs, "Se produjo un problema al recibir el tamanio del dato");
+		log_error(logs, "[SOCKETS] Se produjo un problema al recibir el tamanio del dato");
 		return 0;
 	}
 	return 1;
@@ -115,7 +115,7 @@ int recibirMenu(int socket, t_length* tam, t_log* logs){
 int recibirDato(int socket, int size, void** dato, t_log* logs){
 	*dato = malloc(size);
 	if (recv (socket, dato, size, MSG_WAITALL) < 0){
-		log_error(logs, "Se produjo un problema al recibir el tamanio del dato");
+		log_error(logs, "[SOCKETS] Se produjo un problema al recibir el tamanio del dato");
 		return 0;
 	}
 	return 1;
@@ -127,12 +127,12 @@ int recibirDato(int socket, int size, void** dato, t_log* logs){
 
 int recibirDatos(int socket, t_length* tam, void** datos, t_log* logs){
 	if (recv (socket, tam, sizeof(t_length), MSG_WAITALL) < 0){
-		log_error(logs, "Se produjo un problema al recibir el tamanio del dato");
+		log_error(logs, "[SOCKETS] Se produjo un problema al recibir el tamanio del dato");
 		return 0;
 	}
 	*datos = malloc(tam->length);
 	if (recv (socket, datos, tam->length, MSG_WAITALL) < 0){
-		log_error(logs, "Se produjo un problema al recibir el dato");
+		log_error(logs, "[SOCKETS] Se produjo un problema al recibir el dato");
 		return 0;
 	}
 	return 1;
