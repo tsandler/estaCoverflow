@@ -40,5 +40,11 @@ typedef struct registroPCB{
 }registroPCB;
 
 registroPCB* armarPCB(char* program, int fd);
+int algoritmoDePeso(int cantEtq, int cantfc, t_size cantInstruc);
+void eliminarSegmentoUMV(int socket_UMV, t_log* logs,registroPCB* PCBprograma);
+void conectarseUMV();
+void intercambiarDatosUMV(int socket_UMV, t_log* logs, registroPCB* PCBprograma, char* buf);
+
+//FIXME: agregar cabeceras de funciones
 
 #endif /* MANEJODELPCB_H_ */

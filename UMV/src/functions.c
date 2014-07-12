@@ -1,5 +1,7 @@
 #include "functions.h"
 
+extern int retardoActual;
+
 /*Funcion que llama el hilo cada vez que se conecta algun CPU a la UMV*/
 void funcion_CPU(estructura_hilo* hilo){
 	int pid;
@@ -62,46 +64,60 @@ void funcion_CPU(estructura_hilo* hilo){
 
 /*Funcion que llama el hilo cuando se conecta el KERNEL a la UMV*/
 void funcion_kernel(estructura_hilo* hilo){
+	log_debug(logs,"Entra al hilo del kernel");
 	int pid;
 	t_length* tam = malloc(sizeof(t_length));
-	datos_acceso* etiq;
-	unsigned char* codigo;
+	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
+	char* codigo;
+	datos_crearSeg* pidTam = malloc(sizeof(datos_crearSeg));
 	while(1){
+		log_debug(logs,"\n\n\n\n\n\nEntra al while para recibir menu -kernel-");
 		if(!recibirMenu(hilo->socket, tam, logs)){
-			log_error(logs, "Se produjo un error recibiendo el menu");
+			log_error(logs, "Se produjo un error recibiendo el menu -kernel-");
 			break;
 		}
-
-		datos_crearSeg* pidTam = malloc(sizeof(datos_crearSeg));
-		printf("Menu: %d",tam->menu);
+ 		log_debug(logs,"Sale del recibir menu. menu: %d",tam->menu);
 		switch(tam->menu){
 			case PID_ACTUAL:
+				log_debug(logs,"Cambia pid activo");
 				if(!recibirDato(hilo->socket, tam->length, (void*)&pid, logs)){
 					log_error(logs, "Se produjo un error recibiendo el pid");
 					break;
 				}
 				cambiar_pid_activo(pid);
+				log_debug(logs,"se cambio el pid activo");
 				break;
 			case ESCRIBIR_SEGMENTO:
-				if(!recibirDato(hilo->socket,tam->length,(void*)&codigo,logs)){
-					log_error(logs,"Se produjo un error recibiendo el codigo");
-					break;
-				}
-				if(!recibirDatos(hilo->socket,tam,(void*)&etiq,logs)){
+				log_debug(logs,"Entra a escribir segmento");
+				if(!recibirDato(hilo->socket,tam->length,(void*)etiq,logs)){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
 					break;
 				}
-				escribir_segmento(etiq->base,etiq->tamanio,etiq->offset,codigo);
+				log_debug(logs, "Etiqueta 1: %d\n%d\n%d\n", etiq->base, etiq->offset, etiq->tamanio);
+				if(!recibirDatos(hilo->socket,tam,(void*)&codigo,logs)){
+					log_error(logs,"Se produjo un error recibiendo el codigo");
+					break;
+				}
+
+				char* cod = string_from_format("%s", &codigo);
+
+				escribir_segmento(etiq->base,etiq->tamanio,etiq->offset,cod);
+				log_debug(logs,"ya se escribio el segmento");
 				break;
+
 			case CREAR_SEGMENTO:
-				if(!recibirDato(hilo->socket, tam->length, (void*)&pidTam, logs)){
+				log_debug(logs,"entra kernel a crear segmento");
+				if(!recibirDato(hilo->socket, tam->length, (void*)pidTam, logs)){
 					log_error(logs, "Se produjo un error recibiendo pid-tamanio");
 					break;
 				}
+				log_debug(logs,"sale de recibir dato. entra a la funcion crear segmento");
+				log_info(logs,"recibio por sockets... pid: %d",pidTam->pid);
+				log_info(logs,"recibio por sockets... tam: %d",pidTam->tamanio);
+
 				int baseLog = crear_agregar_segmento(pidTam->pid,pidTam->tamanio);
 				tam->length = sizeof(int);
-	//			tam->menu = TE MANDO LA BASE DEL SEGMENTO
-				enviarDatos(hilo->socket, tam, (void*)&baseLog, logs);
+				enviarDatos(hilo->socket, tam, &baseLog, logs);
 				break;
 			case ELIMINAR_SEGMENTOS:
 				if(!recibirDato(hilo->socket, tam->length, (void*)&pid, logs)){
@@ -109,9 +125,6 @@ void funcion_kernel(estructura_hilo* hilo){
 					break;
 				}
 				destruir_segmentos(pid);
-				break;
-			case SOY_KERNEL:
-				log_debug(logs,"alal");
 				break;
 			default:
 				log_error(logs,"operacion invalida para Kernel");
@@ -300,13 +313,21 @@ unsigned char *leer_segmento(int dirLog, int tamanioALeer, int offset){ //solici
 }
 
 /*Funcion que escribe el buffer en un segmento determinado*/
-void escribir_segmento(int dirLog, int tamanioAEscribir, int offset, void* buffer){
+void escribir_segmento(int dirLog, int tamanioAEscribir, int offset, char* buffer){
+
 	bool buscar_dirLogica(tablaSegUMV* unElem){
 		return dirLog == unElem->dirLogica;
 	}
+	tablaSegUMV* unElem;
 
+	log_debug(logs,"entra a la funcion propia escr_seg");
 	t_list* listaSeg= dictionary_get(tablaPidSeg,string_itoa(pidActive));
-	tablaSegUMV* unElem= list_find(listaSeg,(void*)buscar_dirLogica);
+	if(listaSeg){
+		log_debug(logs,"existe la lista asociada al pid");
+		unElem= list_find(listaSeg,(void*)buscar_dirLogica);
+	}else
+		log_debug(logs,"no existe la lista asociada al pid");
+
 	if(unElem){
 		log_info(logs,"La direccion logica existe");
 		if(unElem->dirFisica + offset + tamanioAEscribir <= unElem->dirFisica + unElem->tamanioSegmento){
@@ -362,7 +383,6 @@ unsigned char* ejec_operacion(int nroOp){
 
 	switch(nroOp){
 		case LEER_SEGMENTO:
-			retardo(retardoActual);
 			//////
 			printf("Ingresar pid: ");
 			scanf("%d",&pid);
@@ -382,7 +402,6 @@ unsigned char* ejec_operacion(int nroOp){
 			return resultado;
 			break;
 		case ESCRIBIR_SEGMENTO:
-			retardo(retardoActual);
 			//////
 			printf("Ingresar pid: ");
 			scanf("%d",&pid);
@@ -397,7 +416,6 @@ unsigned char* ejec_operacion(int nroOp){
 			return NULL;
 			break;
 		case CREAR_SEGMENTO:
-			retardo(retardoActual);
 			printf("Ingresar pid: ");
 			scanf("%d",&pid);
 			printf("Ingresar tamanio: ");
@@ -405,7 +423,6 @@ unsigned char* ejec_operacion(int nroOp){
 			return (unsigned char*)crear_agregar_segmento(pid,tamanio);
 			break;
 		case ELIMINAR_SEGMENTOS:
-			retardo(retardoActual);
 			printf("Ingresar pid: ");
 			scanf("%d",&pid);
 			destruir_segmentos(pid);

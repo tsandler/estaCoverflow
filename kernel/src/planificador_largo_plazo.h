@@ -17,4 +17,6 @@ typedef struct{
 
 
 
+
+
 #endif /* PLANIFICADOR_LARGO_PLAZO_H_ */

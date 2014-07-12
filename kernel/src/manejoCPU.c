@@ -113,6 +113,7 @@ void manejoCPU(int fd) {
 			log_info(logs,"el texto a imprimir es %s",textoAImprimir);
 			break;
 
+
 		case ENTRADA_SALIDA:
 			recibirDato(fd, tam->length, (void*)&tiempo, logs);
 			recibirDatos(fd, tam, (void*)&dispositivo, logs);

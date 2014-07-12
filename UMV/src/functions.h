@@ -17,7 +17,7 @@ int crear_agregar_segmento(int pid, int tamanio);
 void destruir_segmentos(int pidInt);
 
 unsigned char *leer_segmento(int dirLog, int tamanioALeer, int offset);
-void escribir_segmento(int dirLog, int tamanioAEscribir, int offset, void* buffer);
+void escribir_segmento(int dirLog, int tamanioAEscribir, int offset, char* buffer);
 
 int obtener_proxima_dir_logica(int tamanio, char* pid);
 char *obtener_proxima_dirFisica(int tamanio);

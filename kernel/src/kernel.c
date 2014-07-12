@@ -38,7 +38,7 @@ int socketCPU; // LO PUSE PARA CERRARLO MAS ABAJO CUALQUIER COSA VEMOS SI LO CER
 void plp(void* ptr);
 void pcp(void* ptr);
 bool archivo_configuracion_valido();
-
+int tamanioStack;
 
 int main(int argc, char **argv) {
 
@@ -79,6 +79,7 @@ int main(int argc, char **argv) {
 	char** valorComp = config_get_array_value(config,"VALOR_VARIABLES_COMPARTIDAS");
 	char** semaforosArray = config_get_array_value(config, "SEMAFOROS");
 	char** valorSemaforo = config_get_array_value(config, "VALOR_SEMAFORO");
+	tamanioStack = config_get_int_value(config,"TAMANIO_STACK");
 
 	log_debug(logs,"constantes inicializadas");
 
