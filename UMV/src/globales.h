@@ -38,11 +38,6 @@ char* ramAux;
 char* dirHueco;
 int tamHueco;
 
-
-typedef struct{
-	int socket;
-}estructura_hilo;
-
 typedef struct{
 	int base;
 	int offset;

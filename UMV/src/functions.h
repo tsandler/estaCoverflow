@@ -54,8 +54,8 @@ void vaciarLista(t_list* listaSeg);
 
 void generar_archivo(unsigned char* resultado, int nroOp);
 
-void funcion_kernel(estructura_hilo* hilo);
-void funcion_CPU(estructura_hilo* hilo);
+void funcion_kernel(int socket);
+void funcion_CPU(int socket);
 
 void compactar_memoria();
 void buscar_segmento_y_desplazarlo();

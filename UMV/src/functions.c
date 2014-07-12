@@ -3,57 +3,58 @@
 extern int retardoActual;
 
 /*Funcion que llama el hilo cada vez que se conecta algun CPU a la UMV*/
-void funcion_CPU(estructura_hilo* hilo){
+void funcion_CPU(int socket){
 	int pid;
 	t_length* tam = malloc(sizeof(t_length));
-	datos_acceso* etiq;
+	datos_acceso* etiq = malloc(sizeof(datos_acceso));
 	unsigned char* codigo;
 
 	while(1){
-		if(!recibirMenu(hilo->socket, tam, logs)){
+		if(!recibirMenu(socket, tam, logs)){
 			log_error(logs, "Se produjo un error recibiendo el menu");
 			break;
 		}
 
 		switch(tam->menu){
 			case PID_ACTUAL:
-				if(!recibirDato(hilo->socket, tam->length, (void*)&pid, logs)){
+				if(!recibirDato(socket, tam->length, (void*)&pid, logs)){
 					log_error(logs, "Se produjo un error recibiendo el pid");
 					break;
 				}
+				log_debug(logs,"Pid actual por CPU: %d", pid);
 				cambiar_pid_activo(pid);
 				break;
 			case ESCRIBIR_SEGMENTO:
-				if(!recibirDato(hilo->socket,tam->length,(void*)&codigo,logs)){
+				if(!recibirDato(socket,tam->length,(void*)&codigo,logs)){
 					log_error(logs,"Se produjo un error recibiendo el codigo");
 					break;
 				}
-				if(!recibirDatos(hilo->socket,tam,(void*)etiq,logs)){
+				if(!recibirDatos(socket, tam,(void*)etiq,logs)){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
 					break;
 				}
 				escribir_segmento(etiq->base,etiq->tamanio,etiq->offset,(void*)codigo);
 				break;
 			case PEDIR_SENTENCIA:
-				if(!recibirDato(hilo->socket,tam->length,(void*)etiq,logs)){
+				if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
 					break;
 				}
 				codigo = leer_segmento(etiq->base,etiq->tamanio,etiq->offset);
 				//tam->menu = TE_MANDO_EL_SEGMENTO;
 				tam->length = etiq->tamanio;
-				if(!enviarDatos(hilo->socket, tam, codigo, logs))
+				if(!enviarDatos(socket, tam, codigo, logs))
 					log_error(logs,"Error al enviarse el codigo");
 				break;
 			case LEER_SEGMENTO:
-				if(!recibirDato(hilo->socket,tam->length,(void*)&etiq,logs)){
+				if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
 					break;
 				}
 				codigo = leer_segmento(etiq->base,etiq->tamanio,etiq->offset);
 				//tam->menu = TE_MANDO_EL_SEGMENTO;
 				tam->length = etiq->tamanio;
-				enviarDatos(hilo->socket, tam, codigo, logs);
+				enviarDatos(socket, tam, codigo, logs);
 				break;
 			default:
 				log_error(logs,"operacion invalida para CPU");
@@ -63,7 +64,7 @@ void funcion_CPU(estructura_hilo* hilo){
 }
 
 /*Funcion que llama el hilo cuando se conecta el KERNEL a la UMV*/
-void funcion_kernel(estructura_hilo* hilo){
+void funcion_kernel(int socket){
 	log_debug(logs,"Entra al hilo del kernel");
 	int pid;
 	t_length* tam = malloc(sizeof(t_length));
@@ -71,7 +72,7 @@ void funcion_kernel(estructura_hilo* hilo){
 	datos_crearSeg* pidTam = malloc(sizeof(datos_crearSeg));
 	while(1){
 		log_debug(logs,"\n\n\n\n\n\nEntra al while para recibir menu -kernel-");
-		if(!recibirMenu(hilo->socket, tam, logs)){
+		if(!recibirMenu(socket, tam, logs)){
 			log_error(logs, "Se produjo un error recibiendo el menu -kernel-");
 			break;
 		}
@@ -79,7 +80,7 @@ void funcion_kernel(estructura_hilo* hilo){
 		switch(tam->menu){
 			case PID_ACTUAL:
 				log_debug(logs,"Cambia pid activo");
-				if(!recibirDato(hilo->socket, tam->length, (void*)&pid, logs)){
+				if(!recibirDato(socket, tam->length, (void*)&pid, logs)){
 					log_error(logs, "Se produjo un error recibiendo el pid");
 					break;
 				}
@@ -88,7 +89,7 @@ void funcion_kernel(estructura_hilo* hilo){
 				break;
 			case ESCRIBIR_SEGMENTO:
 				log_debug(logs,"Entra a escribir segmento");
-				if(!recibirDato(hilo->socket,tam->length,(void*)etiq,logs)){
+				if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
 					break;
 				}
@@ -97,7 +98,7 @@ void funcion_kernel(estructura_hilo* hilo){
 				int offset=etiq->offset;
 				int tamanio=etiq->tamanio;
 				char buffer[1024];
-				if(!recibirDatos(hilo->socket,tam,(void*)&buffer,logs)){
+				if(!recibirDatos(socket,tam,(void*)&buffer,logs)){
 					log_error(logs,"Se produjo un error recibiendo el codigo");
 					break;
 				}
@@ -110,7 +111,7 @@ void funcion_kernel(estructura_hilo* hilo){
 
 			case CREAR_SEGMENTO:
 				log_debug(logs,"Entra kernel a crear segmento");
-				if(!recibirDato(hilo->socket, tam->length, (void*)pidTam, logs)){
+				if(!recibirDato(socket, tam->length, (void*)pidTam, logs)){
 					log_error(logs, "Se produjo un error recibiendo pid-tamanio");
 					break;
 				}
@@ -120,10 +121,10 @@ void funcion_kernel(estructura_hilo* hilo){
 
 				int baseLog = crear_agregar_segmento(pidTam->pid,pidTam->tamanio);
 				tam->length = sizeof(int);
-				enviarDatos(hilo->socket, tam, &baseLog, logs);
+				enviarDatos(socket, tam, &baseLog, logs);
 				break;
 			case ELIMINAR_SEGMENTOS:
-				if(!recibirDato(hilo->socket, tam->length, (void*)&pid, logs)){
+				if(!recibirDato(socket, tam->length, (void*)&pid, logs)){
 					log_error(logs, "Se produjo un error recibiendo el pid");
 					break;
 				}
