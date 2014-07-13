@@ -10,6 +10,7 @@ void funcion_CPU(int socket){
 	unsigned char* codigo;
 
 	while(1){
+		log_info(logs,"[HILO CPU] Esperando menu...");
 		if(!recibirMenu(socket, tam, logs)){
 			log_error(logs, "Se produjo un error recibiendo el menu");
 			break;
@@ -17,14 +18,17 @@ void funcion_CPU(int socket){
 
 		switch(tam->menu){
 			case PID_ACTUAL:
+				log_info(logs,"[HILO CPU] Entra a cambiar el pidActivo");
 				if(!recibirDato(socket, tam->length, (void*)&pid, logs)){
 					log_error(logs, "Se produjo un error recibiendo el pid");
 					break;
 				}
 				log_debug(logs,"Pid actual por CPU: %d", pid);
 				cambiar_pid_activo(pid);
+				log_info(logs,"[HILO CPU] Ya cambio el pidActivo");
 				break;
 			case ESCRIBIR_SEGMENTO:
+				log_info(logs,"[HILO CPU] Entra a escribir segmento");
 				if(!recibirDato(socket,tam->length,(void*)&codigo,logs)){
 					log_error(logs,"Se produjo un error recibiendo el codigo");
 					break;
@@ -34,8 +38,10 @@ void funcion_CPU(int socket){
 					break;
 				}
 				escribir_segmento(etiq->base,etiq->tamanio,etiq->offset,(void*)codigo);
+				log_info(logs,"[HILO CPU] Ya escribio el segmento");
 				break;
 			case PEDIR_SENTENCIA:
+				log_info(logs,"[HILO CPU] Entra a pedir sentencia");
 				if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
 					break;
@@ -45,8 +51,10 @@ void funcion_CPU(int socket){
 				tam->length = etiq->tamanio;
 				if(!enviarDatos(socket, tam, codigo, logs))
 					log_error(logs,"Error al enviarse el codigo");
+				log_info(logs,"[HILO CPU] Ya se envio la sentencia");
 				break;
 			case LEER_SEGMENTO:
+				log_info(logs,"[HILO CPU] Entra a leer segmento");
 				if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
 					break;
@@ -55,9 +63,10 @@ void funcion_CPU(int socket){
 				//tam->menu = TE_MANDO_EL_SEGMENTO;
 				tam->length = etiq->tamanio;
 				enviarDatos(socket, tam, codigo, logs);
+				log_info(logs,"[HILO CPU] Ya envio el buf");
 				break;
 			default:
-				log_error(logs,"operacion invalida para CPU");
+				log_error(logs,"[HILO CPU] Se recibio una operacion invalida");
 				break;
 		}
 	}
@@ -65,18 +74,18 @@ void funcion_CPU(int socket){
 
 /*Funcion que llama el hilo cuando se conecta el KERNEL a la UMV*/
 void funcion_kernel(int socket){
-	log_debug(logs,"Entra al hilo del kernel");
+	log_info(logs,"[HILO KERNEL]Entra al hilo");
 	int pid;
 	t_length* tam = malloc(sizeof(t_length));
 	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
 	datos_crearSeg* pidTam = malloc(sizeof(datos_crearSeg));
 	while(1){
-		log_debug(logs,"\n\n\n\n\n\nEntra al while para recibir menu -kernel-");
+		log_debug(logs,"\n\n\n\n\n\n[HILO KERNEL] Esperando menu...");
 		if(!recibirMenu(socket, tam, logs)){
-			log_error(logs, "Se produjo un error recibiendo el menu -kernel-");
+			log_error(logs, "[HILO KERNEL] Error al recibir el menu");
 			break;
 		}
- 		log_debug(logs,"Sale del recibir menu. menu: %d",tam->menu);
+ 		log_info(logs,"[HILO KERNEL] Sale del recibir menu. menu: %d",tam->menu);
 		switch(tam->menu){
 			case PID_ACTUAL:
 				log_debug(logs,"Cambia pid activo");
@@ -383,10 +392,10 @@ unsigned char* ejec_operacion(int nroOp){
 	int dirLogica=0, offset=0;
 	void* buffer = NULL; //FIXME: preguntar cómo se inicializa
 	int pid, tamanio=0, tamanioAEscribir=0, tamanioALeer=0;
-	int genArch;
 
 	switch(nroOp){
-		case LEER_SEGMENTO:
+		case LEER_SEG:
+			log_info(logs,"[CONSOLA UMV] El usuario solicito Leer segmento");
 			//////
 			printf("Ingresar pid: ");
 			scanf("%d",&pid);
@@ -399,13 +408,11 @@ unsigned char* ejec_operacion(int nroOp){
 			printf("Ingresar offset: ");
 			scanf("%d",&offset);
 			unsigned char* resultado = leer_segmento(dirLogica,tamanioALeer,offset);
-			printf("Desea generar un archivo con el resultado? 0=no 1=si: ");
-			scanf("%d",&genArch);
-			if(genArch)
-				generar_archivo(resultado,nroOp);
+//			generar_archivo(resultado,nroOp);
 			return resultado;
 			break;
-		case ESCRIBIR_SEGMENTO:
+		case ESCR_SEG:
+			log_info(logs,"[CONSOLA UMV] El usuario solicito escribir segmento");
 			//////
 			printf("Ingresar pid: ");
 			scanf("%d",&pid);
@@ -413,26 +420,25 @@ unsigned char* ejec_operacion(int nroOp){
 			//////
 //			FIXME: como poner el buffer que se escribe
 			escribir_segmento(dirLogica,tamanioAEscribir,offset,buffer);
-			printf("Desea generar un archivo con el resultado? 0=no 1=si: ");
-			scanf("%d",&genArch);
-			if(genArch)
 				//generar_archivo(resultado,nroOp);
 			return NULL;
 			break;
-		case CREAR_SEGMENTO:
+		case CREAR_SEG:
+			log_info(logs,"[CONSOLA UMV] El usuario solicito crear segmento");
 			printf("Ingresar pid: ");
 			scanf("%d",&pid);
 			printf("Ingresar tamanio: ");
 			scanf("%d",&tamanio);
 			return (unsigned char*)crear_agregar_segmento(pid,tamanio);
 			break;
-		case ELIMINAR_SEGMENTOS:
+		case ELIM_SEG:
+			log_info(logs,"[CONSOLA UMV] El usuario solicito eliminar segmentos");
 			printf("Ingresar pid: ");
 			scanf("%d",&pid);
 			destruir_segmentos(pid);
 			break;
 		default:
-			log_error(logs,"OPERACION NO VALIDA");
+			log_error(logs,"[CONSOLA UMV] El usuario ingreso una operacion invalida");
 			break;
 	}
 	return NULL;
@@ -441,16 +447,16 @@ unsigned char* ejec_operacion(int nroOp){
 void generar_archivo(unsigned char* resultado, int nroOp){
 	FILE* arch;
 	char* nombre;
-	log_debug(logs,"entra a generar archivo");
+	log_debug(logs,"Entra a generar archivo");
 
 	switch(nroOp){
-		case LEER_SEGMENTO:
+		case LEER_SEG:
 			log_debug(logs,"entra a leerSeg");
 			nombre ="leer";
 			arch = txt_open_for_append(nombre);
 			txt_write_in_file(arch,(char*)resultado);
 			break;
-		case ESCRIBIR_SEGMENTO:
+		case ESCR_SEG:
 			log_debug(logs,"entra a escribirSeg");
 			nombre = "escribir";
 			arch = txt_open_for_append(nombre);
@@ -462,7 +468,7 @@ void generar_archivo(unsigned char* resultado, int nroOp){
 }
 
 void dump(){
-	int nroOp, opArchivo;
+	int nroOp;
 	printf("Segun indice...\n");
 	printf("ESTRUCTURAS_MEMORIA = 0\n");
 	printf("MEMORIA_PRINCIPAL = 1\n");
@@ -472,20 +478,15 @@ void dump(){
 	switch(nroOp){
 		case ESTRUCTURAS_MEMORIA:
 			imprime_estructuras_memoria();
-			printf("Desea generar archivo <1/0>: ");
-			scanf("%d",&opArchivo);
-//			if(opArchivo == GENERAR_ARCHIVO)
-//				generar_archivo(unsigned char* resultado, int nroOp); TODO: generarArchivo
+//			generar_archivo(unsigned char* resultado, int nroOp); TODO: generarArchivo
 			break;
 		case MEMORIA_PRINCIPAL:
 			imprime_estado_mem_ppal();
-//			if(opArchivo == GENERAR_ARCHIVO)
-//				generar_archivo();
+//			generar_archivo();
 			break;
 		case CONTENIDO_MEM_PPAL:
 			//TODO: dump: contenido memoria ppal y generar archivo
-//			if(opArchivo == GENERAR_ARCHIVO)
-//				generar_archivo();
+//			generar_archivo();
 			break;
 		default:
 			log_error(logs,"COMANDO NO VALIDO");
@@ -503,7 +504,7 @@ char *first_fit(int tamanio){ //
 	nodoHuecos* unElem = list_remove_by_condition(listaHuecos,(void*)filtra_por_tamanio);
 
 	if(!unElem){
-		//llamar a compactar
+		//llamar a compactar FIXME
 		unElem = list_remove_by_condition(listaHuecos,(void*)filtra_por_tamanio);
 		if(!unElem){
 			log_error(logs,"Memory overload");
@@ -591,58 +592,61 @@ void imprime_estado_mem_ppal(){
 
 void consola(){
 	log_debug(logs,"Entra a consola");
-	int pid, cambioAlgoritmo ,nroOp, operacion, retardoNuevo;
-	int i=1;
-	while(i){
-		printf("\nSeleccione la operación segun...\n");
-		printf("OPERACION = 1\n");
-		printf("RETARDO = 2\n");
-		printf("ALGORITMO = 3\n");
-		printf("COMPACTACION = 4\n");
-		printf("DUMP = 5\n");
+	int cambioAlgoritmo ,nroOp, operacion, retardoNuevo;
+	int i=0;
+	while(!i){
+		printf("\nSeleccione la operación segun\n");
+		printf("	1.Operacion\n");
+		printf("	2.Cambiar retardo\n");
+		printf("	3.Cambiar Algorimo\n");
+		printf("	4.Compactar memoria\n");
+		printf("	5.Dump\n");
 		printf("Operacion solicitada: ");
 		scanf("%d",&operacion);
 
 		switch(operacion){
-			case CAMBIO_PROCESO_ACTIVO:
-				printf("Ingrese nuevo pid: ");
-				scanf("%d",&pid);
-				cambiar_pid_activo(pid);
-				break;
 			case OPERACION:
+				printf("\nUsted selecciono 'Operacion'\n");
 				printf("Ingrese operacion segun...\n");
-				printf("LEER_SEGMENTO = 1\n");
-				printf("ESCRIBIR_SEGMENTO = 2\n");
-				printf("CREAR_SEGMENTO = 3\n");
-				printf("ELIMINAR_SEGMENTOS = 4\n");
-				printf("Ingrese operacion: ");
+				printf("	1.Leer segmento\n");
+				printf("	2.Escribir segmento\n");
+				printf("	3.Crear segmento\n");
+				printf("	4.Eliminar segmentos\n");
+				printf("Opcion: ");
 				scanf("%d",&nroOp);
 				ejec_operacion(nroOp);
-
 				break;
 			case CAMBIAR_RETARDO:
+				printf("\nUsted selecciono 'Cambiar retardo'\n");
 				printf("Ingrese nuevo retardo: ");
 				scanf("%d",&retardoNuevo);
 				cambiar_retardo(retardoNuevo);
 				break;
 			case CAMBIAR_ALGORITMO:
-				printf("Ingrese opcion segun...\n");
-				printf("FIRST_FIT = 0\nWORST_FIT = 1\n");
+				printf("\nUsted selecciono 'Cambiar algoritmo'\n");
+				printf("Ingrese opcion segun\n");
+				printf("	0.First-fit\n");
+				printf("	1.Worst-fit\n");
 				printf("Opcion: ");
 				scanf("%d",&cambioAlgoritmo);
 				cambiarAlgoritmo(cambioAlgoritmo);
 				break;
 			case DUMP:
+				printf("\nUsted selecciono 'Dump'\n");
 				dump();
 				break;
 			default:
-				printf("Operacion invalida\n");
+				printf("**Operacion invalida**\n");
 				break;
 		}
-		printf("Realizar otra operacion? s=1:");
+		printf("¿Desea realizar otra operacion?\n");
+		printf("	0.Si\n");
+		printf("	1.No\n");
+		printf("Opcion: ");
 		scanf("%d",&i);
-
 	}
+//	printf("Ha finalizado la consola. ¿Desea re-abrirla?");
+	log_info(logs,"El usuario cerro la consola");
 }
 //
 //void compactar_memoria(){

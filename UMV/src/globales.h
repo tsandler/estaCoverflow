@@ -82,6 +82,10 @@ typedef enum{
 	CAMBIAR_ALGORITMO = 3,
 	COMPACTACION = 4,
 	DUMP = 5,
+	LEER_SEG = 1,
+	ESCR_SEG = 2,
+	CREAR_SEG = 3,
+	ELIM_SEG = 4,
 }t_op_consola;
 
 typedef enum{

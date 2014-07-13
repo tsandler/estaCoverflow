@@ -52,14 +52,14 @@ int main(int argc, char** argv){
 			log_info(logs,"Se acepto la conexion -kernel-");
 
 		if(!recibirMenu(socket, tam, logs))
-			log_error(logs, "Se produjo un error haciendo el handshake");
-
-		if (tam->menu == SOY_KERNEL){
-			log_debug(logs,"Se conecto: Kernel");
-			pthread_create(&pthread_kernel, NULL, (void*)funcion_kernel, (void*)socket);
-		}else
-			log_error(logs, "Se esta esperando la conexion del kernel");
-
+			log_error(logs, "Error al hacer el handshake: KERNEL");
+		else{
+			if (tam->menu == SOY_KERNEL){
+				log_debug(logs,"Se conecto: Kernel");
+				pthread_create(&pthread_kernel, NULL, (void*)funcion_kernel, (void*)socket);
+			}else
+				log_error(logs, "Se esta esperando la conexion del kernel");
+		}
 	}while(tam->menu != SOY_KERNEL);
 
 	while(1){
@@ -70,17 +70,18 @@ int main(int argc, char** argv){
 			log_info(logs,"Se acepto la conexion -cpu-");
 
 		if(!recibirMenu(socket, tam, logs))
-			log_error(logs, "Se produjo un error haciendo el handshake -cpu-");
-
-		if (tam->menu == SOY_CPU){
-			log_debug(logs,"Se conecto: CPU");
-			pthread_create(&pthread_CPU, NULL, (void*)funcion_CPU, (void*)socket);
-		}else{
-			log_error(logs, "Se conecto algo en la espera del CPU");
+			log_error(logs, "Error al hacer el handshake: CPU");
+		else{
+			if (tam->menu == SOY_CPU){
+				log_debug(logs,"Se conecto: CPU");
+				pthread_create(&pthread_CPU, NULL, (void*)funcion_CPU, (void*)socket);
+			}else{
+				log_error(logs, "Error en handshake: NO ES CPU");
+			}
 		}
 	}
 	pthread_join(pthread_consola,NULL);
-	eliminarUMV();
+	pthread_join(pthread_kernel,NULL);
 	log_destroy(logs);
 	config_destroy(config);
 	return 0;
