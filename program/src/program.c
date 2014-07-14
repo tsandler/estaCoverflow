@@ -16,7 +16,11 @@
 int main(int argc, char **argv) {
 
 	inicializar_variables();
-
+	if (argc < 2){
+		log_error(logs, "No se paso ningun script para procesar");
+		liberar_estructuras();
+		return 0;
+	}
 	if (!archivo_de_configuracion_valido()){
 		log_error(logs, "El archivo de configuracion no tiene todos los campos necesarios");
 		liberar_estructuras();
