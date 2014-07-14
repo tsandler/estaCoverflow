@@ -5,6 +5,7 @@ extern int retardoActual;
 /*Funcion que llama el hilo cada vez que se conecta algun CPU a la UMV*/
 void funcion_CPU(int socket){
 	int pid;
+	int termina=0;
 	t_length* tam = malloc(sizeof(t_length));
 	datos_acceso* etiq = malloc(sizeof(datos_acceso));
 	unsigned char* codigo;
@@ -33,21 +34,28 @@ void funcion_CPU(int socket){
 					log_error(logs,"Se produjo un error recibiendo el codigo");
 					break;
 				}
+
 				if(!recibirDatos(socket, tam,(void*)etiq,logs)){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
+					break;
+				}
+
+				if( validacion_escribir_seg(etiq->base) ){
+					termina = 1;
 					break;
 				}
 				escribir_segmento(etiq->base,etiq->tamanio,etiq->offset,(void*)codigo);
 				log_info(logs,"[HILO CPU] Ya escribio el segmento");
 				break;
+
 			case PEDIR_SENTENCIA:
 				log_info(logs,"[HILO CPU] Entra a pedir sentencia");
 				if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
 					break;
 				}
+
 				codigo = leer_segmento(etiq->base,etiq->tamanio,etiq->offset);
-				//tam->menu = TE_MANDO_EL_SEGMENTO;
 				tam->length = etiq->tamanio;
 				if(!enviarDatos(socket, tam, codigo, logs))
 					log_error(logs,"Error al enviarse el codigo");
@@ -59,7 +67,13 @@ void funcion_CPU(int socket){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
 					break;
 				}
- 				codigo = leer_segmento(etiq->base,etiq->tamanio,etiq->offset);
+
+				if( validacion_escribir_seg(etiq->base) ){
+					termina = 1;
+					break;
+				}
+
+				codigo = leer_segmento(etiq->base,etiq->tamanio,etiq->offset);
 				//tam->menu = TE_MANDO_EL_SEGMENTO;
 				tam->length = etiq->tamanio;
 				enviarDatos(socket, tam, codigo, logs);
@@ -67,9 +81,13 @@ void funcion_CPU(int socket){
 				break;
 			default:
 				log_error(logs,"[HILO CPU] Se recibio una operacion invalida");
+				termina = 1;
 				break;
 		}
+		if(termina)
+				break;
 	}
+		log_error(logs,"[HILO CPU]La UMV desconectó al CPU por fallo");
 }
 
 /*Funcion que llama el hilo cuando se conecta el KERNEL a la UMV*/

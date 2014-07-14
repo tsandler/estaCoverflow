@@ -32,6 +32,8 @@ int main(int argc, char** argv){
 	log_debug(logs,"Levanto el hilo: Consola");
 	pthread_create(&pthread_consola, NULL, (void*)consola, NULL);
 
+
+	int termina = 0;
 	int socket;
 	t_length* tam = malloc(sizeof(t_length));
 	int s = crearServidor(puerto, logs);
@@ -51,18 +53,26 @@ int main(int argc, char** argv){
 		}else
 			log_info(logs,"[MAIN KERNEL]Se acepto la conexion");
 
-		if(!recibirMenu(socket, tam, logs))
+		if(!recibirMenu(socket, tam, logs)){
 			log_error(logs, "[MAIN KERNEL]Error al hacer el handshake: KERNEL");
-		else{
+			termina = 1;
+
+		}else{
 			if (tam->menu == SOY_KERNEL){
 				log_debug(logs,"[MAIN KERNEL]Se conecto: Kernel");
 				pthread_create(&pthread_kernel, NULL, (void*)funcion_kernel, (void*)socket);
 			}else
 				log_error(logs, "[MAIN KERNEL]Se esta esperando la conexion del kernel");
 		}
+
+		if(termina)
+			break;
 	}while(tam->menu != SOY_KERNEL);
 
 	while(1){
+		if(termina)
+			break;
+
 		socket = aceptarConexion(s, logs);
 		if(!socket)
 			log_error(logs,"[MAIN CPU] Error al aceptar la conexion");
