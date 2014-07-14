@@ -218,7 +218,7 @@ void manejoCPU(int fd) {
 		default:
 			log_error(logs,"Se interrumpio el proceso con el PID: %d debido a que la CPU esta caida",unPCB->pid); //antes habias puesto unPCB->fd
 																									 //creo que te confundistes sino lo cambiamos
-			unPCB = ponerCola(READY, &mutexREADY, &hayAlgoEnReady);
+			ponerCola(unPCB,READY, &mutexREADY, &hayAlgoEnReady);
 			break;/*
 
 ESTO ESTA COMENTADO PORQUE PARA MI DEBERIAMOS SACARLO.... CREO..... OPINION HERNAN?????
