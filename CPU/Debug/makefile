@@ -26,7 +26,7 @@ endif
 all: CPU
 
 dependents:
-	-cd /home/utnso/workspace/tp-2014-1c-out-of-range/commons/Debug && $(MAKE) all
+	-cd /home/utnso/workspace/tp-2014-1c-out-of-range/commons/Debug && $(MAKE) clean all
 
 # Tool invocations
 CPU: $(OBJS) $(USER_OBJS) /home/utnso/workspace/tp-2014-1c-out-of-range/commons/Debug/libcommons.so
