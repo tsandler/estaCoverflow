@@ -59,7 +59,7 @@ void funcion_CPU(int socket){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
 					break;
 				}
-				codigo = leer_segmento(etiq->base,etiq->tamanio,etiq->offset);
+ 				codigo = leer_segmento(etiq->base,etiq->tamanio,etiq->offset);
 				//tam->menu = TE_MANDO_EL_SEGMENTO;
 				tam->length = etiq->tamanio;
 				enviarDatos(socket, tam, codigo, logs);
@@ -76,6 +76,7 @@ void funcion_CPU(int socket){
 void funcion_kernel(int socket){
 	log_info(logs,"[HILO KERNEL]Entra al hilo");
 	int pid;
+	int termina=0;
 	t_length* tam = malloc(sizeof(t_length));
 	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
 	datos_crearSeg* pidTam = malloc(sizeof(datos_crearSeg));
@@ -85,7 +86,7 @@ void funcion_kernel(int socket){
 			log_error(logs, "[HILO KERNEL] Error al recibir el menu");
 			break;
 		}
- 		log_info(logs,"[HILO KERNEL] Sale del recibir menu. menu: %d",tam->menu);
+ 		log_info(logs,"[HILO KERNEL] Entra al switch");
 		switch(tam->menu){
 			case PID_ACTUAL:
 				log_debug(logs,"Cambia pid activo");
@@ -140,11 +141,14 @@ void funcion_kernel(int socket){
 				destruir_segmentos(pid);
 				break;
 			default:
-				log_error(logs,"operacion invalida para Kernel");
-				retardo();
+				log_error(logs,"[HILO KERNEL] operacion invalida para Kernel.La UMV desconecta al KERNEL");
+				termina = 1;
 				break;
 		}
+		if(termina)
+			break;
 	}
+	log_error(logs,"[HILO KERNEL]La UMV desconectó al kernel por operacion invalida");
 }
 
 

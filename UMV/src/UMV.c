@@ -45,38 +45,38 @@ int main(int argc, char** argv){
 	do{
 		socket = aceptarConexion(s, logs);
 		if(!socket){
-			log_error(logs,"Error al aceptar la conexion -kernel");
+			log_error(logs,"[MAIN KERNEL]Error al aceptar la conexion");
 			log_destroy(logs);
 			return 0;
 		}else
-			log_info(logs,"Se acepto la conexion -kernel-");
+			log_info(logs,"[MAIN KERNEL]Se acepto la conexion");
 
 		if(!recibirMenu(socket, tam, logs))
-			log_error(logs, "Error al hacer el handshake: KERNEL");
+			log_error(logs, "[MAIN KERNEL]Error al hacer el handshake: KERNEL");
 		else{
 			if (tam->menu == SOY_KERNEL){
-				log_debug(logs,"Se conecto: Kernel");
+				log_debug(logs,"[MAIN KERNEL]Se conecto: Kernel");
 				pthread_create(&pthread_kernel, NULL, (void*)funcion_kernel, (void*)socket);
 			}else
-				log_error(logs, "Se esta esperando la conexion del kernel");
+				log_error(logs, "[MAIN KERNEL]Se esta esperando la conexion del kernel");
 		}
 	}while(tam->menu != SOY_KERNEL);
 
 	while(1){
 		socket = aceptarConexion(s, logs);
 		if(!socket)
-			log_error(logs,"Error al aceptar la conexion -cpu-");
+			log_error(logs,"[MAIN CPU] Error al aceptar la conexion");
 		else
-			log_info(logs,"Se acepto la conexion -cpu-");
+			log_info(logs,"[MAIN CPU] Se acepto la conexion");
 
 		if(!recibirMenu(socket, tam, logs))
-			log_error(logs, "Error al hacer el handshake: CPU");
+			log_error(logs, "[MAIN CPU] Error al hacer el handshake: CPU");
 		else{
 			if (tam->menu == SOY_CPU){
-				log_debug(logs,"Se conecto: CPU");
+				log_debug(logs,"[MAIN CPU] Se conecto: CPU");
 				pthread_create(&pthread_CPU, NULL, (void*)funcion_CPU, (void*)socket);
 			}else{
-				log_error(logs, "Error en handshake: NO ES CPU");
+				log_error(logs, "[MAIN CPU] Error en handshake: NO ES CPU");
 			}
 		}
 	}
