@@ -22,7 +22,7 @@ src/manejoSemaforos.d: ../src/manejoSemaforos.c ../src/globales.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/config.h \
  ../src/colas.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/string.h \
- ../src/manejoSemaforos.h
+ ../src/manejoSemaforos.h ../src/funcionesPCB.h
 
 ../src/globales.h:
 
@@ -75,3 +75,5 @@ src/manejoSemaforos.d: ../src/manejoSemaforos.c ../src/globales.h \
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/string.h:
 
 ../src/manejoSemaforos.h:
+
+../src/funcionesPCB.h:

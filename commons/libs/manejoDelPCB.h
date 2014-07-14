@@ -29,9 +29,9 @@ typedef struct registroPCB{
 	int indice_codigo;
 	int program_counter;
 
-	int indice_etiquetas_funciones;
-	int puntero_etiquetas_funciones;
-	int tamanio_indice_etiquetas_funciones;
+	int indice_etiquetas;
+	int puntero_etiquetas;
+	int tamanio_indice_etiquetas;
 
 	int retrasoIO;
 	int peso;

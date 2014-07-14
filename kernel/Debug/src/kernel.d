@@ -22,7 +22,7 @@ src/kernel.d: ../src/kernel.c ../src/globales.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/config.h \
  ../src/colas.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/string.h \
- ../src/manejoSemaforos.h ../src/manejoIO.h ../src/funcionesPCB.h
+ ../src/manejoSemaforos.h ../src/funcionesPCB.h ../src/manejoIO.h
 
 ../src/globales.h:
 
@@ -76,6 +76,6 @@ src/kernel.d: ../src/kernel.c ../src/globales.h \
 
 ../src/manejoSemaforos.h:
 
-../src/manejoIO.h:
-
 ../src/funcionesPCB.h:
+
+../src/manejoIO.h:

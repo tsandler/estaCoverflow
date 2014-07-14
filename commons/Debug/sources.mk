@@ -13,12 +13,8 @@ LIBRARIES :=
 
 # Every subdirectory with source files must be described here
 SUBDIRS := \
-parser/so-ansisop-parser-dummy/build \
 parser \
-parser/parser/build/parser \
 libs \
 commons \
 commons/collections \
-commons/Debug \
-commons/Debug/collections \
 

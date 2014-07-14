@@ -23,7 +23,7 @@ src/planificador_largo_plazo.d: ../src/planificador_largo_plazo.c \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/config.h \
  ../src/colas.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/string.h \
- ../src/manejoSemaforos.h
+ ../src/manejoSemaforos.h ../src/funcionesPCB.h
 
 ../src/globales.h:
 
@@ -76,3 +76,5 @@ src/planificador_largo_plazo.d: ../src/planificador_largo_plazo.c \
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/string.h:
 
 ../src/manejoSemaforos.h:
+
+../src/funcionesPCB.h:

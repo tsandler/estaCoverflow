@@ -23,7 +23,7 @@ src/funcionesPCB.d: ../src/funcionesPCB.c \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/config.h \
  ../src/colas.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/string.h \
- ../src/manejoSemaforos.h
+ ../src/manejoSemaforos.h ../src/funcionesPCB.h
 
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/manejoDelPCB.h:
 
@@ -78,3 +78,5 @@ src/funcionesPCB.d: ../src/funcionesPCB.c \
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/string.h:
 
 ../src/manejoSemaforos.h:
+
+../src/funcionesPCB.h:

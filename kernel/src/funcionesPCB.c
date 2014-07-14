@@ -205,7 +205,7 @@ registroPCB* armarPCB(char* program, int fd){
 	unPCB->tamanio_indice_codigo=strlen(program)+1;
 	unPCB->fd=fd;
 	unPCB->peso = peso;
-	unPCB->indice_etiquetas= metadataP->instrucciones_serializado->offset;
+	unPCB->indice_etiquetas = metadataP->instrucciones_serializado->offset;
 	unPCB->tamanio_indice_etiquetas = metadataP->etiquetas_size;
     unPCB->pid = identificadorUnico;
     unPCB->tamanio_contexto= 0;

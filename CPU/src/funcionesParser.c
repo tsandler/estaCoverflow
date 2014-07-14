@@ -106,9 +106,9 @@ t_valor_variable asignar_valor_compartida(t_nombre_compartida variable, t_valor_
 /* Primitiva que cambia el program counter al correspondiente de una etiqueta dada */
 void ir_al_label(t_nombre_etiqueta etiqueta){
 	t_etiqueta* etiquetaAEnviar = malloc(sizeof(t_etiqueta));
-	etiquetaAEnviar->base = pcb->indice_etiquetas_funciones;
+	etiquetaAEnviar->base = pcb->indice_etiquetas;
 	etiquetaAEnviar->offset = 0;
-	etiquetaAEnviar->tamanio = pcb->tamanio_indice_etiquetas_funciones;
+	etiquetaAEnviar->tamanio = pcb->tamanio_indice_etiquetas;
 	tam->menu = LEER_SEGMENTO;
 	tam->length = sizeof(t_etiqueta);
 	char* etiquetas;
@@ -122,7 +122,7 @@ void ir_al_label(t_nombre_etiqueta etiqueta){
 	else
 		log_error(logs, "Se recibio el segmento de etiquetas");
 
-	t_size tamanio = pcb->tamanio_indice_etiquetas_funciones;
+	t_size tamanio = pcb->tamanio_indice_etiquetas;
 	char* et = string_from_format("%s", &etiquetas);
 	pcb->program_counter = metadata_buscar_etiqueta(etiqueta, et, tamanio);
 }
