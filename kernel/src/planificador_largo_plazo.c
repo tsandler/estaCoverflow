@@ -13,6 +13,7 @@ extern sem_t mutexNEW;
 extern sem_t mutexREADY;
 extern sem_t mutexEXIT;
 
+
 extern sem_t gradoProg;
 extern sem_t hayAlgo;
 extern sem_t hayAlgoEnReady;

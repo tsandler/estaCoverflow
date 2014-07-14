@@ -13,9 +13,8 @@
 extern int socket_UMV;
 extern t_config* config;
 extern t_log* logs;
-int identificadorUnico;
+int identificadorUnico = 1;
 extern int tamanioStack;
-
 
 
 void intercambiarDatosUMV(int socket_UMV, t_log* logs, registroPCB* PCBprograma, char* buf){
@@ -44,7 +43,7 @@ void intercambiarDatosUMV(int socket_UMV, t_log* logs, registroPCB* PCBprograma,
 	//envio segmento etiquetas_funciones
 	datosAEnviar->pid=PCBprograma->pid;
 	log_info(logs,"%i",datosAEnviar->pid);
-	datosAEnviar->tamanio = PCBprograma->tamanio_indice_etiquetas_funciones;
+	datosAEnviar->tamanio = PCBprograma->tamanio_indice_etiquetas;
 	tam->menu = CREAR_SEGMENTO;
 	tam->length = sizeof(datos_crearSeg);
 
@@ -58,7 +57,7 @@ void intercambiarDatosUMV(int socket_UMV, t_log* logs, registroPCB* PCBprograma,
 		exit(EXIT_FAILURE);
 	}else{
 		if(datoRecibido != -1)
-			PCBprograma->puntero_etiquetas_funciones = datoRecibido;  //YA TENGO LA BASE INDICE ETIQUETAS
+			PCBprograma->puntero_etiquetas = datoRecibido;  //YA TENGO LA BASE INDICE ETIQUETAS
 		else{
 			log_error (logs, "La UMV se quedo sin memoria");
 			log_error (logs,"Se ha abortado el proceso de CREACION DE SEGMENTOS");
@@ -206,15 +205,18 @@ registroPCB* armarPCB(char* program, int fd){
 	unPCB->tamanio_indice_codigo=strlen(program)+1;
 	unPCB->fd=fd;
 	unPCB->peso = peso;
-	unPCB->indice_etiquetas_funciones= metadataP->instrucciones_serializado->offset;
-	unPCB->tamanio_indice_etiquetas_funciones = metadataP->etiquetas_size;
-
-	identificadorUnico =+ 1;
+	unPCB->indice_etiquetas= metadataP->instrucciones_serializado->offset;
+	unPCB->tamanio_indice_etiquetas = metadataP->etiquetas_size;
     unPCB->pid = identificadorUnico;
+    unPCB->tamanio_contexto= 0;
+    unPCB->indice_codigo = 0 ; //se empieza en 0 por ser base ??
+    identificadorUnico = identificadorUnico + 1;
 
     log_info(logs,"se creo el pcb. entra a intercambiar datos con la UMV");
     intercambiarDatosUMV(socket_UMV,logs,unPCB, program);// ESTO NO LO EJECUTO HASTA QUE NO PUEDA CONECTARSE DE FORMA EXITOSA
-	return unPCB;                                        //CON LA UMV.
+    													//CON LA UMV.
+
+    return unPCB;
 }
 
 

@@ -25,10 +25,10 @@
 #include <libs/manejoDelPCB.h>
 #include "manejoSemaforos.h"
 #include <libs/sockets.h>
+#include "funcionesPCB.h"
 
 
-
-
+void conectarseUMV();
 //static pthread_mutex_t semaforo_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 

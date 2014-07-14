@@ -95,6 +95,8 @@ int main(int argc, char **argv) {
 	sem_init(&mutexVarCompartidas, 0, 1);
 	sem_init(&mutexSemaforos, 0, 1);
 	sem_init(&mutexMandarColaEXEC, 0, 1);
+
+
 	pthread_t thread1, thread2;
 	dispositivosIO = dictionary_create(); // creo diccionario (?)
 	variablesCompartidas = dictionary_create();

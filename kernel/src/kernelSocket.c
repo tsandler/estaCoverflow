@@ -89,7 +89,7 @@ int openSocketServerPLP(int PORT) {
 			exit(EXIT_FAILURE);
 		} else {
 			log_info(logs, "Conexion entrante aceptada :%i",clilen);
-			if (recibirDatos(newfd, tam, buf, logs)==1) {
+			if (recibirDatos(newfd, tam, (void*)buf, logs)==1) {
 				puts("llego");
 				log_info(logs,"%s \n",&buf);
 				registroPCB* unPCB = armarPCB(&buf,newfd);
