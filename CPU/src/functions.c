@@ -94,6 +94,8 @@ void pedir_stack(int tamanio){
 
 	if(!recibirDatos(socketUMV, tam, (void*)&stack, logs))
 		log_error(logs, "Se produjo un error recibiendo el segmento");
+	else
+		log_info(logs, "Se recibio el stack");
 }
 
 /* Funcion que verifica que sea un archivo de configuracion valido */
