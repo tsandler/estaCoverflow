@@ -81,7 +81,7 @@ void funcion_kernel(int socket){
 	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
 	datos_crearSeg* pidTam = malloc(sizeof(datos_crearSeg));
 	while(1){
-		log_debug(logs,"\n\n\n\n\n\n[HILO KERNEL] Esperando menu...");
+		log_debug(logs,"\n\n\n[HILO KERNEL] Esperando menu...");
 		if(!recibirMenu(socket, tam, logs)){
 			log_error(logs, "[HILO KERNEL] Error al recibir el menu");
 			break;
@@ -103,7 +103,12 @@ void funcion_kernel(int socket){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
 					break;
 				}
-				log_debug(logs, "Etiqueta 1: %d\n%d\n%d\n", etiq->base, etiq->offset, etiq->tamanio);
+				log_debug(logs, "Etiqueta 1:\n  base: %d | offset: %d | tam: %d", etiq->base, etiq->offset, etiq->tamanio);
+
+				if( validacion_escribir_seg(etiq->base) ){
+					termina = 1;
+					break;
+				}
 				int base=etiq->base;
 				int offset=etiq->offset;
 				int tamanio=etiq->tamanio;
@@ -134,6 +139,7 @@ void funcion_kernel(int socket){
 				enviarDatos(socket, tam, &baseLog, logs);
 				break;
 			case ELIMINAR_SEGMENTOS:
+				log_info(logs,"[HILO KERNEL] Entra a eliminar segmentos");
 				if(!recibirDato(socket, tam->length, (void*)&pid, logs)){
 					log_error(logs, "Se produjo un error recibiendo el pid");
 					break;
@@ -151,6 +157,13 @@ void funcion_kernel(int socket){
 	log_error(logs,"[HILO KERNEL]La UMV desconectó al kernel por operacion invalida");
 }
 
+
+
+bool validacion_escribir_seg(int base){
+	if( base >= 0 && base <= 2000)
+		return 0;
+	return 1;
+}
 
 /* Funcion que solicita el bloque de memoria inicial para la UMV y
 crea estructuras para el manejo de la UMV. */
@@ -251,9 +264,9 @@ void destruir_segmentos(int pidInt){
 		dictionary_remove(tablaPidSeg,pid);
 
 		if( dictionary_has_key(tablaPidSeg, pid)){
-			log_error(logs,"Los sementos no se eliminaron");
+			log_error(logs,"[HILO KERNEL]Los sementos no se eliminaron");
 		}else
-			log_info(logs,"Los segmentos se eliminaron correctamente");
+			log_info(logs,"[HILO KERNEL]Los segmentos se eliminaron correctamente");
 	}else{
 		log_error(logs,"Se intento eliminar segmentos no existentes");
 		free(pid);
@@ -343,7 +356,7 @@ void escribir_segmento(int dirLog, int tamanioAEscribir, int offset, char* buffe
 		log_debug(logs,"existe la lista asociada al pid");
 		unElem= list_find(listaSeg,(void*)buscar_dirLogica);
 	}else
-		log_debug(logs,"no existe la lista asociada al pid");
+		log_error(logs,"no existe la lista asociada al pid");
 
 	if(unElem){
 		log_info(logs,"La direccion logica existe");
@@ -353,8 +366,8 @@ void escribir_segmento(int dirLog, int tamanioAEscribir, int offset, char* buffe
 			printf("El segmento fue escrito");
 			log_info(logs,"El segmento fue escrito");
 		}else{
-			log_error(logs,"SEGMENTATION FAULT");
-			printf("Segmentation fault");
+			log_error(logs,"Se esta tratando de escribir fuera de los rangos del segmento");
+			puts("Segmentation fault");
 		}
 	}else{
 		log_error(logs,"La direccion logica no existe");

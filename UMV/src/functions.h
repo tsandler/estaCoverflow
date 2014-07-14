@@ -62,6 +62,7 @@ void buscar_segmento_y_desplazarlo();
 bool buscar_ramAux(tablaSegUMV* unElem);
 void busca_seg_en_diccionario(char* pid,t_list* listaSeg);
 
+bool validacion_escribir_seg(int base);
 
 
 #endif /* FUNCTIONS_H_ */
