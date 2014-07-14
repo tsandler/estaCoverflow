@@ -418,3 +418,305 @@ end
 [DEBUG] 15:29:33:904 kernel.c/(12381:12389): se envio el crear_seg et_func
 [ERROR] 15:29:43:853 kernel.c/(12381:12389): [SOCKETS] Se produjo un problema al recibir el tamanio del dato
 [ERROR] 15:29:43:853 kernel.c/(12381:12389): Error en el envio del Segmento Etiquetas_Funciones
+[DEBUG] 00:52:59:710 kernel.c/(2457:2457): inicia kernel
+[DEBUG] 00:52:59:718 kernel.c/(2457:2457): colas creadas
+[DEBUG] 00:52:59:720 kernel.c/(2457:2457): constantes inicializadas
+[INFO] 00:52:59:722 kernel.c/(2457:2457): Conectandose con la UMV...
+[DEBUG] 00:52:59:723 kernel.c/(2457:2457): el puerto es: 6000
+[INFO] 00:52:59:726 kernel.c/(2457:2457): El kernel se conecto correctamente con la UMV
+[DEBUG] 00:52:59:729 kernel.c/(2457:2457): ya se envio el menu
+[INFO] 00:52:59:732 kernel.c/(2457:2462): Impresora corriendo dispositivo
+[INFO] 00:52:59:733 kernel.c/(2457:2461): Disco corriendo dispositivo
+[INFO] 00:52:59:733 kernel.c/(2457:2463): Scanner corriendo dispositivo
+[INFO] 00:52:59:744 kernel.c/(2457:2464): En PCP(): Waiting conection ...
+[INFO] 00:52:59:747 kernel.c/(2457:2465): En PLP(): Waiting Connection...
+
+[DEBUG] 01:00:11:859 kernel.c/(3746:3746): inicia kernel
+[DEBUG] 01:00:11:861 kernel.c/(3746:3746): colas creadas
+[DEBUG] 01:00:11:862 kernel.c/(3746:3746): constantes inicializadas
+[INFO] 01:00:11:864 kernel.c/(3746:3746): Conectandose con la UMV...
+[DEBUG] 01:00:11:865 kernel.c/(3746:3746): el puerto es: 6000
+[INFO] 01:00:11:868 kernel.c/(3746:3746): El kernel se conecto correctamente con la UMV
+[DEBUG] 01:00:11:879 kernel.c/(3746:3746): ya se envio el menu
+[INFO] 01:00:11:887 kernel.c/(3746:3750): Disco corriendo dispositivo
+[INFO] 01:00:11:887 kernel.c/(3746:3751): Impresora corriendo dispositivo
+[INFO] 01:00:11:887 kernel.c/(3746:3752): Scanner corriendo dispositivo
+[INFO] 01:00:11:894 kernel.c/(3746:3753): En PCP(): Waiting conection ...
+[INFO] 01:00:11:902 kernel.c/(3746:3754): En PLP(): Waiting Connection...
+
+[INFO] 01:00:38:424 kernel.c/(3746:3754): Conexion entrante aceptada :16
+[INFO] 01:00:38:441 kernel.c/(3746:3754): #!/usr/bin/ansisop
+begin
+	variables a, b
+	a = 3
+	b = 5
+	a = b + 12
+end
+
+
+ 
+
+[DEBUG] 01:00:38:441 kernel.c/(3746:3754): entra a metadata desde literal
+[DEBUG] 01:00:38:441 kernel.c/(3746:3754): sale de metadata desde literal
+[DEBUG] 01:00:38:441 kernel.c/(3746:3754): entra a algoritmo de peso
+[DEBUG] 01:00:38:441 kernel.c/(3746:3754): sale de algoritmo de peso
+[INFO] 01:00:38:442 kernel.c/(3746:3754): se creo el pcb. entra a intercambiar datos con la UMV
+[INFO] 01:00:38:442 kernel.c/(3746:3754): 1
+[DEBUG] 01:00:38:444 kernel.c/(3746:3754): se envio el crear_seg et_func
+[DEBUG] 01:00:38:458 kernel.c/(3746:3754): se envio el crear_seg tam_ind_cod
+[DEBUG] 01:00:38:539 kernel.c/(3746:3754): se recibio la base del segmento codigo
+[DEBUG] 01:00:38:539 kernel.c/(3746:3754): se envio el crear_seg stack
+[DEBUG] 01:00:38:618 kernel.c/(3746:3754): se envio el recibio el segmento stack
+[DEBUG] 01:00:38:618 kernel.c/(3746:3754): se envio el escribir segmento codigo
+[INFO] 01:00:38:618 kernel.c/(3746:3754): Se termino el proceso de CONEXION y CREACION DE SEGMENTOS
+[INFO] 01:00:38:619 kernel.c/(3746:3755): El grado de multiprogramacion es : 4 
+
+[INFO] 01:00:38:619 kernel.c/(3746:3755): En la cola New hay: 1 
+
+[INFO] 01:00:38:619 kernel.c/(3746:3755): En la cola Ready Hay 0 
+
+[INFO] 01:00:38:619 kernel.c/(3746:3755): En la cola Ready se agrego el programa 1, ahora hay un total de 1 
+
+[INFO] 01:00:38:620 kernel.c/(3746:3754): Se coloco en la cola NEW el programa 1
+[INFO] 01:00:38:622 kernel.c/(3746:3754): En PLP(): Waiting Connection...
+
+[INFO] 01:02:18:891 kernel.c/(3746:3754): Conexion entrante aceptada :16
+[INFO] 01:02:18:897 kernel.c/(3746:3754): #!/usr/bin/ansisop
+begin
+	variables a, b
+	a = 3
+	b = 5
+	a = b + 12
+end
+
+
+ 
+
+[DEBUG] 01:02:18:897 kernel.c/(3746:3754): entra a metadata desde literal
+[DEBUG] 01:02:18:898 kernel.c/(3746:3754): sale de metadata desde literal
+[DEBUG] 01:02:18:898 kernel.c/(3746:3754): entra a algoritmo de peso
+[DEBUG] 01:02:18:898 kernel.c/(3746:3754): sale de algoritmo de peso
+[INFO] 01:02:18:898 kernel.c/(3746:3754): se creo el pcb. entra a intercambiar datos con la UMV
+[INFO] 01:02:18:898 kernel.c/(3746:3754): 2
+[DEBUG] 01:02:18:900 kernel.c/(3746:3754): se envio el crear_seg et_func
+[DEBUG] 01:02:18:951 kernel.c/(3746:3754): se envio el crear_seg tam_ind_cod
+[DEBUG] 01:02:19:35 kernel.c/(3746:3754): se recibio la base del segmento codigo
+[DEBUG] 01:02:19:35 kernel.c/(3746:3754): se envio el crear_seg stack
+[DEBUG] 01:02:19:114 kernel.c/(3746:3754): se envio el recibio el segmento stack
+[DEBUG] 01:02:19:114 kernel.c/(3746:3754): se envio el escribir segmento codigo
+[INFO] 01:02:19:114 kernel.c/(3746:3754): Se termino el proceso de CONEXION y CREACION DE SEGMENTOS
+[INFO] 01:02:19:114 kernel.c/(3746:3755): El grado de multiprogramacion es : 3 
+
+[INFO] 01:02:19:114 kernel.c/(3746:3755): En la cola New hay: 1 
+
+[INFO] 01:02:19:115 kernel.c/(3746:3755): En la cola Ready Hay 1 
+
+[INFO] 01:02:19:115 kernel.c/(3746:3755): En la cola Ready se agrego el programa 2, ahora hay un total de 2 
+
+[INFO] 01:02:19:115 kernel.c/(3746:3754): Se coloco en la cola NEW el programa 2
+[INFO] 01:02:19:118 kernel.c/(3746:3754): En PLP(): Waiting Connection...
+
+[INFO] 01:02:21:192 kernel.c/(3746:3754): Conexion entrante aceptada :16
+[INFO] 01:02:21:197 kernel.c/(3746:3754): #!/usr/bin/ansisop
+begin
+	variables a, b
+	a = 3
+	b = 5
+	a = b + 12
+end
+
+
+ 
+
+[DEBUG] 01:02:21:197 kernel.c/(3746:3754): entra a metadata desde literal
+[DEBUG] 01:02:21:197 kernel.c/(3746:3754): sale de metadata desde literal
+[DEBUG] 01:02:21:197 kernel.c/(3746:3754): entra a algoritmo de peso
+[DEBUG] 01:02:21:197 kernel.c/(3746:3754): sale de algoritmo de peso
+[INFO] 01:02:21:197 kernel.c/(3746:3754): se creo el pcb. entra a intercambiar datos con la UMV
+[INFO] 01:02:21:197 kernel.c/(3746:3754): 3
+[DEBUG] 01:02:21:199 kernel.c/(3746:3754): se envio el crear_seg et_func
+[DEBUG] 01:02:21:250 kernel.c/(3746:3754): se envio el crear_seg tam_ind_cod
+[DEBUG] 01:02:21:330 kernel.c/(3746:3754): se recibio la base del segmento codigo
+[DEBUG] 01:02:21:330 kernel.c/(3746:3754): se envio el crear_seg stack
+[DEBUG] 01:02:21:411 kernel.c/(3746:3754): se envio el recibio el segmento stack
+[DEBUG] 01:02:21:411 kernel.c/(3746:3754): se envio el escribir segmento codigo
+[INFO] 01:02:21:411 kernel.c/(3746:3754): Se termino el proceso de CONEXION y CREACION DE SEGMENTOS
+[INFO] 01:02:21:411 kernel.c/(3746:3755): El grado de multiprogramacion es : 2 
+
+[INFO] 01:02:21:411 kernel.c/(3746:3755): En la cola New hay: 1 
+
+[INFO] 01:02:21:412 kernel.c/(3746:3755): En la cola Ready Hay 2 
+
+[INFO] 01:02:21:412 kernel.c/(3746:3755): En la cola Ready se agrego el programa 3, ahora hay un total de 3 
+
+[INFO] 01:02:21:412 kernel.c/(3746:3754): Se coloco en la cola NEW el programa 3
+[INFO] 01:02:21:414 kernel.c/(3746:3754): En PLP(): Waiting Connection...
+
+[INFO] 01:02:22:840 kernel.c/(3746:3754): Conexion entrante aceptada :16
+[INFO] 01:02:22:845 kernel.c/(3746:3754): #!/usr/bin/ansisop
+begin
+	variables a, b
+	a = 3
+	b = 5
+	a = b + 12
+end
+
+
+ 
+
+[DEBUG] 01:02:22:845 kernel.c/(3746:3754): entra a metadata desde literal
+[DEBUG] 01:02:22:845 kernel.c/(3746:3754): sale de metadata desde literal
+[DEBUG] 01:02:22:846 kernel.c/(3746:3754): entra a algoritmo de peso
+[DEBUG] 01:02:22:846 kernel.c/(3746:3754): sale de algoritmo de peso
+[INFO] 01:02:22:846 kernel.c/(3746:3754): se creo el pcb. entra a intercambiar datos con la UMV
+[INFO] 01:02:22:846 kernel.c/(3746:3754): 4
+[DEBUG] 01:02:22:851 kernel.c/(3746:3754): se envio el crear_seg et_func
+[DEBUG] 01:02:22:898 kernel.c/(3746:3754): se envio el crear_seg tam_ind_cod
+[DEBUG] 01:02:22:982 kernel.c/(3746:3754): se recibio la base del segmento codigo
+[DEBUG] 01:02:22:982 kernel.c/(3746:3754): se envio el crear_seg stack
+[DEBUG] 01:02:23:62 kernel.c/(3746:3754): se envio el recibio el segmento stack
+[DEBUG] 01:02:23:62 kernel.c/(3746:3754): se envio el escribir segmento codigo
+[INFO] 01:02:23:62 kernel.c/(3746:3754): Se termino el proceso de CONEXION y CREACION DE SEGMENTOS
+[INFO] 01:02:23:62 kernel.c/(3746:3755): El grado de multiprogramacion es : 1 
+
+[INFO] 01:02:23:62 kernel.c/(3746:3755): En la cola New hay: 1 
+
+[INFO] 01:02:23:62 kernel.c/(3746:3755): En la cola Ready Hay 3 
+
+[INFO] 01:02:23:62 kernel.c/(3746:3755): En la cola Ready se agrego el programa 4, ahora hay un total de 4 
+
+[INFO] 01:02:23:63 kernel.c/(3746:3754): Se coloco en la cola NEW el programa 4
+[INFO] 01:02:23:65 kernel.c/(3746:3754): En PLP(): Waiting Connection...
+
+[INFO] 01:02:24:411 kernel.c/(3746:3754): Conexion entrante aceptada :16
+[INFO] 01:02:24:419 kernel.c/(3746:3754): #!/usr/bin/ansisop
+begin
+	variables a, b
+	a = 3
+	b = 5
+	a = b + 12
+end
+
+
+ 
+
+[DEBUG] 01:02:24:419 kernel.c/(3746:3754): entra a metadata desde literal
+[DEBUG] 01:02:24:419 kernel.c/(3746:3754): sale de metadata desde literal
+[DEBUG] 01:02:24:419 kernel.c/(3746:3754): entra a algoritmo de peso
+[DEBUG] 01:02:24:419 kernel.c/(3746:3754): sale de algoritmo de peso
+[INFO] 01:02:24:419 kernel.c/(3746:3754): se creo el pcb. entra a intercambiar datos con la UMV
+[INFO] 01:02:24:419 kernel.c/(3746:3754): 5
+[DEBUG] 01:02:24:421 kernel.c/(3746:3754): se envio el crear_seg et_func
+[DEBUG] 01:02:24:462 kernel.c/(3746:3754): se envio el crear_seg tam_ind_cod
+[DEBUG] 01:02:24:542 kernel.c/(3746:3754): se recibio la base del segmento codigo
+[DEBUG] 01:02:24:542 kernel.c/(3746:3754): se envio el crear_seg stack
+[DEBUG] 01:02:24:622 kernel.c/(3746:3754): se envio el recibio el segmento stack
+[DEBUG] 01:02:24:622 kernel.c/(3746:3754): se envio el escribir segmento codigo
+[INFO] 01:02:24:622 kernel.c/(3746:3754): Se termino el proceso de CONEXION y CREACION DE SEGMENTOS
+[INFO] 01:02:24:622 kernel.c/(3746:3755): El grado de multiprogramacion es : 0 
+
+[INFO] 01:02:24:622 kernel.c/(3746:3755): En la cola New hay: 1 
+
+[INFO] 01:02:24:622 kernel.c/(3746:3755): En la cola Ready Hay 4 
+
+[INFO] 01:02:24:622 kernel.c/(3746:3755): En la cola Ready se agrego el programa 5, ahora hay un total de 5 
+
+[INFO] 01:02:24:623 kernel.c/(3746:3754): Se coloco en la cola NEW el programa 5
+[INFO] 01:02:24:625 kernel.c/(3746:3754): En PLP(): Waiting Connection...
+
+[INFO] 01:02:27:817 kernel.c/(3746:3754): Conexion entrante aceptada :16
+[INFO] 01:02:27:825 kernel.c/(3746:3754): #!/usr/bin/ansisop
+begin
+	variables a, b
+	a = 3
+	b = 5
+	a = b + 12
+end
+
+
+ 
+
+[DEBUG] 01:02:27:825 kernel.c/(3746:3754): entra a metadata desde literal
+[DEBUG] 01:02:27:826 kernel.c/(3746:3754): sale de metadata desde literal
+[DEBUG] 01:02:27:826 kernel.c/(3746:3754): entra a algoritmo de peso
+[DEBUG] 01:02:27:826 kernel.c/(3746:3754): sale de algoritmo de peso
+[INFO] 01:02:27:826 kernel.c/(3746:3754): se creo el pcb. entra a intercambiar datos con la UMV
+[INFO] 01:02:27:826 kernel.c/(3746:3754): 6
+[DEBUG] 01:02:27:833 kernel.c/(3746:3754): se envio el crear_seg et_func
+[DEBUG] 01:02:27:874 kernel.c/(3746:3754): se envio el crear_seg tam_ind_cod
+[DEBUG] 01:02:27:954 kernel.c/(3746:3754): se recibio la base del segmento codigo
+[DEBUG] 01:02:27:954 kernel.c/(3746:3754): se envio el crear_seg stack
+[DEBUG] 01:02:28:35 kernel.c/(3746:3754): se envio el recibio el segmento stack
+[DEBUG] 01:02:28:35 kernel.c/(3746:3754): se envio el escribir segmento codigo
+[INFO] 01:02:28:35 kernel.c/(3746:3754): Se termino el proceso de CONEXION y CREACION DE SEGMENTOS
+[INFO] 01:02:28:36 kernel.c/(3746:3754): Se coloco en la cola NEW el programa 6
+[INFO] 01:02:28:38 kernel.c/(3746:3754): En PLP(): Waiting Connection...
+
+[INFO] 01:02:29:899 kernel.c/(3746:3754): Conexion entrante aceptada :16
+[INFO] 01:02:29:915 kernel.c/(3746:3754): #!/usr/bin/ansisop
+begin
+	variables a, b
+	a = 3
+	b = 5
+	a = b + 12
+end
+
+
+ 
+
+[DEBUG] 01:02:29:916 kernel.c/(3746:3754): entra a metadata desde literal
+[DEBUG] 01:02:29:916 kernel.c/(3746:3754): sale de metadata desde literal
+[DEBUG] 01:02:29:916 kernel.c/(3746:3754): entra a algoritmo de peso
+[DEBUG] 01:02:29:916 kernel.c/(3746:3754): sale de algoritmo de peso
+[INFO] 01:02:29:916 kernel.c/(3746:3754): se creo el pcb. entra a intercambiar datos con la UMV
+[INFO] 01:02:29:916 kernel.c/(3746:3754): 7
+[DEBUG] 01:02:29:917 kernel.c/(3746:3754): se envio el crear_seg et_func
+[DEBUG] 01:02:29:967 kernel.c/(3746:3754): se envio el crear_seg tam_ind_cod
+[DEBUG] 01:02:30:46 kernel.c/(3746:3754): se recibio la base del segmento codigo
+[DEBUG] 01:02:30:46 kernel.c/(3746:3754): se envio el crear_seg stack
+[DEBUG] 01:02:30:126 kernel.c/(3746:3754): se envio el recibio el segmento stack
+[DEBUG] 01:02:30:127 kernel.c/(3746:3754): se envio el escribir segmento codigo
+[INFO] 01:02:30:127 kernel.c/(3746:3754): Se termino el proceso de CONEXION y CREACION DE SEGMENTOS
+[INFO] 01:02:30:127 kernel.c/(3746:3754): Se coloco en la cola NEW el programa 7
+[INFO] 01:02:30:127 kernel.c/(3746:3754): En PLP(): Waiting Connection...
+
+[DEBUG] 01:11:55:215 kernel.c/(4334:4334): inicia kernel
+[DEBUG] 01:11:55:218 kernel.c/(4334:4334): colas creadas
+[DEBUG] 01:11:55:219 kernel.c/(4334:4334): constantes inicializadas
+[INFO] 01:11:55:221 kernel.c/(4334:4334): Conectandose con la UMV...
+[DEBUG] 01:11:55:222 kernel.c/(4334:4334): el puerto es: 6000
+[INFO] 01:11:55:230 kernel.c/(4334:4334): El kernel se conecto correctamente con la UMV
+[DEBUG] 01:11:55:233 kernel.c/(4334:4334): ya se envio el menu
+[INFO] 01:11:55:235 kernel.c/(4334:4339): Impresora corriendo dispositivo
+[INFO] 01:11:55:236 kernel.c/(4334:4340): Scanner corriendo dispositivo
+[INFO] 01:11:55:236 kernel.c/(4334:4338): Disco corriendo dispositivo
+[INFO] 01:11:55:240 kernel.c/(4334:4341): En PCP(): Waiting conection ...
+[INFO] 01:11:55:245 kernel.c/(4334:4342): En PLP(): Waiting Connection...
+
+[INFO] 01:14:01:255 kernel.c/(4334:4342): Conexion entrante aceptada :16
+[INFO] 01:14:01:741 kernel.c/(4334:4342): €j} 
+
+[DEBUG] 01:14:01:742 kernel.c/(4334:4342): entra a metadata desde literal
+[DEBUG] 01:14:01:742 kernel.c/(4334:4342): sale de metadata desde literal
+[DEBUG] 01:14:01:742 kernel.c/(4334:4342): entra a algoritmo de peso
+[DEBUG] 01:14:01:742 kernel.c/(4334:4342): sale de algoritmo de peso
+[INFO] 01:14:01:742 kernel.c/(4334:4342): se creo el pcb. entra a intercambiar datos con la UMV
+[INFO] 01:14:01:742 kernel.c/(4334:4342): 1
+[DEBUG] 01:14:01:746 kernel.c/(4334:4342): se envio el crear_seg et_func
+[DEBUG] 01:14:01:758 kernel.c/(4334:4342): se envio el crear_seg tam_ind_cod
+[DEBUG] 01:14:01:838 kernel.c/(4334:4342): se recibio la base del segmento codigo
+[DEBUG] 01:14:01:838 kernel.c/(4334:4342): se envio el crear_seg stack
+[DEBUG] 01:14:01:918 kernel.c/(4334:4342): se envio el recibio el segmento stack
+[DEBUG] 01:14:01:919 kernel.c/(4334:4342): se envio el escribir segmento codigo
+[INFO] 01:14:01:919 kernel.c/(4334:4342): Se termino el proceso de CONEXION y CREACION DE SEGMENTOS
+[INFO] 01:14:01:919 kernel.c/(4334:4343): El grado de multiprogramacion es : 4 
+
+[INFO] 01:14:01:919 kernel.c/(4334:4343): En la cola New hay: 1 
+
+[INFO] 01:14:01:919 kernel.c/(4334:4343): En la cola Ready Hay 0 
+
+[INFO] 01:14:01:919 kernel.c/(4334:4343): En la cola Ready se agrego el programa 1, ahora hay un total de 1 
+
+[INFO] 01:14:01:920 kernel.c/(4334:4342): Se coloco en la cola NEW el programa 1
+[INFO] 01:14:01:922 kernel.c/(4334:4342): En PLP(): Waiting Connection...
+

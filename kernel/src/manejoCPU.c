@@ -56,8 +56,6 @@ void manejoCPU(int fd) {
 	unPCB = sacarCola(READY, &mutexREADY, &hayAlgoEnReady); //para mandar a exec
 	log_info(logs, "Se saco de la cola Ready el proceso %i",unPCB->pid);
 
-//regreso_CPU_caida: ///TODO creo que va a funcionar esto si se cae un CPU
-
 
 
 	sem_wait(&mutexMandarColaEXEC);	//envio datos y pongo en exec atomicamente
@@ -218,7 +216,7 @@ void manejoCPU(int fd) {
 		default:
 			log_error(logs,"Se interrumpio el proceso con el PID: %d debido a que la CPU esta caida",unPCB->pid); //antes habias puesto unPCB->fd
 																									 //creo que te confundistes sino lo cambiamos
-			ponerCola(unPCB,READY, &mutexREADY, &hayAlgoEnReady);
+		//	ponerCola(unPCB,READY, &mutexREADY, &hayAlgoEnReady);
 			break;/*
 
 ESTO ESTA COMENTADO PORQUE PARA MI DEBERIAMOS SACARLO.... CREO..... OPINION HERNAN?????
