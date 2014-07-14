@@ -56,6 +56,13 @@ void funcion_CPU(int socket){
 				}
 
 				codigo = leer_segmento(etiq->base,etiq->tamanio,etiq->offset);
+
+				if(!codigo){
+					termina = 1;
+					log_error(logs,"[HILO CPU] No se envió la sentencia. Error en la etiqueta. Finaliza el CPU");
+					break;
+				}
+
 				tam->length = etiq->tamanio;
 				if(!enviarDatos(socket, tam, codigo, logs))
 					log_error(logs,"Error al enviarse el codigo");
@@ -354,7 +361,7 @@ unsigned char *leer_segmento(int dirLog, int tamanioALeer, int offset){ //solici
 			memcpy((void*)destino,(void*)desde,tamanioALeer);
 			return destino;
 		}else
-			log_error(logs,"Segmentation fault");
+			log_error(logs,"se esta tratando de acceder fuera de los rangos del segmento-segmentation fault-");
 	}else
 		log_error(logs,"se intento acceder a una base inexistente");
 	return NULL;

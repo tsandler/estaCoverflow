@@ -56,7 +56,6 @@ int main(int argc, char** argv){
 		if(!recibirMenu(socket, tam, logs)){
 			log_error(logs, "[MAIN KERNEL]Error al hacer el handshake: KERNEL");
 			termina = 1;
-
 		}else{
 			if (tam->menu == SOY_KERNEL){
 				log_debug(logs,"[MAIN KERNEL]Se conecto: Kernel");
