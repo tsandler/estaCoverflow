@@ -20,19 +20,6 @@ void intercambiarDatosUMV(int socket_UMV, t_log* logs, registroPCB* PCBprograma,
 
 	t_length *tam;
 	tam = malloc(sizeof(t_length));
-//	tam->menu = SOY_KERNEL;
-//	log_debug(logs,"Entra al while para enviar menu");
-//	//while(1){
-//		if(!enviarMenu(socket_UMV, tam, logs))//Le aviso a la UMV que soy el kernel
-//			log_error(logs,"Error en la identificacion ... (LA UMV NO RECIBE AL KERNEL)");
-//	//	else
-//	//		break;
-////	}
-//	log_debug(logs,"ya se envio el menu");
-/*	tam->menu = PID_ACTUAL ;
-	int datos_pid = PCBprograma.pid;								/////SACAMOS ESTO???////
-	if(!enviarDatos(socket_UMV, tam, (void*)datos_pid,logs))
-			log_error(logs,"Error en el envio del pid");*/
 
 	datos_crearSeg* datosAEnviar=malloc(sizeof(datos_crearSeg));
 	tam->length = sizeof(datos_crearSeg);
@@ -110,8 +97,6 @@ void intercambiarDatosUMV(int socket_UMV, t_log* logs, registroPCB* PCBprograma,
 		}
 	}
 
-
-//ESTO NO SE COMO HACER... FALTA ALGO?? ¿HAY QUE VOLVER A ENVIAR?
 
 
 	//envio stack
