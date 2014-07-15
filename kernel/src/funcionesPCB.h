@@ -45,6 +45,8 @@ void eliminarSegmentoUMV(int socket_UMV, t_log* logs,registroPCB* PCBprograma);
 void conectarseUMV();
 void intercambiarDatosUMV(int socket_UMV, t_log* logs, registroPCB* PCBprograma, char* buf);
 
-//FIXME: agregar cabeceras de funciones
+int crearSegmento(registroPCB* PCBprograma,t_log* logs , int tamanio);
+
+
 
 #endif /* MANEJODELPCB_H_ */

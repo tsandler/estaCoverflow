@@ -9,13 +9,14 @@
 #include <libs/manejoDelPCB.h>
 #include "planificador_largo_plazo.h"
 #include <commons/log.h>
+#include "funcionesPCB.h"
 
 extern int socket_UMV;
 extern t_config* config;
 extern t_log* logs;
 int identificadorUnico = 1;
 extern int tamanioStack;
-
+/*
 void intercambiarDatosUMV(int socket_UMV, t_log* logs, registroPCB* PCBprograma, char* buf){
 
 	t_length *tam;
@@ -196,7 +197,7 @@ void intercambiarDatosUMV(int socket_UMV, t_log* logs, registroPCB* PCBprograma,
 log_info(logs,"Se termino el proceso de CONEXION y CREACION DE SEGMENTOS");
 }
 
-
+*/
 //////////////////////////////////////////////////////////////////////////////
 void conectarseUMV(){
     char *ip = config_get_string_value(config,"IP");
@@ -265,20 +266,93 @@ registroPCB* armarPCB(char* program, int fd){
 	unPCB->peso = peso;
 	unPCB->puntero_etiquetas = 0 ;
 	unPCB->cursor_stack = 0;
-	unPCB->tamanio_indice_etiquetas = metadataP->etiquetas_size;
+	unPCB->tamanio_indice_etiquetas = sizeof(metadataP->etiquetas_size);
     unPCB->pid = identificadorUnico;
     unPCB->tamanio_contexto= 0;
-    unPCB->indice_codigo = 0 ; //se empieza en 0 por ser base ??
-    unPCB->tamanio_indice_codigo=metadataP->instrucciones_size;
-    identificadorUnico = identificadorUnico + 1;
-    log_info(logs,"se creo el pcb. entra a intercambiar datos con  la UMV");
-    intercambiarDatosUMV(socket_UMV,logs,unPCB, program);// ESTO NO LO EJECUTO HASTA QUE NO PUEDA CONECTARSE DE FORMA EXITOSA
-    													//CON LA UMV.
+    unPCB->tamanio_indice_codigo=sizeof(metadataP->instrucciones_size);
+    unPCB->indice_etiquetas = crearSegmento(unPCB,logs,unPCB->tamanio_indice_etiquetas,socket_UMV);
+    unPCB->segmento_stack = crearSegmento(unPCB,logs,tamanioStack,socket_UMV);
+    unPCB->segmento_codigo = crearSegmento(unPCB,logs,(strlen(program)+1),socket_UMV);
+    unPCB->indice_codigo = crearSegmento(unPCB,logs,unPCB->tamanio_indice_codigo,socket_UMV);
 
+    identificadorUnico = identificadorUnico + 1;
+
+    escribirSegmento(unPCB,unPCB->indice_codigo,unPCB->tamanio_indice_codigo,metadataP->instrucciones_serializado);
+    escribirSegmento(unPCB,unPCB->indice_etiquetas,unPCB->tamanio_indice_etiquetas,metadataP->etiquetas);
+    escribirSegmento(unPCB,unPCB->segmento_codigo,(strlen(program)+1),program);
+
+    log_info(logs,"se creo el pcb. entra a intercambiar datos con  la UMV");
+    //intercambiarDatosUMV(socket_UMV,logs,unPCB, program);// ESTO NO LO EJECUTO HASTA QUE NO PUEDA CONECTARSE DE FORMA EXITOSA
+    													//CON LA UMV.
     return unPCB;
 }
 
+/* crea un segmento y retorna la base*/
+int crearSegmento(registroPCB* PCBprograma,t_log* logs , int tamanio, int socket_UMV){
+	t_length *tam;
+	tam = malloc(sizeof(t_length));
+	datos_crearSeg* datosAEnviar=malloc(sizeof(datos_crearSeg));
+	tam->length = sizeof(datos_crearSeg);
 
+
+	int datoRecibido;
+
+	datosAEnviar->pid=PCBprograma->pid;
+	log_info(logs,"%i",datosAEnviar->pid);
+	datosAEnviar->tamanio = tamanio;
+	tam->menu = CREAR_SEGMENTO;
+	tam->length = sizeof(datos_crearSeg);
+
+			if(!enviarDatos(socket_UMV, tam, datosAEnviar, logs)){
+				log_error( logs ,"Error en el envio de los datos...(FALLO EN EL ENVIO DEL SEGMENTO)");
+				exit(EXIT_FAILURE);
+			}
+			log_debug(logs,"se envio el Crear Segmento");
+			if (!recibirDatos (socket_UMV,tam,(void*)&datoRecibido,logs)){ //base
+				log_error (logs,"Error en el envio del Segmento ");
+				exit(EXIT_FAILURE);
+			}else{
+				if(datoRecibido != -1)
+					return datoRecibido;  //BASE
+				else{
+					log_error (logs, "La UMV se quedo sin memoria");
+					log_error (logs,"Se ha abortado el proceso de CREACION DE SEGMENTOS");
+					exit(EXIT_FAILURE);
+				}
+			}
+}
+
+/*escribe un segmento*/
+void escribirSegmento(registroPCB* PCBprograma, int base ,int tamanio, void* datoAEnviar){
+	t_length* tam;
+	t_etiqueta *etiq=malloc(sizeof(t_etiqueta));
+	int pid;
+
+	tam->menu= PID_ACTUAL;
+	tam->length = sizeof(int);
+	pid = PCBprograma->pid;
+	if(!enviarDatos(socket_UMV, tam, &pid,logs))
+		log_error(logs,"Error en el envio de los datos");
+
+	tam->menu = ESCRIBIR_SEGMENTO;
+	etiq->base=base;
+	etiq->offset=0;
+	etiq->tamanio=tamanio;
+	tam->length = sizeof(t_etiqueta);
+
+	if(!enviarDatos(socket_UMV, tam, etiq,logs))
+		log_error(logs,"Error en el envio del tamaño de los datos");
+
+	tam->length = tamanio;
+
+	if(!enviarDatos(socket_UMV, tam, datoAEnviar ,logs))
+		log_error(logs,"Error en el envio de los datos");
+
+	log_debug(logs,"se envio el escribir segmento");
+
+
+log_info(logs,"Se termino el proceso de escritura");
+}
 
 
 
