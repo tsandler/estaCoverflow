@@ -9,6 +9,11 @@
 
 static char* _depurar_sentencia();
 
+typedef struct{
+	int offset;
+	int tamanio;
+}t_aux;
+
 /* Funcion que conecta a la CPU con la UMV */
 int conectar_UMV(){
 	char *ip = config_get_string_value(config, "IP_UMV");
@@ -113,8 +118,9 @@ int archivo_de_configuracion_valido(){
 
 /* Funcion que recibe la sentencia de la UMV */
 char* recibir_sentencia(){
+	t_aux* aux = malloc(sizeof(t_aux));
 	t_etiqueta* et = malloc(sizeof(t_etiqueta));
-
+	unsigned char* datos;
 	et->base = pcb->indice_codigo;
 	et->offset = pcb->program_counter * 8;
 	et->tamanio = 8;
@@ -124,10 +130,12 @@ char* recibir_sentencia(){
 	if (!enviarDatos(socketUMV, tam, et, logs))
 		log_error(logs, "Se produjo un error al enviar el indice de codigo.");
 
-	if (!recibirDatos(socketUMV, tam, (void*)et, logs))
+	if (!recibirDatos(socketUMV, tam, (void*)aux, logs))
 		log_error(logs, "Se produjo un error al recibir el segmento de codigo");
 
 	et->base = pcb->segmento_codigo;
+	et->offset = aux->offset;
+	et->tamanio = aux->tamanio;
 
 	if (!enviarDatos(socketUMV, tam, et, logs))
 		log_error(logs, "Se produjo un error al enviar el segmento de codigo");
