@@ -16,8 +16,6 @@ extern t_log* logs;
 int identificadorUnico = 1;
 extern int tamanioStack;
 
-static void _obtener_sentencias(char** buffer, char* programa, t_size cant, t_intructions* instrucciones);
-
 void intercambiarDatosUMV(int socket_UMV, t_log* logs, registroPCB* PCBprograma, char* buf){
 
 	t_length *tam;
@@ -207,31 +205,20 @@ registroPCB* armarPCB(char* program, int fd){
 	unPCB->fd=fd;
 	unPCB->peso = peso;
 	unPCB->puntero_etiquetas = 0 ;
-	//unPCB->indice_etiquetas =0 FIXME: esto lo deberia devolver la umv
 	unPCB->cursor_stack = 0;
 	unPCB->tamanio_indice_etiquetas = metadataP->etiquetas_size;
     unPCB->pid = identificadorUnico;
     unPCB->tamanio_contexto= 0;
     unPCB->indice_codigo = 0 ; //se empieza en 0 por ser base ??
     identificadorUnico = identificadorUnico + 1;
-    char* buf;
-    _obtener_sentencias(&buf, program, metadataP->instrucciones_size, metadataP->instrucciones_serializado);
     log_info(logs,"se creo el pcb. entra a intercambiar datos con  la UMV");
-    intercambiarDatosUMV(socket_UMV,logs,unPCB, buf);// ESTO NO LO EJECUTO HASTA QUE NO PUEDA CONECTARSE DE FORMA EXITOSA
+    intercambiarDatosUMV(socket_UMV,logs,unPCB, program);// ESTO NO LO EJECUTO HASTA QUE NO PUEDA CONECTARSE DE FORMA EXITOSA
     													//CON LA UMV.
 
     return unPCB;
 }
 
-static void _obtener_sentencias(char** buffer, char* programa, t_size cant, t_intructions* instrucciones){
-	int i;
-	for (i = 0; i < cant; i++){
-		t_intructions* inst = malloc(sizeof(t_intructions));
-		memcpy(inst, instrucciones + (i * sizeof(t_intructions)), sizeof(t_intructions));
-		char* aux = string_substring(programa, inst->start, inst->offset);
-		string_append(buffer, aux);
-	}
-}
+
 
 
 
