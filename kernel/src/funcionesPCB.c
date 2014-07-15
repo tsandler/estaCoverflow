@@ -246,6 +246,72 @@ int algoritmoDePeso(int cantEtq, int cantfc, t_size cantInstruc){
 	return peso;
 }
 
+/* crea un segmento y retorna la base*/
+int crearSegmento(registroPCB* PCBprograma,t_log* logs , int tamanio, int socket_UMV){
+	t_length *tam;
+	tam = malloc(sizeof(t_length));
+	datos_crearSeg* datosAEnviar=malloc(sizeof(datos_crearSeg));
+	tam->length = sizeof(datos_crearSeg);
+
+
+	int datoRecibido;
+
+	datosAEnviar->pid=PCBprograma->pid;
+	log_info(logs,"%i",datosAEnviar->pid);
+	datosAEnviar->tamanio = tamanio;
+	tam->menu = CREAR_SEGMENTO;
+	tam->length = sizeof(datos_crearSeg);
+
+			if(!enviarDatos(socket_UMV, tam, datosAEnviar, logs)){
+				log_error( logs ,"Error en el envio de los datos...(FALLO EN EL ENVIO DEL SEGMENTO)");
+				exit(EXIT_FAILURE);
+			}
+			log_debug(logs,"se envio el Crear Segmento");
+			if (!recibirDatos (socket_UMV,tam,(void*)&datoRecibido,logs)){ //base
+				log_error (logs,"Error en el envio del Segmento ");
+				exit(EXIT_FAILURE);
+			}else{
+				if(datoRecibido != -1)
+					return datoRecibido;  //BASE
+				else{
+					log_error (logs, "La UMV se quedo sin memoria");
+					log_error (logs,"Se ha abortado el proceso de CREACION DE SEGMENTOS");
+					exit(EXIT_FAILURE);
+				}
+			}
+}
+
+/*escribe un segmento*/
+void escribirSegmento(registroPCB* PCBprograma, int base ,int tamanio, void* datoAEnviar){
+	t_length* tam = malloc(sizeof(t_length));
+	t_etiqueta *etiq=malloc(sizeof(t_etiqueta));
+	int pid;
+
+	tam->menu= PID_ACTUAL;
+	tam->length = sizeof(int);
+	pid = PCBprograma->pid;
+	if(!enviarDatos(socket_UMV, tam, &pid,logs))
+		log_error(logs,"Error en el envio de los datos");
+
+	tam->menu = ESCRIBIR_SEGMENTO;
+	etiq->base=base;
+	etiq->offset=0;
+	etiq->tamanio=tamanio;
+	tam->length = sizeof(t_etiqueta);
+
+	if(!enviarDatos(socket_UMV, tam, etiq,logs))
+		log_error(logs,"Error en el envio del tamaño de los datos");
+
+	tam->length = tamanio;
+
+	if(!enviarDatos(socket_UMV, tam, datoAEnviar ,logs))
+		log_error(logs,"Error en el envio de los datos");
+
+	log_debug(logs,"se envio el escribir segmento");
+
+
+	log_info(logs,"Se termino el proceso de escritura");
+}
 
 registroPCB* armarPCB(char* program, int fd){
 
@@ -287,72 +353,7 @@ registroPCB* armarPCB(char* program, int fd){
     return unPCB;
 }
 
-/* crea un segmento y retorna la base*/
-int crearSegmento(registroPCB* PCBprograma,t_log* logs , int tamanio, int socket_UMV){
-	t_length *tam;
-	tam = malloc(sizeof(t_length));
-	datos_crearSeg* datosAEnviar=malloc(sizeof(datos_crearSeg));
-	tam->length = sizeof(datos_crearSeg);
 
-
-	int datoRecibido;
-
-	datosAEnviar->pid=PCBprograma->pid;
-	log_info(logs,"%i",datosAEnviar->pid);
-	datosAEnviar->tamanio = tamanio;
-	tam->menu = CREAR_SEGMENTO;
-	tam->length = sizeof(datos_crearSeg);
-
-			if(!enviarDatos(socket_UMV, tam, datosAEnviar, logs)){
-				log_error( logs ,"Error en el envio de los datos...(FALLO EN EL ENVIO DEL SEGMENTO)");
-				exit(EXIT_FAILURE);
-			}
-			log_debug(logs,"se envio el Crear Segmento");
-			if (!recibirDatos (socket_UMV,tam,(void*)&datoRecibido,logs)){ //base
-				log_error (logs,"Error en el envio del Segmento ");
-				exit(EXIT_FAILURE);
-			}else{
-				if(datoRecibido != -1)
-					return datoRecibido;  //BASE
-				else{
-					log_error (logs, "La UMV se quedo sin memoria");
-					log_error (logs,"Se ha abortado el proceso de CREACION DE SEGMENTOS");
-					exit(EXIT_FAILURE);
-				}
-			}
-}
-
-/*escribe un segmento*/
-void escribirSegmento(registroPCB* PCBprograma, int base ,int tamanio, void* datoAEnviar){
-	t_length* tam;
-	t_etiqueta *etiq=malloc(sizeof(t_etiqueta));
-	int pid;
-
-	tam->menu= PID_ACTUAL;
-	tam->length = sizeof(int);
-	pid = PCBprograma->pid;
-	if(!enviarDatos(socket_UMV, tam, &pid,logs))
-		log_error(logs,"Error en el envio de los datos");
-
-	tam->menu = ESCRIBIR_SEGMENTO;
-	etiq->base=base;
-	etiq->offset=0;
-	etiq->tamanio=tamanio;
-	tam->length = sizeof(t_etiqueta);
-
-	if(!enviarDatos(socket_UMV, tam, etiq,logs))
-		log_error(logs,"Error en el envio del tamaño de los datos");
-
-	tam->length = tamanio;
-
-	if(!enviarDatos(socket_UMV, tam, datoAEnviar ,logs))
-		log_error(logs,"Error en el envio de los datos");
-
-	log_debug(logs,"se envio el escribir segmento");
-
-
-log_info(logs,"Se termino el proceso de escritura");
-}
 
 
 
