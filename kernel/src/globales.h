@@ -31,6 +31,12 @@
 void conectarseUMV();
 //static pthread_mutex_t semaforo_mutex = PTHREAD_MUTEX_INITIALIZER;
 
+typedef struct t_semaforos {
+	int valor;
+	t_queue *cola;
+	sem_t hayAlgo;
+	sem_t mutex;
+} t_semaforos;
 
 
 

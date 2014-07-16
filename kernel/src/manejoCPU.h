@@ -5,5 +5,6 @@
 #include <commons/log.h>
 #include <commons/config.h>
 
+
 void manejoCPU(int fd);
 bool condicion(registroPCB* pcb);
