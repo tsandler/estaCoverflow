@@ -40,7 +40,7 @@ char* recibir_sentencia(){
 	char* sent;
 	if (recibirMenu(socketKernel, tam, logs)){
 		if (tam->menu != FINALIZAR){
-			if(recibirDato(socketKernel, tam->length, (void*)sent, logs)){
+			if(recibirDato(socketKernel, tam->length, (void*)&sent, logs)){
 				log_info(logs, "La sentencia fue recibida correctamente");
 			}
 		}

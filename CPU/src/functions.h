@@ -20,6 +20,7 @@ void cargar_diccionario();
 int recibir(int valor);
 void pedir_stack(int tamanio);
 char* recibir_sentencia();
+void retorno_de_stack(int tamanio);
 
 int archivo_de_configuracion_valido();
 void manejar_senial();

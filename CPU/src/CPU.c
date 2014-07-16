@@ -48,6 +48,7 @@ int main(int argc, char** argv){
 	int retardo = recibir(3);
 
 	inicializar_funciones_parser();
+	diccionarioDeVariables = dictionary_create();
 
 	int pc;
 	seguir = 1;
@@ -72,33 +73,28 @@ int main(int argc, char** argv){
 		cargar_diccionario();
 
 		systemCall = false;
-		ejecutando = 1;
+		ejecutando = 1; //Si se llama la senial SIGUSR1 espera a que concluya el quantum
 		while (quantum > cont && !systemCall){
 			pc = pcb->program_counter;
 
 			char* sentencia = recibir_sentencia();
-
+			//sleep(5);
 			analizadorLinea(strdup(sentencia), &functions, &kernel_functions);
 
 			if (pc == pcb->program_counter)
 				pcb->program_counter++;
 			cont++;
 			log_debug(logs, "Se concluyo un quantum");
-			usleep(retardo);
+			//sleep(retardo/1000);
 		}
-		if (tam->menu != ENTRADA_SALIDA){
-			if (tam->menu != FINALIZAR) //finalizo el programa
-				tam->menu = CONCLUYO_UN_QUANTUM;
+		if (!systemCall){
+			tam->menu = CONCLUYO_UN_QUANTUM;
 			tam->length = sizeof(registroPCB);
 			if (!enviarDatos(socketKernel, tam, pcb, logs))
 				log_error(logs, "Se produjo un error al notificar al pcp que concluyo un quantum.");
 		}
 
-		tam->menu = ESCRIBIR_SEGMENTO;
-		tam->length = tamanioStack;
-
-		if(!enviarDatos(socketUMV, tam, stack, logs))
-			log_error(logs, "Se produjo un error al devolverle el stack a la umv");
+		retorno_de_stack(tamanioStack);
 
 		if (signalCall){
 			cerrarSocket(socketKernel);

@@ -39,7 +39,7 @@ t_puntero definir_variable(t_nombre_variable identificador_variable){
 	dictionary_put(diccionarioDeVariables, variable, posicion);
 	pcb->tamanio_contexto++;
 	log_info(logs, "La variable %c fue definida correctamente", identificador_variable);
-	return 0;
+	return *posicion;
 }
 
 /* Primitiva que obtiene del diccionario de variables la posicion de una variable */
@@ -129,13 +129,10 @@ void ir_al_label(t_nombre_etiqueta etiqueta){
 
 /* Primitiva que se invoca en los procedimientos, cambia el contexto de ejecucion a una etiqueta dada */
 void llamar_sin_retorno(t_nombre_etiqueta etiqueta){
-	int desplazamiento = pcb->cursor_stack;
-	memcpy(stack+desplazamiento, &pcb->cursor_stack, 4);
-	desplazamiento += 4;
-	memcpy(stack+desplazamiento, &pcb->program_counter+1, 4);
-	desplazamiento += 4;
-
-	pcb->cursor_stack = desplazamiento;
+	memcpy(stack + pcb->cursor_stack, &pcb->cursor_stack, 4);
+	pcb->cursor_stack += 4;
+	memcpy(stack + pcb->cursor_stack, &pcb->program_counter+1, 4);
+	pcb->cursor_stack += 4;
 	log_info(logs, "Se llamo a la funcion llamarSinRetorno con la etiqueta %s", etiqueta);
 	ir_al_label(etiqueta);
 }
@@ -143,32 +140,35 @@ void llamar_sin_retorno(t_nombre_etiqueta etiqueta){
 /* Primitiva que se invoca en las funciones, recibe la direccion donde retornar el valor y la etiqueta a la cual tiene que ir */
 void llamar_con_retorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar){
 	llamar_sin_retorno(etiqueta);
-	int desplazamiento = pcb->cursor_stack;
-	memcpy(stack+desplazamiento, &donde_retornar, 4);
-	desplazamiento += 4;
-
-	pcb->cursor_stack = desplazamiento;
+	memcpy(stack + pcb->cursor_stack, &donde_retornar, 4);
+	pcb->cursor_stack += 4;
 	log_info(logs, "Se llamo a la funcion llamarConRetorno con la etiqueta %s y puntero %d", etiqueta, donde_retornar);
 }
 
 /* Primitiva que finaliza el contexto actual */
 void finalizar(){
 	if (pcb->tamanio_contexto * 5 < pcb->cursor_stack){
-		memcpy(&pcb->program_counter, stack + pcb->cursor_stack - 4, 4);
-		memcpy(&pcb->cursor_stack, stack + pcb->cursor_stack - 8, 4);
+		pcb->cursor_stack -= 4;
+		memcpy(&pcb->program_counter, stack + pcb->cursor_stack, 4);
+		pcb->cursor_stack -= 8;
+		memcpy(&pcb->cursor_stack, stack + pcb->cursor_stack, 4);
 		log_info(logs, "Finalizando el contexto actual");
 	}else{
 		tam->menu = FINALIZAR;
+		tam->length = sizeof(registroPCB);
+		if (!enviarDatos(socketKernel, tam, pcb, logs))
+			log_error(logs, "Se produjo un error al notificar al pcp que concluyo el programa");
 		log_info(logs, "Finalizando el programa");
+		systemCall = true;
 	}
 }
 
 /* Primitiva que finaliza el contexto actual y asigna el valor a retornar en su posicion correspondiente en el stack */
 void retornar(t_valor_variable retorno){
 	t_puntero* posicion = malloc(sizeof(t_puntero));
-	memcpy(posicion, stack + pcb->cursor_stack - 4, 4);
-	asignar(*posicion, retorno);
 	pcb->cursor_stack -= 4;
+	memcpy(posicion, stack + pcb->cursor_stack, 4);
+	asignar(*posicion, retorno);
 	finalizar();
 	log_info(logs, "Se llamo a la funcion retornar");
 }
@@ -216,7 +216,7 @@ void entrada_salida(t_nombre_dispositivo dispositivo, int tiempo){
 		log_error(logs, "Se produjo un error enviando el nombre del dispositivo de entrada y salida al kernel");
 	tam->length = sizeof(registroPCB);
 	if (!enviarDatos(socketKernel, tam, pcb, logs))
-		log_error(logs, "Se produjo un error al notificar al pcp que concluyo un quantum.");
+		log_error(logs, "Se produjo un error al enviar el PCB por un systemCall");
 	systemCall = true;
 }
 
@@ -234,6 +234,12 @@ void wait(t_nombre_semaforo identificador_semaforo){
 		log_error(logs, "Se produjo un error recibiendo el resultado del wait a un semaforo");
 	else
 		log_info(logs, "Se recibio correctamente el resultado de la senial wait del kernel");
+
+	if (systemCall){
+		tam->length = sizeof(registroPCB);
+		if (!enviarDatos(socketKernel, tam, pcb, logs))
+			log_error(logs, "Se produjo un error al notificar al enviar el PCB porque se bloqueo el semaforo");
+	}
 }
 
 /* Primitiva que envia la senial de signal de un semaforo al kernel */

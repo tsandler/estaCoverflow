@@ -71,16 +71,17 @@ int recibir(int dato){
 
 /* Funcion que carga el diccionario de variables para el contexto de ejecucion actual */
 void cargar_diccionario(){
-	t_puntero posicion = 0;
 	t_nombre_variable variable;
+	t_puntero* pos = malloc(sizeof(t_puntero) * pcb->tamanio_contexto);
 	int i;
 	for (i=0; i < pcb->tamanio_contexto; i++){
-		memcpy(&variable, stack + posicion, 1);
+		int aux = i * 5;
+		memcpy(pos + (i*5), &aux, 4);
+		memcpy(&variable, stack + i * 5, 1);
 		char var[2];
 		var[0] = variable;
 		var[1] = '\0';
-		dictionary_put(diccionarioDeVariables, var, &posicion);
-		posicion += 5;
+		dictionary_put(diccionarioDeVariables, var, pos + (i*5));
 	}
 	log_info(logs, "Se cargo el diccionario de variables");
 }
@@ -97,12 +98,32 @@ void pedir_stack(int tamanio){
 	if(!enviarDatos(socketUMV, tam, et, logs))
 		log_error(logs, "Se produjo un error enviando la base a la UMV");
 
-	if(!recibirDatos(socketUMV, tam, (void*)&stack, logs))
-		log_error(logs, "Se produjo un error recibiendo el segmento");
-	else
-		log_info(logs, "Se recibio el stack");
+	if (recv (socketUMV, tam, sizeof(t_length), MSG_WAITALL) < 0){
+		log_error(logs, "[SOCKETS] Se produjo un problema al recibir el tamanio del dato");
+	}
+	stack = malloc(tam->length);
+	if (recv (socketUMV, stack, tam->length, MSG_WAITALL) < 0){
+		log_error(logs, "[SOCKETS] Se produjo un problema al recibir el dato");
+	}
 }
 
+void retorno_de_stack(int tamanio){
+	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
+	tam->menu = ENVIO_DE_STACK;
+	tam->length = sizeof(t_etiqueta);
+
+	etiq->base = pcb->segmento_stack;
+	etiq->offset = 0;
+	etiq->tamanio = tamanio;
+
+	if(!enviarDatos(socketUMV, tam, etiq, logs))
+		log_error(logs, "Se produjo un error al devolverle la etiqueta del stack a la umv");
+
+	tam->length = tamanio;
+
+	if(!enviarDatos(socketUMV, tam, stack, logs))
+		log_error(logs, "Se produjo un error al devolverle el stack a la umv");
+}
 /* Funcion que verifica que sea un archivo de configuracion valido */
 int archivo_de_configuracion_valido(){
 	if (!config_has_property(config, "IP_KERNEL"))
@@ -120,23 +141,23 @@ int archivo_de_configuracion_valido(){
 char* recibir_sentencia(){
 	t_aux* aux = malloc(sizeof(t_aux));
 	t_etiqueta* et = malloc(sizeof(t_etiqueta));
-	unsigned char* datos;
 	et->base = pcb->indice_codigo;
 	et->offset = pcb->program_counter * 8;
 	et->tamanio = 8;
 	tam->menu = PEDIR_SENTENCIA;
 	tam->length = sizeof(t_etiqueta);
 
+	log_debug(logs, "Base: %d; Offset: %d; Tamanio: %d", et->base, et->offset, et->tamanio);
 	if (!enviarDatos(socketUMV, tam, et, logs))
 		log_error(logs, "Se produjo un error al enviar el indice de codigo.");
 
 	if (!recibirDatos(socketUMV, tam, (void*)aux, logs))
 		log_error(logs, "Se produjo un error al recibir el segmento de codigo");
-
 	et->base = pcb->segmento_codigo;
 	et->offset = aux->offset;
 	et->tamanio = aux->tamanio;
-
+	tam->length = sizeof(t_etiqueta);
+	log_debug(logs, "Base: %d; Offset: %d; Tamanio: %d", et->base, et->offset, et->tamanio);
 	if (!enviarDatos(socketUMV, tam, et, logs))
 		log_error(logs, "Se produjo un error al enviar el segmento de codigo");
 
@@ -156,6 +177,11 @@ static char* _depurar_sentencia(char* sentencia){
 	while (string_ends_with(sentencia, "\n")){
 		i--;
 		sentencia = string_substring_until(sentencia, i);
+	}
+	i = 0;
+	while (string_starts_with(sentencia, "\t")){
+		i++;
+		sentencia = string_substring_from(sentencia, i);
 	}
 	log_info(logs, "Sentencia depurada: %s", sentencia);
 	return sentencia;
