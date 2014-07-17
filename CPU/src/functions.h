@@ -18,9 +18,9 @@ int conectar_kernel();
 
 void cargar_diccionario();
 int recibir(int valor);
-void pedir_stack(int tamanio);
+void pedir_stack();
 char* recibir_sentencia();
-void retorno_de_stack(int tamanio);
+void retorno_de_stack();
 
 int archivo_de_configuracion_valido();
 void manejar_senial();

@@ -44,7 +44,7 @@ int main(int argc, char** argv){
 	enviarMenu(socketUMV, tam, logs);
 
 	int quantum = recibir(1);
-	int tamanioStack = recibir(2);
+	tamanioStack = recibir(2);
 	int retardo = recibir(3);
 
 	inicializar_funciones_parser();
@@ -69,22 +69,22 @@ int main(int argc, char** argv){
 		if(!enviarDatos(socketUMV, tam, &pcb->pid, logs))
 			log_error(logs, "Se produjo un error enviando el pid a la UMV");
 
-		pedir_stack(tamanioStack);
+		pedir_stack();
 		cargar_diccionario();
 
 		systemCall = false;
 		ejecutando = 1; //Si se llama la senial SIGUSR1 espera a que concluya el quantum
 		while (quantum > cont && !systemCall){
 			pc = pcb->program_counter;
-
+			sleep(2);
 			char* sentencia = recibir_sentencia();
-			//sleep(5);
+
 			analizadorLinea(strdup(sentencia), &functions, &kernel_functions);
 
 			if (pc == pcb->program_counter)
 				pcb->program_counter++;
 			cont++;
-			log_debug(logs, "Se concluyo un quantum");
+			log_debug(logs, "Concluyo el quantum %d\n\n\n", cont);
 			//sleep(retardo/1000);
 		}
 		if (!systemCall){
@@ -92,9 +92,9 @@ int main(int argc, char** argv){
 			tam->length = sizeof(registroPCB);
 			if (!enviarDatos(socketKernel, tam, pcb, logs))
 				log_error(logs, "Se produjo un error al notificar al pcp que concluyo un quantum.");
+			retorno_de_stack();
 		}
 
-		retorno_de_stack(tamanioStack);
 
 		if (signalCall){
 			cerrarSocket(socketKernel);

@@ -7,7 +7,7 @@
 
 #include "functions.h"
 
-static char* _depurar_sentencia();
+static char* _depurar_sentencia(char* sentencia, int tamanio);
 
 typedef struct{
 	int offset;
@@ -87,11 +87,11 @@ void cargar_diccionario(){
 }
 
 /* Funcion que le pide el stack a la UMV */
-void pedir_stack(int tamanio){
+void pedir_stack(){
 	t_etiqueta* et = malloc(sizeof(t_etiqueta));
 	et->base = pcb->segmento_stack;
 	et->offset = 0;
-	et->tamanio = tamanio;
+	et->tamanio = tamanioStack;
 	tam->length = sizeof(t_etiqueta);
 	tam->menu = LEER_SEGMENTO;
 
@@ -107,22 +107,25 @@ void pedir_stack(int tamanio){
 	}
 }
 
-void retorno_de_stack(int tamanio){
+void retorno_de_stack(){
 	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
-	tam->menu = ENVIO_DE_STACK;
+	tam->menu = RETORNO_DE_STACK;
 	tam->length = sizeof(t_etiqueta);
 
 	etiq->base = pcb->segmento_stack;
 	etiq->offset = 0;
-	etiq->tamanio = tamanio;
+	etiq->tamanio = tamanioStack;
 
 	if(!enviarDatos(socketUMV, tam, etiq, logs))
 		log_error(logs, "Se produjo un error al devolverle la etiqueta del stack a la umv");
 
-	tam->length = tamanio;
+	tam->length = tamanioStack;
 
 	if(!enviarDatos(socketUMV, tam, stack, logs))
 		log_error(logs, "Se produjo un error al devolverle el stack a la umv");
+
+	t_length* tam = malloc(sizeof(t_length));
+	recibirMenu(socketUMV, tam, logs);
 }
 /* Funcion que verifica que sea un archivo de configuracion valido */
 int archivo_de_configuracion_valido(){
@@ -147,7 +150,6 @@ char* recibir_sentencia(){
 	tam->menu = PEDIR_SENTENCIA;
 	tam->length = sizeof(t_etiqueta);
 
-	log_debug(logs, "Base: %d; Offset: %d; Tamanio: %d", et->base, et->offset, et->tamanio);
 	if (!enviarDatos(socketUMV, tam, et, logs))
 		log_error(logs, "Se produjo un error al enviar el indice de codigo.");
 
@@ -156,8 +158,9 @@ char* recibir_sentencia(){
 	et->base = pcb->segmento_codigo;
 	et->offset = aux->offset;
 	et->tamanio = aux->tamanio;
+	int tamanio;
+	memcpy(&tamanio, &aux->tamanio, 4);
 	tam->length = sizeof(t_etiqueta);
-	log_debug(logs, "Base: %d; Offset: %d; Tamanio: %d", et->base, et->offset, et->tamanio);
 	if (!enviarDatos(socketUMV, tam, et, logs))
 		log_error(logs, "Se produjo un error al enviar el segmento de codigo");
 
@@ -165,26 +168,25 @@ char* recibir_sentencia(){
 	if (!recibirDatos(socketUMV, tam, (void*)&sentencia, logs))
 		log_error(logs, "Se produjo un error al recibir la sentencia.");
 
-	log_info(logs, "Sentencia recibida: %s", &sentencia);
-
 	char* s = string_from_format("%s", &sentencia);
-	return _depurar_sentencia(s);
+	return _depurar_sentencia(s, tamanio);
 }
 
 /* Funcion que depura la sentencia eliminando los \n finales */
-static char* _depurar_sentencia(char* sentencia){
-	int i = strlen(sentencia);
-	while (string_ends_with(sentencia, "\n")){
+static char* _depurar_sentencia(char* sentencia, int tamanio){
+	char* sent = string_substring_until(sentencia, tamanio);
+	int i = strlen(sent);
+	while (string_ends_with(sent, "\n")){
 		i--;
-		sentencia = string_substring_until(sentencia, i);
+		sent = string_substring_until(sent, i);
 	}
 	i = 0;
-	while (string_starts_with(sentencia, "\t")){
+	while (string_starts_with(sent, "\t")){
 		i++;
-		sentencia = string_substring_from(sentencia, i);
+		sent = string_substring_from(sent, i);
 	}
-	log_info(logs, "Sentencia depurada: %s", sentencia);
-	return sentencia;
+	log_info(logs, "Sentencia depurada: %s", sent);
+	return sent;
 }
 
 /* Funcion que libera las estructuras usadas */

@@ -6,6 +6,7 @@
  */
 
 #include "funcionesParser.h"
+#include "functions.h"
 
 void inicializar_funciones_parser(){
 	functions.AnSISOP_definirVariable = definir_variable;
@@ -111,20 +112,24 @@ void ir_al_label(t_nombre_etiqueta etiqueta){
 	etiquetaAEnviar->tamanio = pcb->tamanio_indice_etiquetas;
 	tam->menu = LEER_SEGMENTO;
 	tam->length = sizeof(t_etiqueta);
-	char* etiquetas;
+	log_debug(logs, "Se recibio la etiqueta %s para ir a ese label", etiqueta);
 	if (!enviarDatos(socketUMV, tam, etiquetaAEnviar, logs))
 		log_error(logs, "Se produjo un error enviando el struct de etiquetas");
 	else
 		log_info(logs, "Se envio el struct para pedir el segmento de etiquetas");
 
-	if(!recibirDatos(socketUMV, tam, (void*)&etiquetas, logs))
+	if (recv (socketUMV, tam, sizeof(t_length), MSG_WAITALL) < 0)
+		log_error(logs, "Se produjo un problema al recibir el tamanio del segmento de etiquetas");
+
+	char* etiquetas = malloc(tam->length);
+	if (recv (socketUMV, etiquetas, tam->length, MSG_WAITALL) < 0)
 		log_error(logs, "Se produjo un error recibiendo el segmento de etiquetas");
 	else
-		log_error(logs, "Se recibio el segmento de etiquetas");
+		log_info(logs, "Se recibio el segmento de etiquetas");
 
 	t_size tamanio = pcb->tamanio_indice_etiquetas;
-	char* et = string_from_format("%s", &etiquetas);
-	pcb->program_counter = metadata_buscar_etiqueta(etiqueta, et, tamanio);
+
+	pcb->program_counter = metadata_buscar_etiqueta(etiqueta, etiquetas, tamanio);
 }
 
 /* Primitiva que se invoca en los procedimientos, cambia el contexto de ejecucion a una etiqueta dada */
@@ -154,6 +159,7 @@ void finalizar(){
 		memcpy(&pcb->cursor_stack, stack + pcb->cursor_stack, 4);
 		log_info(logs, "Finalizando el contexto actual");
 	}else{
+		retorno_de_stack();
 		tam->menu = FINALIZAR;
 		tam->length = sizeof(registroPCB);
 		if (!enviarDatos(socketKernel, tam, pcb, logs))
@@ -207,6 +213,7 @@ void imprimir_texto(char* texto){
 
 /* Primitiva que le dice al kernel que fue a entrada y salida con un dispositivo por un determinado tiempo */
 void entrada_salida(t_nombre_dispositivo dispositivo, int tiempo){
+	retorno_de_stack();
 	tam->menu = ENTRADA_SALIDA;
 	tam->length = sizeof(int);
 	if (!enviarDatos(socketKernel, tam, &tiempo, logs))
@@ -236,6 +243,7 @@ void wait(t_nombre_semaforo identificador_semaforo){
 		log_info(logs, "Se recibio correctamente el resultado de la senial wait del kernel");
 
 	if (systemCall){
+		retorno_de_stack();
 		tam->length = sizeof(registroPCB);
 		if (!enviarDatos(socketKernel, tam, pcb, logs))
 			log_error(logs, "Se produjo un error al notificar al enviar el PCB porque se bloqueo el semaforo");
