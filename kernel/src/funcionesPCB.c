@@ -48,13 +48,7 @@ void eliminarSegmentoUMV(int socket_UMV, t_log* logs,registroPCB* PCBprograma){
 	t_length *tam;
 	tam = malloc(sizeof(t_length));
 	tam->menu = ELIMINAR_SEGMENTOS;
-	while(1){
-		if(!enviarMenu(socket_UMV, tam, logs))//Le aviso a la UMV que soy el kernel
-			log_error(logs,"Error en la identificacion");
-		else
-			break;
-	}
-	tam->menu = PID_ACTUAL ;
+	tam->length = sizeof(int);
 	int datos_pid = PCBprograma->pid;
 	if(!enviarDatos(socket_UMV, tam, &datos_pid,logs))
 		log_error(logs,"Error en el envio del pid, no se pudo DESTRUIR EL SEGMENTO");

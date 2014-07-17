@@ -65,8 +65,6 @@ void funcion_CPU(int socket){
 
 				cod = string_from_format("%s", &buffer);
 
-				///////////////////
-
 				escribir_segmento(base,tamanio,offset,cod);
 				log_debug(logs,"Ya se escribio el segmento");
 				break;
@@ -132,9 +130,7 @@ void funcion_CPU(int socket){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
 					break;
 				}
-//				etiq->offset++;
-//				etiq->tamanio--;
-				//etiq->tamanio--;
+
 				log_info(logs,"base: %d, offset: %d, tam: %d",etiq->base,etiq->offset,etiq->tamanio);
 
 				codigo = leer_segmento(etiq->base,etiq->tamanio,etiq->offset);
@@ -146,8 +142,6 @@ void funcion_CPU(int socket){
 				}
 
 				tam->length = etiq->tamanio;
-
-				//char* sentencia = string_from_format("%s", &codigo);
 
 				if(!enviarDatos(socket, tam, codigo, logs))
 					log_error(logs,"Error al enviarse la sentencia");
@@ -192,7 +186,8 @@ void funcion_kernel(int socket){
 	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
 	datos_crearSeg* pidTam = malloc(sizeof(datos_crearSeg));
 	while(1){
-		log_debug(logs,"\n\n\n[HILO KERNEL] Esperando menu...");
+		printf("\n\n\n");
+		log_debug(logs,"[HILO KERNEL] Esperando menu...");
 		if(!recibirMenu(socket, tam, logs)){
 			log_error(logs, "[HILO KERNEL] Error al recibir el menu");
 			break;
@@ -200,13 +195,13 @@ void funcion_kernel(int socket){
  		log_info(logs,"[HILO KERNEL] Entra al switch");
 		switch(tam->menu){
 			case PID_ACTUAL:
-				log_debug(logs,"Cambia pid activo");
+				log_debug(logs,"[HILO KERNEL] Cambia pid activo");
 				if(!recibirDato(socket, tam->length, (void*)&pid, logs)){
 					log_error(logs, "Se produjo un error recibiendo el pid");
 					break;
 				}
 				cambiar_pid_activo(pid);
-				log_debug(logs,"se cambio el pid activo");
+				log_debug(logs,"[HILO KERNEL] Se cambio el pid activo a %d", pid);
 				break;
 			case ESCRIBIR_SEGMENTO:
 				j++;
@@ -265,6 +260,7 @@ void funcion_kernel(int socket){
 					log_error(logs, "Se produjo un error recibiendo el pid");
 					break;
 				}
+				log_debug(logs,"[HILO KERNEL] Entra a eliminar segmentos con pid %d", pid);
 				destruir_segmentos(pid);
 				break;
 			default:

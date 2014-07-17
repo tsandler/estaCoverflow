@@ -232,15 +232,15 @@ void manejoCPU(int fd) {
 
 	case FINALIZAR:
 		recibirDato(fd, tam->length, (void*) PCBrecibido, logs);
-		sem_wait(&mutexEXEC);
+		//sem_wait(&mutexEXEC);
 		//EXEC = list_filter(EXEC, (void*)condicion); //saco de la cola exec
 		log_info(logs, "Se saco de la cola EXEC el proceso %i",
 				PCBrecibido->pid);
-		sem_post(&mutexEXEC);
+		//sem_post(&mutexEXEC);
 
 		ponerCola(PCBrecibido, EXIT, &mutexEXIT, &hayAlgoEnExit); //la pongo en exit
 		sem_post(&gradoProg);
-		eliminarSegmentoUMV(socket_UMV, logs, PCBrecibido);
+		//eliminarSegmentoUMV(socket_UMV, logs, PCBrecibido);//FIXME: haciendo esto los eliminas dos veces, porque tambien lo hace manejoExit()
 
 		log_info(logs, "Se agrego a la cola EXIT el proceso %i",
 				PCBrecibido->pid);
