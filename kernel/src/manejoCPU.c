@@ -43,7 +43,6 @@ void manejoCPU(int fd) {
 	char* sem;
 	int valorMostrar;
 	char* variable;
-	int valorRecibido;
 	bool bloqueado;
 	t_semaforos* tSem;
 	int* valorCompartida = malloc(sizeof(int));
@@ -72,7 +71,7 @@ void manejoCPU(int fd) {
 	sem_post(&mutexMandarColaEXEC);
 
 	while (1) {
-
+		tam->menu = OK;
 		recibirMenu(fd, tam, logs);
 
 		switch (tam->menu) {
