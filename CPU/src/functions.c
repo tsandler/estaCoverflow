@@ -169,7 +169,6 @@ char* recibir_sentencia(){
 		log_error(logs, "Se produjo un error al recibir la sentencia.");
 
 	char* s = string_from_format("%s", &sentencia);
-	log_debug(logs, "Sentencia recibida: %s", s);
 	return _depurar_sentencia(s, tamanio);
 }
 

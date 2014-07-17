@@ -46,6 +46,7 @@ void manejoCPU(int fd) {
 	int valorRecibido;
 	bool bloqueado;
 	t_semaforos* tSem;
+	int* valorCompartida = malloc(sizeof(int));
 	int quantum = config_get_int_value(config, "QUANTUM");
 	int retardo = config_get_int_value(config, "RETARDO");
 	t_length* tam = malloc(sizeof(registroPCB));
@@ -88,15 +89,14 @@ void manejoCPU(int fd) {
 		break;
 
 	case ASIGNAR_VALOR_COMPARTIDA: //char*
-		recibirDato(fd, tam->length, (void*) &valorRecibido, logs);
+		recibirDato(fd, tam->length, (void*) valorCompartida, logs);
 		recibirDatos(fd, tam, (void*) &variable, logs);
 		sem_wait(&mutexVarCompartidas);
 		var = string_from_format("%s", &variable);
 		dictionary_remove(variablesCompartidas, var);
-		log_info(logs, "Se saco la variable compartida %s", variable);
-		dictionary_put(variablesCompartidas, var, &valorRecibido);
-		log_info(logs, "Se coloco la variable compartida %s y su valor es %i",
-				variable, valorRecibido);
+		log_info(logs, "Se saco la variable compartida %s", var);
+		dictionary_put(variablesCompartidas, var, valorCompartida);
+		log_info(logs, "Se coloco la variable compartida %s y su valor es %i", var, *valorCompartida);
 		sem_post(&mutexVarCompartidas);
 		break;
 
