@@ -10,6 +10,7 @@
 
 #include "functions.h"
 
+
 int main(int argc, char** argv){
 
  	logs = log_create("log","UMV.c",1,LOG_LEVEL_TRACE);
@@ -28,6 +29,7 @@ int main(int argc, char** argv){
 	inicializar_var_config();
 	inicializar_umv(tamanioUMV);
 	log_debug(logs,"Ya se creo la umv");
+
 
 	log_debug(logs,"Levanto el hilo: Consola");
 	pthread_create(&pthread_consola, NULL, (void*)consola, NULL);

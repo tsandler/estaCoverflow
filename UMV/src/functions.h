@@ -59,8 +59,14 @@ void funcion_CPU(int socket);
 
 void compactar_memoria();
 void buscar_segmento_y_desplazarlo();
-bool buscar_ramAux(tablaSegUMV* unElem);
 void busca_seg_en_diccionario(char* pid,t_list* listaSeg);
+bool buscar_ramAux_en_listaH(nodoHuecos* unElem);
+bool buscar_ramAux_endicc(tablaSegUMV* unElem);
+void buscar_hueco_para_compactar(nodoHuecos* unElem);
+void buscar_el_primer_hueco_y_actualizar_ramAux();
+void actualizar_RamAux(char* pid, t_list* listSeg);
+
+
 
 bool validacion_escribir_seg(int base);
 

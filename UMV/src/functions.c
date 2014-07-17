@@ -2,13 +2,25 @@
 
 extern int retardoActual;
 
+typedef struct{
+	int offset;
+	int tamanio;
+}t_aux;
+
 /*Funcion que llama el hilo cada vez que se conecta algun CPU a la UMV*/
 void funcion_CPU(int socket){
+
 	int pid;
 	int termina=0;
 	t_length* tam = malloc(sizeof(t_length));
-	datos_acceso* etiq = malloc(sizeof(datos_acceso));
+	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
 	unsigned char* codigo;
+	int base;
+	int offset;
+	int tamanio;
+	char buffer[1024];
+	char* cod;
+
 
 	while(1){
 		log_info(logs,"[HILO CPU] Esperando menu...");
@@ -30,30 +42,98 @@ void funcion_CPU(int socket){
 				break;
 			case ESCRIBIR_SEGMENTO:
 				log_info(logs,"[HILO CPU] Entra a escribir segmento");
-				if(!recibirDato(socket,tam->length,(void*)&codigo,logs)){
-					log_error(logs,"Se produjo un error recibiendo el codigo");
-					break;
-				}
 
-				if(!recibirDatos(socket, tam,(void*)etiq,logs)){
-					log_error(logs,"Se produjo un error recibiendo la esctructura");
-					break;
-				}
-
-				if( validacion_escribir_seg(etiq->base) ){
-					termina = 1;
-					break;
-				}
-				escribir_segmento(etiq->base,etiq->tamanio,etiq->offset,(void*)codigo);
-				log_info(logs,"[HILO CPU] Ya escribio el segmento");
-				break;
-
-			case PEDIR_SENTENCIA:
-				log_info(logs,"[HILO CPU] Entra a pedir sentencia");
 				if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
 					break;
 				}
+				log_debug(logs, "Etiqueta 1:\n  base: %d | offset: %d | tam: %d", etiq->base, etiq->offset, etiq->tamanio);
+
+				if( validacion_escribir_seg(etiq->base) ){
+					log_error(logs,"[HILO CPU] Error en la base al intentar escribir el segmento");
+					termina = 1;
+					break;
+				}
+				base=etiq->base;
+				offset=etiq->offset;
+				tamanio=etiq->tamanio;
+
+				if(!recibirDatos(socket,tam,(void*)&buffer,logs)){
+					log_error(logs,"[HILO CPU] Se produjo un error recibiendo el codigo");
+					break;
+				}
+
+				cod = string_from_format("%s", &buffer);
+
+				///////////////////
+
+				escribir_segmento(base,tamanio,offset,cod);
+				log_debug(logs,"Ya se escribio el segmento");
+				break;
+
+			case ENVIO_DE_STACK:
+				log_info(logs,"[HILO CPU] Entra a envio de stack");
+
+				if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
+					log_error(logs,"Se produjo un error recibiendo la esctructura");
+					break;
+				}
+
+				if (recv (socket, tam, sizeof(t_length), MSG_WAITALL) < 0){
+					log_error(logs, "[SOCKETS] Se produjo un problema al recibir el tamanio del dato");
+					break;
+				}
+
+				unsigned char* stack = malloc(tam->length);
+
+				if (recv (socket, stack, tam->length, MSG_WAITALL) < 0){
+					log_error(logs, "[SOCKETS] Se produjo un problema al recibir el stack");
+					break;
+				}
+
+				log_debug(logs, "Etiqueta 1:\n  base: %d | offset: %d | tam: %d", etiq->base, etiq->offset, etiq->tamanio);
+
+				if( validacion_escribir_seg(etiq->base) ){
+					log_error(logs,"[HILO CPU] Error en la base al intentar al enviar el stack");
+					termina = 1;
+					break;
+				}
+				base=etiq->base;
+				offset=etiq->offset;
+				tamanio=etiq->tamanio;
+
+				escribir_segmento(base,tamanio,offset,stack);
+				log_debug(logs,"Ya se escribio el segmento");
+				break;
+			case PEDIR_SENTENCIA:
+ 				log_info(logs,"[HILO CPU] Entra a pedir sentencia");
+				if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
+					log_error(logs,"Se produjo un error recibiendo la esctructura");
+					break;
+				}
+
+				log_info(logs,"base: %d, offset: %d, tam: %d",etiq->base,etiq->offset,etiq->tamanio);
+
+				codigo = leer_segmento(etiq->base,etiq->tamanio,etiq->offset);
+
+				if(!codigo){
+					termina = 1;
+					log_error(logs,"[HILO CPU] No se envió la sentencia. Error en la etiqueta. Finaliza el CPU");
+					break;
+				}
+				tam->length = etiq->tamanio;
+
+				if(!enviarDatos(socket, tam, codigo, logs))
+					log_error(logs,"Error al enviarse el codigo");
+
+				if(!recibirDatos(socket,tam,(void*)etiq,logs)){
+					log_error(logs,"Se produjo un error recibiendo la esctructura");
+					break;
+				}
+//				etiq->offset++;
+//				etiq->tamanio--;
+				etiq->tamanio--;
+				log_info(logs,"base: %d, offset: %d, tam: %d",etiq->base,etiq->offset,etiq->tamanio);
 
 				codigo = leer_segmento(etiq->base,etiq->tamanio,etiq->offset);
 
@@ -64,9 +144,13 @@ void funcion_CPU(int socket){
 				}
 
 				tam->length = etiq->tamanio;
+
+				//char* sentencia = string_from_format("%s", &codigo);
+
 				if(!enviarDatos(socket, tam, codigo, logs))
-					log_error(logs,"Error al enviarse el codigo");
-				log_info(logs,"[HILO CPU] Ya se envio la sentencia");
+					log_error(logs,"Error al enviarse la sentencia");
+
+				log_info(logs,"[HILO CPU] Sale de pedir sentencia");
 				break;
 			case LEER_SEGMENTO:
 				log_info(logs,"[HILO CPU] Entra a leer segmento");
@@ -81,7 +165,7 @@ void funcion_CPU(int socket){
 				}
 
 				codigo = leer_segmento(etiq->base,etiq->tamanio,etiq->offset);
-				//tam->menu = TE_MANDO_EL_SEGMENTO;
+
 				tam->length = etiq->tamanio;
 				enviarDatos(socket, tam, codigo, logs);
 				log_info(logs,"[HILO CPU] Ya envio el buf");
@@ -100,7 +184,7 @@ void funcion_CPU(int socket){
 /*Funcion que llama el hilo cuando se conecta el KERNEL a la UMV*/
 void funcion_kernel(int socket){
 	log_info(logs,"[HILO KERNEL]Entra al hilo");
-	int pid;
+	int pid, j=0;
 	int termina=0;
 	t_length* tam = malloc(sizeof(t_length));
 	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
@@ -123,7 +207,8 @@ void funcion_kernel(int socket){
 				log_debug(logs,"se cambio el pid activo");
 				break;
 			case ESCRIBIR_SEGMENTO:
-				log_debug(logs,"Entra a escribir segmento");
+				j++;
+				log_debug(logs,"Entra a escribir segmento. Nro: %d",j);
 				if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
 					break;
@@ -131,7 +216,13 @@ void funcion_kernel(int socket){
 				log_debug(logs, "Etiqueta 1:\n  base: %d | offset: %d | tam: %d", etiq->base, etiq->offset, etiq->tamanio);
 
 				if( validacion_escribir_seg(etiq->base) ){
+					log_error(logs,"[HILO KERNEL] Error en la base al intentar escribir el segmento");
 					termina = 1;
+					break;
+				}
+
+				if(etiq->tamanio <= 0){
+					log_info(logs,"[HILO KERNEL] El tam es <= 0. No se escribe el segmento. No entra al recv");
 					break;
 				}
 				int base=etiq->base;
@@ -142,11 +233,14 @@ void funcion_kernel(int socket){
 					log_error(logs,"Se produjo un error recibiendo el codigo");
 					break;
 				}
+//				t_aux* auxiliar;
+//				auxiliar = buffer;
+//				log_debug(logs, "Offset: %d; Tamanio: %d", auxiliar->offset, auxiliar->tamanio);
 
-				char* cod = string_from_format("%s", &buffer);
-
-				escribir_segmento(base,tamanio,offset,cod);
+				escribir_segmento(base,tamanio,offset,buffer);
 				log_debug(logs,"Ya se escribio el segmento");
+
+
 				break;
 
 			case CREAR_SEGMENTO:
@@ -176,10 +270,13 @@ void funcion_kernel(int socket){
 				termina = 1;
 				break;
 		}
+
+
 		if(termina)
 			break;
 	}
-	log_error(logs,"[HILO KERNEL]La UMV desconectó al kernel por operacion invalida");
+	log_error(logs,"[HILO KERNEL]La UMV desconectó al kernel por fallo");
+
 }
 
 
@@ -342,8 +439,6 @@ char *obtener_proxima_dirFisica(int tamanio){
 	return NULL;
 }
 
-// FIXME: llega base,offset y tamanio. yo devuelvo [offset,tamanio]
-
 
 /*Funcion que lee un segmento de la umv y retorna un puntero a la posicion solicitada */
 unsigned char *leer_segmento(int dirLog, int tamanioALeer, int offset){ //solicitar_memoria_desde_una_pos();
@@ -358,7 +453,7 @@ unsigned char *leer_segmento(int dirLog, int tamanioALeer, int offset){ //solici
 		if( unElem->dirFisica + offset + tamanioALeer <= unElem->dirFisica + unElem->tamanioSegmento ){
 			unsigned char* destino = malloc(sizeof(char) * tamanioALeer);
 			char* desde = unElem->dirFisica + offset;
-			memcpy((void*)destino,(void*)desde,tamanioALeer);
+			memcpy(destino,desde,tamanioALeer);
 			return destino;
 		}else
 			log_error(logs,"se esta tratando de acceder fuera de los rangos del segmento-segmentation fault-");
@@ -454,6 +549,7 @@ unsigned char* ejec_operacion(int nroOp){
 			return resultado;
 			break;
 		case ESCR_SEG:
+
 			log_info(logs,"[CONSOLA UMV] El usuario solicito escribir segmento");
 			//////
 			printf("Ingresar pid: ");
@@ -461,10 +557,15 @@ unsigned char* ejec_operacion(int nroOp){
 			cambiar_pid_activo(pid);
 			//////
 //			FIXME: como poner el buffer que se escribe
+
+
+
 			escribir_segmento(dirLogica,tamanioAEscribir,offset,buffer);
 				//generar_archivo(resultado,nroOp);
 			return NULL;
 			break;
+
+
 		case CREAR_SEG:
 			log_info(logs,"[CONSOLA UMV] El usuario solicito crear segmento");
 			printf("Ingresar pid: ");
@@ -511,12 +612,14 @@ void generar_archivo(unsigned char* resultado, int nroOp){
 
 void dump(){
 	int nroOp;
-	printf("Segun indice...\n");
-	printf("ESTRUCTURAS_MEMORIA = 0\n");
-	printf("MEMORIA_PRINCIPAL = 1\n");
-	printf("CONTENIDO_MEM_PPAL = 2\n");
-	printf("Seleccione opcion: ");
+	printf("\nUsted selecciono 'Dump'\n");
+	printf("Ingrese operacion segun...\n");
+	printf("	1.Estructuras memoria\n");
+	printf("	2.Memoria principal\n");
+	printf("	3.Contenido de la memoria principal\n");
+	printf("Opcion: ");
 	scanf("%d",&nroOp);
+
 	switch(nroOp){
 		case ESTRUCTURAS_MEMORIA:
 			imprime_estructuras_memoria();
@@ -673,6 +776,9 @@ void consola(){
 				scanf("%d",&cambioAlgoritmo);
 				cambiarAlgoritmo(cambioAlgoritmo);
 				break;
+			case COMPACTAR_MEMORIA:
+				compactar_memoria();
+				break;
 			case DUMP:
 				printf("\nUsted selecciono 'Dump'\n");
 				dump();
@@ -681,6 +787,7 @@ void consola(){
 				printf("**Operacion invalida**\n");
 				break;
 		}
+
 		printf("¿Desea realizar otra operacion?\n");
 		printf("	0.Si\n");
 		printf("	1.No\n");
@@ -690,55 +797,84 @@ void consola(){
 //	printf("Ha finalizado la consola. ¿Desea re-abrirla?");
 	log_info(logs,"El usuario cerro la consola");
 }
-//
-//void compactar_memoria(){
-//	ramAux = ramUMVInicial;
-//	tamHueco = 0;
-//
-//	while(ramAux < ramUMVInicial + tamanioUMV){
-//		nodoHuecos* unElem = list_remove_by_condition(listaHuecos,(void*)buscar_ramSiguiente);
-//		if(unElem){
-//			buscar_hueco_para_compactar(unElem);
-//		}else{
-//			buscar_segmento_y_desplazarlo();
-//			tamHueco = 0;
-//		}
-//	}
-//}
-//
-//void buscar_hueco_para_compactar(nodoHuecos* unElem){
-//	char* dirHueco = unElem->dirFisica;
-//	do{
-//		tamHueco += unElem->tamanioSegmento;
-//		ramAux = unElem->dirFisica + unElem->tamanioSegmento;
-//		unElem = list_remove_by_condition(listaHuecos,(void*)buscar_ramSiguiente);
-//	}while(unElem);
-//}
-//
-//void buscar_segmento_y_desplazarlo(){
-//	dictionary_iterator(tablaPidSeg,busca_seg_en_diccionario);
-//}
-//
-//void busca_seg_en_diccionario(char* pid,t_list* listaSeg){
-//
-//	tablaSegUMV* unElem = list_find(listaSeg,buscar_ramAux);
-//
-//	if(tamHueco >= unElem->tamanioSegmento){
-//		nodoHuecos* nuevoElem;
-//		nuevoElem->dirFisica = unElem->dirFisica;
-//		nuevoElem->tamanioSegmento = unElem->tamanioSegmento;
-//		list_add(listaHuecos,nuevoElem);
-//	}else{
-//
-//	}
-//	ramAux = unElem->dirFisica + unElem->tamanioSegmento;
-//	unElem->dirFisica = memmove(dirHueco,unElem->dirFisica,unElem->tamanioSegmento);
-//}
-//
-//bool buscar_ramAux(tablaSegUMV* unElem){
-//	return unElem->dirFisica == ramAux;
-//}
-//
-//bool buscar_ramSiguiente(nodoHuecos* unElem){
-//	return unElem->dirFisica == ramAux;
-//}
+
+
+
+void compactar_memoria(){
+	log_info(logs,"entra a copactar memoria");
+	ramAux = ramUMVInicial;
+	tamHueco = 0;
+
+	while(ramAux < ramUMVInicial + tamanioUMV){
+		nodoHuecos* unElem = list_remove_by_condition(listaHuecos,(void*)buscar_ramAux_en_listaH);
+		int i= 1;
+		if(unElem){
+			buscar_hueco_para_compactar(unElem);
+			i=0;
+		}else{
+			if(!i){
+				buscar_segmento_y_desplazarlo();
+				tamHueco = 0;
+			}else{
+				buscar_el_primer_hueco_y_actualizar_ramAux();
+			}
+		}
+		i=0;
+	}
+}
+
+void buscar_hueco_para_compactar(nodoHuecos* unElem){
+	dirHueco = unElem->dirFisica;
+	do{
+		tamHueco += unElem->tamanioSegmento;
+		ramAux = unElem->dirFisica + unElem->tamanioSegmento;
+		unElem = list_remove_by_condition(listaHuecos,(void*)buscar_ramAux_en_listaH);
+	}while(unElem);
+}
+
+void buscar_el_primer_hueco_y_actualizar_ramAux(){
+	encontroHueco = 0;
+	while(!encontroHueco){
+		dictionary_iterator(tablaPidSeg,(void*)actualizar_RamAux);
+	}
+}
+
+void actualizar_RamAux(char* pid, t_list* listSeg){
+
+	tablaSegUMV* unElem = list_find(listSeg,(void*)buscar_ramAux_endicc);
+	if(unElem){
+		ramAux = unElem->dirFisica + unElem->tamanioSegmento;
+		encontroHueco = 1;
+	}
+}
+
+
+
+void buscar_segmento_y_desplazarlo(){
+	dictionary_iterator(tablaPidSeg,(void*)busca_seg_en_diccionario);
+}
+
+void busca_seg_en_diccionario(char* pid,t_list* listaSeg){
+	nodoHuecos* nuevoElem = malloc(sizeof(nodoHuecos));
+	tablaSegUMV* unElem = list_find(listaSeg,(void*)buscar_ramAux_endicc);
+
+	if(tamHueco == unElem->tamanioSegmento){
+		nuevoElem->dirFisica = unElem->dirFisica;
+		nuevoElem->tamanioSegmento = unElem->tamanioSegmento;
+		list_add(listaHuecos,nuevoElem);
+	}else{
+		nuevoElem->dirFisica = dirHueco + unElem->tamanioSegmento;
+		nuevoElem->tamanioSegmento = tamHueco;
+		list_add(listaHuecos,nuevoElem);
+	}
+	ramAux = unElem->dirFisica + unElem->tamanioSegmento;
+	unElem->dirFisica = memmove(dirHueco,unElem->dirFisica,unElem->tamanioSegmento);
+}
+
+bool buscar_ramAux_endicc(tablaSegUMV* unElem){
+	return unElem->dirFisica == ramAux;
+}
+
+bool buscar_ramAux_en_listaH(nodoHuecos* unElem){
+	return unElem->dirFisica == ramAux;
+}

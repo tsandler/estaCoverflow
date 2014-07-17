@@ -20,6 +20,8 @@
 #include <commons/collections/list.h>
 #include <commons/txt.h>
 #include <libs/sockets.h>
+#include <semaphore.h>
+
 
 pthread_t pthread_kernel, pthread_CPU, pthread_consola;
 t_log *logs;
@@ -32,17 +34,18 @@ int retardoActual;
 int algoritmoActual;
 int pidActive;
 int puerto;
+
+sem_t segsEscritos; //FIXME
+
+int encontroHueco;
+
+
 // globales para compactar
 char* ramUMVInicial;
 char* ramAux;
 char* dirHueco;
 int tamHueco;
 
-typedef struct{
-	int base;
-	int offset;
-	int tamanio;
-}datos_acceso;
 
 typedef struct{
 	int tamanio;
@@ -80,7 +83,7 @@ typedef enum{
 	OPERACION = 1,
 	CAMBIAR_RETARDO = 2,
 	CAMBIAR_ALGORITMO = 3,
-	COMPACTACION = 4,
+	COMPACTAR_MEMORIA = 4,
 	DUMP = 5,
 	LEER_SEG = 1,
 	ESCR_SEG = 2,
@@ -89,9 +92,9 @@ typedef enum{
 }t_op_consola;
 
 typedef enum{
-	ESTRUCTURAS_MEMORIA = 0,
-	MEMORIA_PRINCIPAL = 1,
-	CONTENIDO_MEM_PPAL = 2,
+	ESTRUCTURAS_MEMORIA = 1,
+	MEMORIA_PRINCIPAL = 2,
+	CONTENIDO_MEM_PPAL = 3,
 }t_op_dump;
 
 typedef enum{

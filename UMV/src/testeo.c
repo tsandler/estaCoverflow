@@ -13,13 +13,13 @@ void imprime_listatablaSegUMV(t_list* lista){
 	list_iterate(lista,(void*)imprime_campos_listatablaSegUMV);
 }
 
-void test_crear_agregar_segmento(int pid){
-	int dirLogica, tamanio;
+void test_crear_agregar_segmento(int pid, int tamanio){
+	int dirLogica;
 
 //	printf("Ingresar pid: ");
 //	scanf("%d",&pid);
-	printf("Ingresar tamanio segmento: ");
-	scanf("%d",&tamanio);
+//	printf("Ingresar tamanio segmento: ");
+//	scanf("%d",&tamanio);
 
 	dirLogica = crear_agregar_segmento(pid,tamanio);
 
@@ -53,7 +53,7 @@ void test_crear_varios_segmentos_y_eliminarlos(){
 		printf("Ingresar pid: ");
 		scanf("%d",&pid);
 		vec[i]=pid;
-		test_crear_agregar_segmento(pid);
+//		test_crear_agregar_segmento(pid);
 	}
 	log_debug(logs,"Comienza a destruir segmentos");
 	for(i=0;i<3;i++){
@@ -62,4 +62,24 @@ void test_crear_varios_segmentos_y_eliminarlos(){
 		imprime_listahuecos(listaHuecos);
 	}
 
+}
+
+void test_crear_varios_segs_y_eliminar_uno_para_compactar(){
+
+	log_info(logs,"crea");
+	test_crear_agregar_segmento(1,30);
+	test_crear_agregar_segmento(2,30);
+
+	log_info(logs,"destruye");
+	destruir_segmentos(1);
+
+	imprime_listahuecos(listaHuecos);
+
+	log_info(logs,"compacta");
+	compactar_memoria();
+
+	log_info(logs,"crea denuevo");
+	test_crear_agregar_segmento(2,5);
+
+	imprime_listahuecos(listaHuecos);
 }
