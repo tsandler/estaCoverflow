@@ -155,7 +155,7 @@ void manejoCPU(int fd) {
 		if (tSem->valor <= 0) {
 			tSem->valor = tSem->valor - 1;
 			habilitado = false;
-			log_info(logs, "y su valor es %i", valorSem);
+			log_info(logs, "y su valor es %i", tSem->valor);
 			tam->length = sizeof(bool);
 			enviarDatos(fd, tam, &habilitado, logs);
 			recibirDatos(fd, tam, (void*) PCBrecibido, logs);
@@ -196,7 +196,7 @@ void manejoCPU(int fd) {
 			}
 
 		}
-		log_info(logs, "y su valor es %i", valorSem);
+		log_info(logs, "y su valor es %i", tSem->valor);
 		dictionary_remove(semaforos, nombreSem);
 		dictionary_put(semaforos, nombreSem, tSem);
 		sem_post(&mutexSemaforos);
@@ -245,7 +245,7 @@ void manejoCPU(int fd) {
 				PCBrecibido->pid);
 		tam->length = sizeof(int);
 		enviarMenu(PCBrecibido->fd, tam, logs); //aviso al programa q finalizo.
-		log_info(logs, "El programa ah finalizado");
+		log_info(logs, "El programa ha finalizado");
 
 		PCBPOP = sacarCola(READY, &mutexREADY, &hayAlgoEnReady); //mando de nuevo.
 		ULTIMOPCB = PCBPOP;
