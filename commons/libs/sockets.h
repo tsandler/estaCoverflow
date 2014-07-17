@@ -51,7 +51,8 @@ typedef enum{
 	CREAR_SEGMENTO,
 	ELIMINAR_SEGMENTOS,
 	LEER_SEGMENTO,
-	ENVIO_DE_STACK,
+	RETORNO_DE_STACK,
+	OK,
 }t_menu;
 
 typedef struct t_length{

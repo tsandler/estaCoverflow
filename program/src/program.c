@@ -38,12 +38,13 @@ int main(int argc, char **argv) {
 	log_info(logs, "El proceso se conecto correctamente con el kernel");
 
 	enviar_programa_al_kernel(argv[1]);
-
+	printf("\n\n");
 	while (tam->menu != FINALIZAR){
 		char* sentencia = recibir_sentencia();
 		if (tam->menu != FINALIZAR)
-			printf("%s/n", sentencia);
+			printf("%s", sentencia);
 	}
+	printf("\n\n");
 
 	cerrarSocket(socketKernel);
 

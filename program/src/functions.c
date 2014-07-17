@@ -38,17 +38,28 @@ static char* _obtener_programa(char* path){
 /* Funcion que recibe la sentencia a imprimir */
 char* recibir_sentencia(){
 	char* sent;
+	int val;
 	if (recibirMenu(socketKernel, tam, logs)){
-		if (tam->menu != FINALIZAR){
-			if(recibirDato(socketKernel, tam->length, (void*)&sent, logs)){
-				log_info(logs, "La sentencia fue recibida correctamente");
-			}
+		switch(tam->menu){
+			case IMPRIMIR:
+				if(recibirDato(socketKernel, tam->length, (void*)&val, logs)){
+					return string_from_format("%d", val);
+				}
+				break;
+			case IMPRIMIR_TEXTO:
+				if(recibirDato(socketKernel, tam->length, (void*)&sent, logs)){
+					return string_from_format("%s", &sent);
+				}
+				break;
+			default:
+				tam->menu = FINALIZAR;
+				break;
 		}
 	}else{
 		log_error(logs, "Se produjo un error recibiendo la sentencia");
 		tam->menu = FINALIZAR;
 	}
-	return string_from_format("%s", &sent);
+	return string_from_format("%s", "");
 }
 
 /* Funcion que se conecta al kernel y devuelve el socket al que conecto */

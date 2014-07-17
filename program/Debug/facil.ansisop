@@ -4,6 +4,7 @@ begin
 	a = 3
 	b = 5
 	a = b + 12
+	print a
 end
 
 

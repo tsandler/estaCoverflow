@@ -160,6 +160,7 @@ void finalizar(){
 		log_info(logs, "Finalizando el contexto actual");
 	}else{
 		retorno_de_stack();
+		usleep(2000);
 		tam->menu = FINALIZAR;
 		tam->length = sizeof(registroPCB);
 		if (!enviarDatos(socketKernel, tam, pcb, logs))
