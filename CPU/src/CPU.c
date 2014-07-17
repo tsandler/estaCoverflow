@@ -76,8 +76,8 @@ int main(int argc, char** argv){
 		ejecutando = 1; //Si se llama la senial SIGUSR1 espera a que concluya el quantum
 		while (quantum > cont && !systemCall){
 			pc = pcb->program_counter;
+			sleep(2);
 			char* sentencia = recibir_sentencia();
-
 			analizadorLinea(strdup(sentencia), &functions, &kernel_functions);
 
 			if (pc == pcb->program_counter)

@@ -169,6 +169,7 @@ char* recibir_sentencia(){
 		log_error(logs, "Se produjo un error al recibir la sentencia.");
 
 	char* s = string_from_format("%s", &sentencia);
+	log_debug(logs, "Sentencia recibida: %s", s);
 	return _depurar_sentencia(s, tamanio);
 }
 
@@ -177,13 +178,10 @@ static char* _depurar_sentencia(char* sentencia, int tamanio){
 	char* sent = string_substring_until(sentencia, tamanio);
 	int i = strlen(sent);
 	while (string_ends_with(sent, "\n")){
-		i--;
-		sent = string_substring_until(sent, i);
+		sent = string_substring_until(sent, i-1);
 	}
-	i = 0;
 	while (string_starts_with(sent, "\t")){
-		i++;
-		sent = string_substring_from(sent, i);
+		sent = string_substring_from(sent, 1);
 	}
 	log_info(logs, "Sentencia depurada: %s", sent);
 	return sent;

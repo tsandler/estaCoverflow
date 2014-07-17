@@ -160,7 +160,7 @@ void finalizar(){
 		log_info(logs, "Finalizando el contexto actual");
 	}else{
 		retorno_de_stack();
-		usleep(2000);
+		usleep(10000);
 		tam->menu = FINALIZAR;
 		tam->length = sizeof(registroPCB);
 		if (!enviarDatos(socketKernel, tam, pcb, logs))
@@ -244,6 +244,7 @@ void wait(t_nombre_semaforo identificador_semaforo){
 		log_info(logs, "Se recibio correctamente el resultado de la senial wait del kernel");
 
 	if (systemCall){
+		log_debug(logs, "El semaforo se bloqueo");
 		retorno_de_stack();
 		tam->length = sizeof(registroPCB);
 		if (!enviarDatos(socketKernel, tam, pcb, logs))

@@ -40,11 +40,11 @@ void manejoCPU(int fd) {
 	char* dispositivo;
 	char* textoAImprimir;
 	char* nombreSem;
+	char* sem;
 	int valorMostrar;
 	char* variable;
 	int valorRecibido;
-	int *valorSem;
-	bool habilitado;
+	bool bloqueado;
 	t_semaforos* tSem;
 	int quantum = config_get_int_value(config, "QUANTUM");
 	int retardo = config_get_int_value(config, "RETARDO");
@@ -78,14 +78,13 @@ void manejoCPU(int fd) {
 		char* var;
 		int fdRecibido;
 	case OBTENER_VALOR_COMPARTIDA: // char*
-		recibirDato(fd, tam->length, (void*) &variable, logs);
+		recibirDato(fd, tam->length, (void*)&variable, logs);
 		sem_wait(&mutexVarCompartidas);
 		var = string_from_format("%s", &variable);
-		int valor = (int) dictionary_get(variablesCompartidas, var);
+		int* valor = dictionary_get(variablesCompartidas, var);
 		sem_post(&mutexVarCompartidas);
 		tam->length = sizeof(int);
-		enviarDatos(fd, tam, &valor, logs);
-
+		enviarDatos(fd, tam, valor, logs);
 		break;
 
 	case ASIGNAR_VALOR_COMPARTIDA: //char*
@@ -147,17 +146,17 @@ void manejoCPU(int fd) {
 	case WAIT:
 
 		recibirDato(fd, tam->length, (void*) &nombreSem, logs);
-
+		sem = string_from_format("%s", &nombreSem);
 		//ESTO DEBE SER ATOMICO
-		log_info(logs, "El semaforo se llama %s", nombreSem);
+		log_info(logs, "El semaforo se llama %s", sem);
 		sem_wait(&mutexSemaforos);
-		tSem = dictionary_get(semaforos, nombreSem);
+		tSem = dictionary_get(semaforos, sem);
 		if (tSem->valor <= 0) {
 			tSem->valor = tSem->valor - 1;
-			habilitado = false;
+			bloqueado = true;
 			log_info(logs, "y su valor es %i", tSem->valor);
 			tam->length = sizeof(bool);
-			enviarDatos(fd, tam, &habilitado, logs);
+			enviarDatos(fd, tam, &bloqueado, logs);
 			recibirDatos(fd, tam, (void*) PCBrecibido, logs);
 			ponerCola(PCBrecibido, tSem->cola, &tSem->mutex, &tSem->hayAlgo);
 
@@ -173,7 +172,8 @@ void manejoCPU(int fd) {
 
 		} else {
 			tSem->valor = tSem->valor - 1;
-			habilitado = true;
+			bloqueado = false;
+			enviarDatos(fd, tam, &bloqueado, logs);
 			log_info(logs, "y su valor es %i", tSem->valor);
 			dictionary_remove(semaforos, nombreSem);
 			dictionary_put(semaforos, nombreSem, tSem);
@@ -184,9 +184,11 @@ void manejoCPU(int fd) {
 		break;
 	case SIGNAL:
 		recibirDato(fd, tam->length, (void*) &nombreSem, logs);
-		log_info(logs, "El semaforo es %s", nombreSem);
+		sem = string_from_format("%s", &nombreSem);
+
+		log_info(logs, "El semaforo es %s", sem);
 		sem_wait(&mutexSemaforos);
-		tSem = dictionary_get(semaforos, nombreSem);
+		tSem = dictionary_get(semaforos, sem);
 		tSem->valor = tSem->valor + 1;
 		if (tSem->valor > 0) {
 			if (queue_size(tSem->cola) != 0) {

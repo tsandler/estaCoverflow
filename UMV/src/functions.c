@@ -71,7 +71,7 @@ void funcion_CPU(int socket){
 				log_debug(logs,"Ya se escribio el segmento");
 				break;
 
-			case ENVIO_DE_STACK:
+			case RETORNO_DE_STACK:
 				log_info(logs,"[HILO CPU] Entra a envio de stack");
 
 				if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
@@ -104,6 +104,8 @@ void funcion_CPU(int socket){
 
 				escribir_segmento(base,tamanio,offset,stack);
 				log_debug(logs,"Ya se escribio el segmento");
+				tam->menu = OK;
+				enviarMenu(socket, tam, logs);
 				break;
 			case PEDIR_SENTENCIA:
  				log_info(logs,"[HILO CPU] Entra a pedir sentencia");
@@ -132,7 +134,7 @@ void funcion_CPU(int socket){
 				}
 //				etiq->offset++;
 //				etiq->tamanio--;
-				etiq->tamanio--;
+				//etiq->tamanio--;
 				log_info(logs,"base: %d, offset: %d, tam: %d",etiq->base,etiq->offset,etiq->tamanio);
 
 				codigo = leer_segmento(etiq->base,etiq->tamanio,etiq->offset);
