@@ -10,6 +10,8 @@
 
 #include "functions.h"
 
+sem_t yaEscribio;
+
 
 int main(int argc, char** argv){
 
@@ -30,10 +32,7 @@ int main(int argc, char** argv){
 	inicializar_umv(tamanioUMV);
 	log_debug(logs,"Ya se creo la umv");
 
-
-	log_debug(logs,"Levanto el hilo: Consola");
-	pthread_create(&pthread_consola, NULL, (void*)consola, NULL);
-
+	sem_init(&yaEscribio,0,0);
 
 	int termina = 0;
 	int socket;
@@ -60,6 +59,10 @@ int main(int argc, char** argv){
 			termina = 1;
 		}else{
 			if (tam->menu == SOY_KERNEL){
+
+				log_debug(logs,"Levanto el hilo: Consola");
+				pthread_create(&pthread_consola, NULL, (void*)consola, NULL);
+
 				log_debug(logs,"[MAIN KERNEL]Se conecto: Kernel");
 				pthread_create(&pthread_kernel, NULL, (void*)funcion_kernel, (void*)socket);
 			}else

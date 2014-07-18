@@ -17,10 +17,6 @@ extern t_log* logs;
 int identificadorUnico = 1;
 extern int tamanioStack;
 
-//typedef struct{
-//	int offset;
-//	int tamanio;
-//}t_aux;
 
 void conectarseUMV(){
     char *ip = config_get_string_value(config,"IP");

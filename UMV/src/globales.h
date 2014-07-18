@@ -34,11 +34,9 @@ int retardoActual;
 int algoritmoActual;
 int pidActive;
 int puerto;
-
-sem_t segsEscritos; //FIXME
-
 int encontroHueco;
 
+int segEscritos;
 
 // globales para compactar
 char* ramUMVInicial;
