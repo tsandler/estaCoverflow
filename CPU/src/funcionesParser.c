@@ -133,13 +133,17 @@ void ir_al_label(t_nombre_etiqueta etiqueta){
 }
 
 /* Primitiva que se invoca en los procedimientos, cambia el contexto de ejecucion a una etiqueta dada */
-void llamar_sin_retorno(t_nombre_etiqueta etiqueta){
-	memcpy(stack + pcb->cursor_stack, &pcb->cursor_stack, 4);
+void llamar_sin_retorno(t_nombre_etiqueta etiqueta){;
+	 pcb->cursor_anterior = pcb->cursor_stack  - pcb->tamanio_contexto * 5;
+	memcpy(stack + pcb->cursor_stack, &pcb->cursor_anterior, 4);
 	pcb->cursor_stack += 4;
-	memcpy(stack + pcb->cursor_stack, &pcb->program_counter+1, 4);
+	int pc = pcb->program_counter+1;
+	memcpy(stack + pcb->cursor_stack, &pc, 4);
 	pcb->cursor_stack += 4;
 	log_info(logs, "Se llamo a la funcion llamarSinRetorno con la etiqueta %s", etiqueta);
 	ir_al_label(etiqueta);
+	pcb->tamanio_contexto = 0;
+	dictionary_clean(diccionarioDeVariables);
 }
 
 /* Primitiva que se invoca en las funciones, recibe la direccion donde retornar el valor y la etiqueta a la cual tiene que ir */
@@ -153,14 +157,17 @@ void llamar_con_retorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar){
 /* Primitiva que finaliza el contexto actual */
 void finalizar(){
 	if (pcb->tamanio_contexto * 5 < pcb->cursor_stack){
+		pcb->cursor_stack -= pcb->tamanio_contexto * 5;
 		pcb->cursor_stack -= 4;
 		memcpy(&pcb->program_counter, stack + pcb->cursor_stack, 4);
-		pcb->cursor_stack -= 8;
-		memcpy(&pcb->cursor_stack, stack + pcb->cursor_stack, 4);
+		pcb->cursor_stack -= 4;
+		memcpy(&pcb->cursor_anterior, stack + pcb->cursor_stack, 4);
 		log_info(logs, "Finalizando el contexto actual");
+		pcb->tamanio_contexto = (pcb->cursor_stack - pcb->cursor_anterior) / 5;
+		pcb->cursor_stack = pcb->cursor_anterior;
+		cargar_diccionario();
 	}else{
 		retorno_de_stack();
-		usleep(10000);
 		tam->menu = FINALIZAR;
 		tam->length = sizeof(registroPCB);
 		if (!enviarDatos(socketKernel, tam, pcb, logs))

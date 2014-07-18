@@ -72,17 +72,19 @@ int recibir(int dato){
 /* Funcion que carga el diccionario de variables para el contexto de ejecucion actual */
 void cargar_diccionario(){
 	t_nombre_variable variable;
+	int inicial = pcb->cursor_stack;
 	t_puntero* pos = malloc(sizeof(t_puntero) * pcb->tamanio_contexto);
 	int i;
 	for (i=0; i < pcb->tamanio_contexto; i++){
-		int aux = i * 5;
-		memcpy(pos + (i*5), &aux, 4);
-		memcpy(&variable, stack + i * 5, 1);
+		memcpy(pos + (i*5), &inicial, 4);
+		memcpy(&variable, stack + inicial, 1);
+		inicial += i * 5;
 		char var[2];
 		var[0] = variable;
 		var[1] = '\0';
 		dictionary_put(diccionarioDeVariables, var, pos + (i*5));
 	}
+	pcb->cursor_stack = inicial;
 	log_info(logs, "Se cargo el diccionario de variables");
 }
 
