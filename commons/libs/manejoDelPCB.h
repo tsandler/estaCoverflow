@@ -32,6 +32,7 @@ typedef struct registroPCB{
 	int indice_etiquetas;
 	int puntero_etiquetas;
 	int tamanio_indice_etiquetas;
+	int cursor_anterior;
 
 	int retrasoIO;
 	int peso;
