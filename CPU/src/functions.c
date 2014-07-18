@@ -175,6 +175,7 @@ char* recibir_sentencia(){
 /* Funcion que depura la sentencia eliminando los \n finales */
 static char* _depurar_sentencia(char* sentencia, int tamanio){
 	char* sent = string_substring_until(sentencia, tamanio);
+	string_trim(&sent);
 	int i = strlen(sent);
 	while (string_ends_with(sent, "\n")){
 		sent = string_substring_until(sent, i-1);
