@@ -67,8 +67,8 @@ void test_crear_varios_segmentos_y_eliminarlos(){
 void test_crear_varios_segs_y_eliminar_uno_para_compactar(){
 
 	log_info(logs,"crea");
-	test_crear_agregar_segmento(1,30);
-	test_crear_agregar_segmento(2,30);
+	test_crear_agregar_segmento(1,10);
+	test_crear_agregar_segmento(2,20);
 
 	log_info(logs,"destruye");
 	destruir_segmentos(1);
@@ -79,7 +79,7 @@ void test_crear_varios_segs_y_eliminar_uno_para_compactar(){
 	compactar_memoria();
 
 	log_info(logs,"crea denuevo");
-	test_crear_agregar_segmento(2,5);
+	test_crear_agregar_segmento(2,10);
 
 	imprime_listahuecos(listaHuecos);
 }

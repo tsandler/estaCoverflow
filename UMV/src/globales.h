@@ -34,8 +34,6 @@ int retardoActual;
 int algoritmoActual;
 int pidActive;
 int puerto;
-int encontroHueco;
-
 int segEscritos;
 
 // globales para compactar
@@ -43,7 +41,7 @@ char* ramUMVInicial;
 char* ramAux;
 char* dirHueco;
 int tamHueco;
-
+int encontroHueco;
 
 typedef struct{
 	int tamanio;

@@ -12,7 +12,6 @@
 
 sem_t yaEscribio;
 
-
 int main(int argc, char** argv){
 
  	logs = log_create("log","UMV.c",1,LOG_LEVEL_TRACE);
@@ -31,6 +30,7 @@ int main(int argc, char** argv){
 	inicializar_var_config();
 	inicializar_umv(tamanioUMV);
 	log_debug(logs,"Ya se creo la umv");
+
 
 	sem_init(&yaEscribio,0,0);
 

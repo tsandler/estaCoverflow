@@ -3,6 +3,7 @@
 extern sem_t yaEscribio;
 
 extern int retardoActual;
+extern int encontroHueco;
 
 
 /*Funcion que llama el hilo cada vez que se conecta algun CPU a la UMV*/
@@ -211,7 +212,7 @@ void funcion_kernel(int socket){
 				cambiar_pid_activo(pid);
 				log_debug(logs,"[HILO KERNEL] Se cambio el pid activo a %d", pid);
 				break;
-			case ESCRIBIR_SEGMENTO: //FIXME
+			case ESCRIBIR_SEGMENTO:
 				retardo();
 				log_debug(logs,"Entra a escribir segmento");
 				if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
@@ -446,6 +447,54 @@ char *obtener_proxima_dirFisica(int tamanio){
 	return NULL;
 }
 
+/* Funcion que representa al funcionamiento del algoritmo first-fit de asignacion de memoria*/
+char *first_fit(int tamanio){ //
+
+	bool filtra_por_tamanio(nodoHuecos* unElem){
+		return unElem->tamanioSegmento >= tamanio;
+	}
+	nodoHuecos* unElem = list_remove_by_condition(listaHuecos,(void*)filtra_por_tamanio);
+
+	if(!unElem){
+		compactar_memoria();
+		unElem = list_remove_by_condition(listaHuecos,(void*)filtra_por_tamanio);
+		if(!unElem){
+			log_error(logs,"Memory overload");
+			printf("Memory overload");
+			return string_itoa(-1);
+		}
+	}
+	return manejo_memoria(unElem,tamanio);
+}
+
+/* Funcion que representa al funcionamiento del algoritmo worst-fit de asignacion de memoria*/
+char *worst_fit(int tamanio){
+	list_sort(listaHuecos, (void*)sort_mayor_hueco);
+	nodoHuecos* unElem = list_remove(listaHuecos,0);
+
+	if(!unElem){
+		compactar_memoria();
+		list_sort(listaHuecos, (void*)sort_mayor_hueco);
+		nodoHuecos* unElem = list_remove(listaHuecos,0);
+		if(!unElem){
+			log_error(logs,"Memory overload");
+			printf("Memory overload");
+			return string_itoa(-1);
+		}
+	}
+	return manejo_memoria(unElem,tamanio);
+}
+
+char *manejo_memoria(nodoHuecos* unElem, int tamanio){
+
+	char* nuevaDirFisica = unElem->dirFisica;
+//	char* nuevaDirFisica=malloc(sizeof(char)*tamanio);
+//	memcpy(nuevaDirFisica,unElem->dirFisica,tamanio);
+	unElem->dirFisica = unElem->dirFisica + tamanio;
+	unElem->tamanioSegmento = unElem->tamanioSegmento - tamanio;
+	list_add(listaHuecos,(void*)unElem);
+	return nuevaDirFisica;
+}
 
 /*Funcion que lee un segmento de la umv y retorna un puntero a la posicion solicitada */
 unsigned char *leer_segmento(int dirLog, int tamanioALeer, int offset){ //solicitar_memoria_desde_una_pos();
@@ -647,53 +696,6 @@ void dump(){
 }
 
 
-/* Funcion que representa al funcionamiento del algoritmo first-fit de asignacion de memoria*/
-char *first_fit(int tamanio){ //
-
-	bool filtra_por_tamanio(nodoHuecos* unElem){
-		return unElem->tamanioSegmento >= tamanio;
-	}
-	nodoHuecos* unElem = list_remove_by_condition(listaHuecos,(void*)filtra_por_tamanio);
-
-	if(!unElem){
-		//llamar a compactar FIXME
-		unElem = list_remove_by_condition(listaHuecos,(void*)filtra_por_tamanio);
-		if(!unElem){
-			log_error(logs,"Memory overload");
-			printf("Memory overload");
-			return string_itoa(-1);
-		}
-	}
-	return manejo_memoria(unElem,tamanio);
-}
-
-/* Funcion que representa al funcionamiento del algoritmo worst-fit de asignacion de memoria*/
-char *worst_fit(int tamanio){
-	list_sort(listaHuecos, (void*)sort_mayor_hueco);
-	nodoHuecos* unElem = list_remove(listaHuecos,0);
-
-	if(!unElem){
-		//llamar a compactar
-		list_sort(listaHuecos, (void*)sort_mayor_hueco);
-		nodoHuecos* unElem = list_remove(listaHuecos,0);
-		if(!unElem){
-			log_error(logs,"Memory overload");
-			printf("Memory overload");
-			return string_itoa(-1);
-		}
-	}
-	return manejo_memoria(unElem,tamanio);
-}
-
-char *manejo_memoria(nodoHuecos* unElem, int tamanio){
-	char* nuevaDirFisica=malloc(sizeof(char)*tamanio);
-	memcpy(nuevaDirFisica,unElem->dirFisica,tamanio);
-	unElem->dirFisica = unElem->dirFisica + tamanio;
-	unElem->tamanioSegmento = unElem->tamanioSegmento - tamanio;
-	list_add(listaHuecos,(void*)unElem);
-	return nuevaDirFisica;
-}
-
 /* Funcion que retorna el mayor idSegmento entre dos elementos */
 bool sort_nroSeg(tablaSegUMV* unElem, tablaSegUMV* otroElem){
 	return unElem->idSegmento > otroElem->idSegmento;
@@ -743,6 +745,7 @@ void imprime_estado_mem_ppal(){
 
 
 void consola(){
+
 	log_debug(logs,"Entra a consola");
 	int cambioAlgoritmo ,nroOp, operacion, retardoNuevo;
 	int i=0;
@@ -808,25 +811,32 @@ void consola(){
 
 
 void compactar_memoria(){
-	log_info(logs,"entra a copactar memoria");
+	log_info(logs,"entra a compactar memoria");
 	ramAux = ramUMVInicial;
 	tamHueco = 0;
+	int yaDesplazo= 1;
 
 	while(ramAux < ramUMVInicial + tamanioUMV){
 		nodoHuecos* unElem = list_remove_by_condition(listaHuecos,(void*)buscar_ramAux_en_listaH);
-		int i= 1;
 		if(unElem){
 			buscar_hueco_para_compactar(unElem);
-			i=0;
+			yaDesplazo=0;
 		}else{
-			if(!i){
+			if(!yaDesplazo){
 				buscar_segmento_y_desplazarlo();
 				tamHueco = 0;
+				yaDesplazo=1;
 			}else{
 				buscar_el_primer_hueco_y_actualizar_ramAux();
 			}
 		}
-		i=0;
+		if(ramAux == ramUMVInicial + tamanioUMV){
+			nodoHuecos* huecoFinal = malloc(sizeof(nodoHuecos));
+			huecoFinal->dirFisica  = dirHueco;
+			huecoFinal->tamanioSegmento = tamHueco;
+			list_add(listaHuecos,huecoFinal);
+		}
+
 	}
 }
 
@@ -855,7 +865,9 @@ void actualizar_RamAux(char* pid, t_list* listSeg){
 	}
 }
 
-
+bool buscar_ramAux_endicc(tablaSegUMV* unElem){
+	return unElem->dirFisica == ramAux;
+}
 
 void buscar_segmento_y_desplazarlo(){
 	dictionary_iterator(tablaPidSeg,(void*)busca_seg_en_diccionario);
@@ -874,13 +886,10 @@ void busca_seg_en_diccionario(char* pid,t_list* listaSeg){
 		nuevoElem->tamanioSegmento = tamHueco;
 		list_add(listaHuecos,nuevoElem);
 	}
-	ramAux = unElem->dirFisica + unElem->tamanioSegmento;
+	ramAux = dirHueco + unElem->tamanioSegmento;
 	unElem->dirFisica = memmove(dirHueco,unElem->dirFisica,unElem->tamanioSegmento);
 }
 
-bool buscar_ramAux_endicc(tablaSegUMV* unElem){
-	return unElem->dirFisica == ramAux;
-}
 
 bool buscar_ramAux_en_listaH(nodoHuecos* unElem){
 	return unElem->dirFisica == ramAux;
