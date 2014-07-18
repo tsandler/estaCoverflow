@@ -72,20 +72,23 @@ int recibir(int dato){
 /* Funcion que carga el diccionario de variables para el contexto de ejecucion actual */
 void cargar_diccionario(){
 	t_nombre_variable variable;
-	int inicial = pcb->cursor_stack;
+	int inicial = pcb->cursor_anterior;
 	t_puntero* pos = malloc(sizeof(t_puntero) * pcb->tamanio_contexto);
-	int i;
+	printf("\n\n\n\n");
+	int i, cont = 0;
 	for (i=0; i < pcb->tamanio_contexto; i++){
-		memcpy(pos + (i*5), &inicial, 4);
-		memcpy(&variable, stack + inicial, 1);
-		inicial += i * 5;
+		int aux = inicial + (i*5);
+		memcpy(pos + aux, &aux, 4);
+		memcpy(&variable, stack + aux, 1);
 		char var[2];
 		var[0] = variable;
 		var[1] = '\0';
 		dictionary_put(diccionarioDeVariables, var, pos + (i*5));
+		cont++;
 	}
-	pcb->cursor_stack = inicial;
+	pcb->cursor_stack = cont * 5;
 	log_info(logs, "Se cargo el diccionario de variables");
+	printf("\n\n\n\n");
 }
 
 /* Funcion que le pide el stack a la UMV */
