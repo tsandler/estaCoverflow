@@ -133,8 +133,6 @@ void retorno_de_stack(){
 	if(!enviarDatos(socketUMV, tam, stack, logs))
 		log_error(logs, "Se produjo un error al devolverle el stack a la umv");
 
-	t_length* tam = malloc(sizeof(t_length));
-	recibirMenu(socketUMV, tam, logs);
 }
 /* Funcion que verifica que sea un archivo de configuracion valido */
 int archivo_de_configuracion_valido(){
