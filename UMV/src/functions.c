@@ -135,8 +135,6 @@ void funcion_CPU(int socket){
 
 				escribir_segmento(base,tamanio,offset,stack);
 				log_debug(logs,"Ya se escribio el segmento");
-				tam->menu = OK;
-				enviarMenu(socket, tam, logs);
 				sem_post(&mutexOpera);
 				break;
 			case PEDIR_SENTENCIA:
