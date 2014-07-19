@@ -80,7 +80,6 @@ void cargar_diccionario(){
 		pcb->cursor_stack += 5 * pcb->tamanio_contexto;
 	}
 	t_puntero* pos = malloc(sizeof(t_puntero) * pcb->tamanio_contexto);
-	printf("\n\n\n\n");
 	int i, cont = 0;
 	for (i=0; i < pcb->tamanio_contexto; i++){
 		int aux = inicial + (i*5);
@@ -94,7 +93,6 @@ void cargar_diccionario(){
 	}
 	//pcb->cursor_stack =  cont * 5;
 	log_info(logs, "Se cargo el diccionario de variables");
-	printf("\n\n\n\n");
 }
 
 /* Funcion que le pide el stack a la UMV */
@@ -149,6 +147,12 @@ int archivo_de_configuracion_valido(){
 	if (!config_has_property(config, "PUERTO_UMV"))
 		return 0;
 	return 1;
+}
+
+void vaciarDiccionario(){
+	if (!dictionary_is_empty(diccionarioDeVariables)){
+		dictionary_clean(diccionarioDeVariables);
+	}
 }
 
 /* Funcion que recibe la sentencia de la UMV */

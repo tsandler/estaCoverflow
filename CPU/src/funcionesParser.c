@@ -143,7 +143,7 @@ void llamar_sin_retorno(t_nombre_etiqueta etiqueta){;
 	log_info(logs, "Se llamo a la funcion llamarSinRetorno con la etiqueta %s", etiqueta);
 	ir_al_label(etiqueta);
 	pcb->tamanio_contexto = 0;
-	dictionary_clean(diccionarioDeVariables);
+	vaciarDiccionario();
 }
 
 /* Primitiva que se invoca en las funciones, recibe la direccion donde retornar el valor y la etiqueta a la cual tiene que ir */
@@ -239,6 +239,7 @@ void entrada_salida(t_nombre_dispositivo dispositivo, int tiempo){
 	tam->length = sizeof(registroPCB);
 	if (!enviarDatos(socketKernel, tam, pcb, logs))
 		log_error(logs, "Se produjo un error al enviar el PCB por un systemCall");
+	log_info(logs, "El dispositivo %s fue a E/S con %d tiempos", dispositivo, tiempo);
 	systemCall = true;
 }
 

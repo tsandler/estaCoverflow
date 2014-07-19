@@ -127,13 +127,14 @@ void manejoCPU(int fd) {
 		recibirDato(fd, tam->length, (void*) &tiempo, logs);
 		recibirDatos(fd, tam, (void*) &dispositivo, logs);
 		recibirDatos(fd, tam, (void*) PCBrecibido, logs);
-		sem_wait(&mutexEXEC);
-		//EXEC = list_filter(EXEC, (void*)condicion); //saco de la cola exec
+		/*sem_wait(&mutexEXEC);
+		EXEC = list_filter(EXEC, (void*)condicion); //saco de la cola exec
 		log_info(logs, "Se saco de la cola EXEC el proceso %i",
 				PCBrecibido->pid);
-		sem_post(&mutexEXEC);
-		t_io*io = malloc(sizeof(t_io));
-		io = dictionary_get(dispositivosIO, dispositivo);
+		sem_post(&mutexEXEC);*/
+		char* disp = string_from_format("%s", &dispositivo);
+		t_io*io;
+		io = dictionary_get(dispositivosIO, disp);
 		PCBrecibido->retrasoIO = tiempo;
 		ponerCola(PCBrecibido, io->cola, &io->mutex, &io->hayAlgo); //lo mando al io
 		log_info(logs, "Se coloco en la Cola de IO el proceso %i",

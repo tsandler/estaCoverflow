@@ -139,7 +139,7 @@ int main(int argc, char **argv) {
 
 	while (dispositivos[i] != NULL ) {
 		t_io* io;
-		io = malloc(sizeof(t_io));
+		io = malloc(strlen(dispositivos[i]) + sizeof(sem_t) * 2 + sizeof(t_queue) + sizeof(int));
 
 		io->nombre = dispositivos[i];
 		int a = atoi(dispRetardo[i]);

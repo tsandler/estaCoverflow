@@ -23,6 +23,7 @@ char* recibir_sentencia();
 void retorno_de_stack();
 
 int archivo_de_configuracion_valido();
+void vaciarDiccionario();
 void manejar_senial();
 void liberar_estructuras();
 

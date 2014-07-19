@@ -99,7 +99,7 @@ int main(int argc, char** argv){
 			cerrarSocket(socketKernel);
 			cerrarSocket(socketUMV);
 		}
-		dictionary_clean_and_destroy_elements(diccionarioDeVariables, NULL);
+		vaciarDiccionario();
 	}
 
 	liberar_estructuras();
