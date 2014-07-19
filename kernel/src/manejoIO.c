@@ -2,6 +2,8 @@
 #include "colas.h"
 extern t_queue* READY;
 extern t_log *logs;
+extern sem_t mutexREADY;
+extern sem_t hayAlgoEnReady;
 
 
 void manejoIO(t_io* io){
@@ -15,7 +17,7 @@ while(1){
 
 	sleep(unPCB->retrasoIO*io->retardo/1000);
 
-	ponerCola(unPCB, READY,&io->mutex, &io->hayAlgo);
+	ponerCola(unPCB, READY,&mutexREADY,&hayAlgoEnReady);
 	log_info(logs, "Se coloco en la cola ready el programa: %i",unPCB->pid);
 
 

@@ -137,8 +137,7 @@ void manejoCPU(int fd) {
 		io = dictionary_get(dispositivosIO, disp);
 		PCBrecibido->retrasoIO = tiempo;
 		ponerCola(PCBrecibido, io->cola, &io->mutex, &io->hayAlgo); //lo mando al io
-		log_info(logs, "Se coloco en la Cola de IO el proceso %i",
-				PCBrecibido->pid);
+		log_info(logs, "Se coloco en la Cola de IO el proceso %i",PCBrecibido->pid);
 		PCBPOP = sacarCola(READY, &mutexREADY, &hayAlgoEnReady); //mando PCB nuevo nuevo.
 		sem_wait(&mutexMandarColaEXEC);	//envio datos y pongo en exec atomicamente
 		ponerCola(PCBPOP, EXEC, &mutexEXEC, &hayAlgoEnExec);
