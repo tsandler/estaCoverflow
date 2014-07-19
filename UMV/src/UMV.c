@@ -15,7 +15,7 @@ sem_t mutexOpera;
 
 int main(int argc, char** argv){
 
- 	logs = log_create("log","UMV.c",0,LOG_LEVEL_TRACE);
+ 	logs = log_create("log","UMV.c",1,LOG_LEVEL_TRACE);
 	/*if (argc < 2){
 		log_error(logs, "No se envio ningun parametro");
 		log_destroy(logs);
@@ -31,10 +31,6 @@ int main(int argc, char** argv){
 	inicializar_var_config();
 	inicializar_umv(tamanioUMV);
 	log_debug(logs,"Ya se creo la umv");
-
-	log_debug(logs,"Levanto el hilo: Consola");
-	pthread_create(&pthread_consola, NULL, (void*)consola, NULL);
-
 
 	sem_init(&yaEscribio,0,0);
 	sem_init(&mutexOpera,0,1);
@@ -64,6 +60,10 @@ int main(int argc, char** argv){
 			termina = 1;
 		}else{
 			if (tam->menu == SOY_KERNEL){
+
+				log_debug(logs,"Levanto el hilo: Consola");
+				pthread_create(&pthread_consola, NULL, (void*)consola, NULL);
+
 				log_debug(logs,"[MAIN KERNEL]Se conecto: Kernel");
 				pthread_create(&pthread_kernel, NULL, (void*)funcion_kernel, (void*)socket);
 			}else

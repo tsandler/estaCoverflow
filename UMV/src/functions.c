@@ -47,6 +47,7 @@ void funcion_CPU(int socket){
 		sem_wait(&yaEscribio);
 
 	while(1){
+		printf("\n\n\n");
 		log_info(logs,"[HILO CPU] Esperando menu...");
 		if(!recibirMenu(socket, tam, logs)){
 			log_error(logs, "Se produjo un error recibiendo el menu");
@@ -653,13 +654,9 @@ unsigned char* ejec_operacion(int nroOp){
 			scanf("%d",&pid);
 			cambiar_pid_activo(pid);
 			//////
-			printf("Ingresar la direccion logica: ");
-			scanf("%d",&dirLogica);
-			printf("Ingresar offset: ");
-			scanf("%d",&offset);
-			printf("Ingresar tamanio a escribir: ");
-			scanf("%d",&tamanio);
-			//FIXME
+//			FIXME: como poner el buffer que se escribe
+
+
 
 			escribir_segmento(dirLogica,tamanioAEscribir,offset,buffer);
 				//generar_archivo(resultado,nroOp);
@@ -762,16 +759,10 @@ void imprime_listahuecos(){
 	list_iterate(listaHuecos, (void*)imprime_campos_listahuecos);
 }
 
-void imprime_campos_listatablaSegUMV(tablaSegUMV *unElem){ //FIXME
+void imprime_campos_listatablaSegUMV(tablaSegUMV *unElem){
 	printf("Nro segmento: %d\n",unElem->idSegmento);
 	printf("  Dirección logica: %d\n",unElem->dirLogica);
 	printf("  Tamaño del segmento: %d\n",unElem->tamanioSegmento);
-	printf("  Contenido:\n");
-	char* resp = malloc(unElem->tamanioSegmento);
-	memcpy(resp, unElem->dirFisica, unElem->tamanioSegmento);
-	//string_from_format("%s",resp);
-	printf("%s",resp);
-
 }
 
 void imprime_campos_listahuecos(nodoHuecos *unElem){

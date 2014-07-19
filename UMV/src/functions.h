@@ -67,6 +67,9 @@ void buscar_hueco_para_compactar(nodoHuecos* unElem);
 void buscar_el_primer_hueco_y_actualizar_ramAux();
 void actualizar_RamAux(char* pid, t_list* listSeg);
 
+
+
 bool validacion_escribir_seg(int base);
+
 
 #endif /* FUNCTIONS_H_ */
