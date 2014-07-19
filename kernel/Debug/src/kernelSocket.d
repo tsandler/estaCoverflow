@@ -21,7 +21,7 @@ src/kernelSocket.d: ../src/kernelSocket.c ../src/kernelSocket.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../commons/log.h \
  ../src/manejoSemaforos.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/sockets.h \
- ../src/funcionesPCB.h ../src/manejoCPU.h ../src/colas.h
+ ../src/funcionesPCB.h ../src/colas.h ../src/manejoCPU.h
 
 ../src/kernelSocket.h:
 
@@ -73,6 +73,6 @@ src/kernelSocket.d: ../src/kernelSocket.c ../src/kernelSocket.h \
 
 ../src/funcionesPCB.h:
 
-../src/manejoCPU.h:
-
 ../src/colas.h:
+
+../src/manejoCPU.h:

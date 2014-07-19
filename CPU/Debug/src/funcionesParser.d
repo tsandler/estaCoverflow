@@ -16,7 +16,8 @@ src/funcionesParser.d: ../src/funcionesParser.c ../src/funcionesParser.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/log.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/config.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/parser/metadata_program.h \
- /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/string.h
+ /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/string.h \
+ ../src/functions.h
 
 ../src/funcionesParser.h:
 
@@ -55,3 +56,5 @@ src/funcionesParser.d: ../src/funcionesParser.c ../src/funcionesParser.h \
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/parser/metadata_program.h:
 
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/string.h:
+
+../src/functions.h:

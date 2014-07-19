@@ -19,7 +19,7 @@ variables f,  A,  g
     io impresora 20
 	:Siguiente	
     imprimir A
-    textPrint    Hola Mundo!
+    textPrint Hola Mundo!
     
     sumar1 &g		
     print 		g    
