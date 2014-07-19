@@ -707,7 +707,6 @@ void generar_archivo(unsigned char* resultado, int nroOp){
 			break;
 	}
 }
-
 void dump(){
 	int nroOp;
 	printf("\nUsted selecciono 'Dump'\n");
@@ -721,21 +720,74 @@ void dump(){
 	switch(nroOp){
 		case ESTRUCTURAS_MEMORIA:
 			imprime_estructuras_memoria();
-//			generar_archivo(unsigned char* resultado, int nroOp); TODO: generarArchivo
 			break;
 		case MEMORIA_PRINCIPAL:
 			imprime_estado_mem_ppal();
-//			generar_archivo();
 			break;
 		case CONTENIDO_MEM_PPAL:
-			//TODO: dump: contenido memoria ppal y generar archivo
-//			generar_archivo();
+
 			break;
 		default:
 			log_error(logs,"COMANDO NO VALIDO");
 			break;
 	}
 }
+
+void imprime_listahuecos(){
+	log_info(logs,"Se imprime lista huecos");
+	list_iterate(listaHuecos, (void*)imprime_campos_listahuecos);
+}
+
+void imprime_campos_listatablaSegUMV(tablaSegUMV *unElem){
+	printf("Nro segmento: %d\n",unElem->idSegmento);
+	printf("  Dirección logica: %d\n",unElem->dirLogica);
+	printf("  Tamaño del segmento: %d\n",unElem->tamanioSegmento);
+	char* rta = malloc(unElem->tamanioSegmento);
+	memcpy(rta,unElem->dirFisica,unElem->tamanioSegmento);
+	printf("Contenido:\n	%s",rta);
+	free(rta);
+}
+
+void imprime_campos_listahuecos(nodoHuecos *unElem){
+	printf("Contenido:\n");
+	printf("  Tamaño del segmento: %d\n",unElem->tamanioSegmento);
+}
+
+void imprime_estructuras_memoria(){
+	int opcion;
+	void itera_diccionario(char* pid,t_list* listaSeg){
+		list_iterate(listaSeg, (void*)imprime_campos_listatablaSegUMV);
+	}
+	if(!dictionary_size(tablaPidSeg))
+		printf("**Actualmente no hay segmentos en memoria**");
+	else{
+		printf("Reporte de..\n   1.Tablas de segmentos de todos los procesos\n");
+		printf("   2.Tablas de segmentos de un proceso");
+		printf("Opcion: ");
+		scanf("%d",&opcion);
+
+		if(opcion == 1)
+			dictionary_iterator(tablaPidSeg,(void*)itera_diccionario);
+		else if(opcion == 2){
+			int pid;
+			printf("Ingrese PID:");
+			scanf("%d",&pid);
+			t_list* listSeg = dictionary_remove(tablaPidSeg,string_itoa(pid));
+			list_iterate(listSeg,(void*)imprime_campos_listatablaSegUMV);
+		}
+
+
+	}
+
+
+}
+
+void imprime_estado_mem_ppal(){
+	imprime_estructuras_memoria();
+	printf("Bloques libres de memoria:\n");
+	imprime_listahuecos();
+}
+
 
 
 /* Funcion que retorna el mayor idSegmento entre dos elementos */
@@ -751,38 +803,6 @@ bool sort_mayor_hueco(nodoHuecos* unElem, nodoHuecos* otroElem){
 /* Funcion que retorna la mayor dirLogica entre dos elementos */
 bool sort_mayor_dirLogica(tablaSegUMV* unElem, tablaSegUMV* otroElem){
 	return unElem->dirLogica > otroElem->dirLogica;
-}
-
-
-void imprime_listahuecos(){
-	log_info(logs,"Se imprime lista huecos");
-	list_iterate(listaHuecos, (void*)imprime_campos_listahuecos);
-}
-
-void imprime_campos_listatablaSegUMV(tablaSegUMV *unElem){
-	printf("Nro segmento: %d\n",unElem->idSegmento);
-	printf("  Dirección logica: %d\n",unElem->dirLogica);
-	printf("  Tamaño del segmento: %d\n",unElem->tamanioSegmento);
-}
-
-void imprime_campos_listahuecos(nodoHuecos *unElem){
-	printf("Contenido:\n");
-	printf("  Tamaño del segmento: %d\n",unElem->tamanioSegmento);
-}
-
-void imprime_estructuras_memoria(){
-	void itera_diccionario(char* pid,t_list* listaSeg){
-		list_iterate(listaSeg, (void*)imprime_campos_listatablaSegUMV);
-	}
-	printf("Reporte de: Tablas de segmentos de todos los procesos\n");
-	dictionary_iterator(tablaPidSeg,(void*)itera_diccionario);
-
-}
-
-void imprime_estado_mem_ppal(){
-	imprime_estructuras_memoria();
-	printf("Bloques libres de memoria:\n");
-	imprime_listahuecos();
 }
 
 
