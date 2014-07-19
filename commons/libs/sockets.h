@@ -53,6 +53,7 @@ typedef enum{
 	LEER_SEGMENTO,
 	RETORNO_DE_STACK,
 	OK,
+	ERROR,
 }t_menu;
 
 typedef struct t_length{

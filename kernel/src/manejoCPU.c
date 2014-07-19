@@ -19,6 +19,7 @@ extern sem_t gradoProg;
 extern t_dictionary * variablesCompartidas;
 extern t_dictionary * dispositivosIO;
 extern t_dictionary * semaforos;
+extern t_dictionary * fileDescriptors;
 extern t_config * config;
 extern sem_t mutexSemaforos;
 extern sem_t mutexMandarColaEXEC;
@@ -43,7 +44,7 @@ void manejoCPU(int fd) {
 	char* sem;
 	int valorMostrar;
 	char* variable;
-	bool bloqueado;
+	int bloqueado;
 	t_semaforos* tSem;
 	int* valorCompartida = malloc(sizeof(int));
 	int quantum = config_get_int_value(config, "QUANTUM");
@@ -76,9 +77,9 @@ void manejoCPU(int fd) {
 
 		switch (tam->menu) {
 		char* var;
-		int fdRecibido;
+		int pidRecibido;
 	case OBTENER_VALOR_COMPARTIDA: // char*
-		recibirDato(fd, tam->length, (void*)&variable, logs);
+		recibirDato(fd, tam->length, (void*) &variable, logs);
 		sem_wait(&mutexVarCompartidas);
 		var = string_from_format("%s", &variable);
 		int* valor = dictionary_get(variablesCompartidas, var);
@@ -95,25 +96,30 @@ void manejoCPU(int fd) {
 		dictionary_remove(variablesCompartidas, var);
 		log_info(logs, "Se saco la variable compartida %s", var);
 		dictionary_put(variablesCompartidas, var, valorCompartida);
-		log_info(logs, "Se coloco la variable compartida %s y su valor es %i", var, *valorCompartida);
+		log_info(logs, "Se coloco la variable compartida %s y su valor es %i",
+				var, *valorCompartida);
 		sem_post(&mutexVarCompartidas);
 		break;
 
 	case IMPRIMIR:
 		recibirDato(fd, tam->length, (void*) &valorMostrar, logs);
-		recibirDatos(fd, tam, (void*) &fdRecibido, logs);
+		recibirDatos(fd, tam, (void*) &pidRecibido, logs);
 		tam->length = sizeof(int);
-		enviarDatos(fdRecibido, tam, &valorMostrar, logs);
+		char* p = string_from_format("%d", pidRecibido);
+		int* fdTemp = dictionary_get(fileDescriptors, p);
+		enviarDatos(*fdTemp, tam, &valorMostrar, logs);
 		log_info(logs, "El valor a imprimir es %i", valorMostrar);
 
 		break;
 
 	case IMPRIMIR_TEXTO:
 		recibirDato(fd, tam->length, (void*) &textoAImprimir, logs);
-		recibirDatos(fd, tam, (void*) &fdRecibido, logs);
+		recibirDatos(fd, tam, (void*) &pidRecibido, logs);
 		char* algto = string_from_format("%s", &textoAImprimir);
 		tam->length = strlen(algto) + 1;
-		enviarDatos(fdRecibido, tam, algto, logs);
+		char* p1 = string_from_format("%d", pidRecibido);
+		int* fdTemp1 = dictionary_get(fileDescriptors, p1);
+		enviarDatos(*fdTemp1, tam, algto, logs);
 		log_info(logs, "el texto a imprimir es %s", algto);
 		break;
 
@@ -145,16 +151,18 @@ void manejoCPU(int fd) {
 	case WAIT:
 
 		recibirDato(fd, tam->length, (void*) &nombreSem, logs);
+		log_info(logs, "SYSCALL: WAIT");
 		sem = string_from_format("%s", &nombreSem);
 		//ESTO DEBE SER ATOMICO
 		log_info(logs, "El semaforo se llama %s", sem);
 		sem_wait(&mutexSemaforos);
 		tSem = dictionary_get(semaforos, sem);
 		if (tSem->valor <= 0) {
-			tSem->valor = tSem->valor - 1;
-			bloqueado = true;
+			//tSem->valor = tSem->valor - 1;
+			tSem->valor = 0;
+			bloqueado = 1;
 			log_info(logs, "y su valor es %i", tSem->valor);
-			tam->length = sizeof(bool);
+			tam->length = sizeof(int);
 			enviarDatos(fd, tam, &bloqueado, logs);
 			recibirDatos(fd, tam, (void*) PCBrecibido, logs);
 			ponerCola(PCBrecibido, tSem->cola, &tSem->mutex, &tSem->hayAlgo);
@@ -171,17 +179,17 @@ void manejoCPU(int fd) {
 
 		} else {
 			tSem->valor = tSem->valor - 1;
-			bloqueado = false;
+			bloqueado = 0;
 			enviarDatos(fd, tam, &bloqueado, logs);
 			log_info(logs, "y su valor es %i", tSem->valor);
-			dictionary_remove(semaforos, nombreSem);
-			dictionary_put(semaforos, nombreSem, tSem);
 		}
 
 		sem_post(&mutexSemaforos);
 
 		break;
 	case SIGNAL:
+
+		log_info(logs, "SYSCALL: SIGNAL");
 		recibirDato(fd, tam->length, (void*) &nombreSem, logs);
 		sem = string_from_format("%s", &nombreSem);
 
@@ -189,7 +197,7 @@ void manejoCPU(int fd) {
 		sem_wait(&mutexSemaforos);
 		tSem = dictionary_get(semaforos, sem);
 		tSem->valor = tSem->valor + 1;
-		if (tSem->valor > 0) {
+		if (tSem->valor >= 0) {
 			if (queue_size(tSem->cola) != 0) {
 				PCBPOP = sacarCola(tSem->cola, &tSem->mutex, &tSem->hayAlgo);
 				ULTIMOPCB = PCBPOP;
@@ -198,8 +206,6 @@ void manejoCPU(int fd) {
 
 		}
 		log_info(logs, "y su valor es %i", tSem->valor);
-		dictionary_remove(semaforos, nombreSem);
-		dictionary_put(semaforos, nombreSem, tSem);
 		sem_post(&mutexSemaforos);
 
 		break;
@@ -219,12 +225,11 @@ void manejoCPU(int fd) {
 		log_info(logs, "Se coloco en la cola Ready el proceso %i",
 				PCBrecibido->pid);
 		PCBPOP = sacarCola(READY, &mutexREADY, &hayAlgoEnReady); //saco de ready
-		log_info(logs, "Se saco de la cola Ready el proceso %i",
-				PCBrecibido->pid);
+		ULTIMOPCB = PCBPOP;
+		log_info(logs, "Se saco de la cola Ready el proceso %i", PCBPOP->pid);
 		sem_wait(&mutexMandarColaEXEC);	//envio datos y pongo en exec atomicamente
 		ponerCola(PCBPOP, EXEC, &mutexEXEC, &hayAlgoEnExec);
-		log_info(logs, "Se coloco en la cola EXEC el proceso %i",
-				PCBrecibido->pid);
+		log_info(logs, "Se coloco en la cola EXEC el proceso %i", PCBPOP->pid);
 		tam->length = sizeof(registroPCB);
 		enviarDatos(fd, tam, PCBPOP, logs);
 		sem_post(&mutexMandarColaEXEC);
@@ -259,11 +264,21 @@ void manejoCPU(int fd) {
 		break;
 
 	default:
+
+		ponerCola(ULTIMOPCB,EXIT,&mutexEXIT,&hayAlgoEnExit);
+
+		/*tam->menu = IMPRIMIR_TEXTO;
+		char* mensaje = string_from_format("%s", "El programa tuvo que terminar inesperadamente.");
+		tam->length = strlen(mensaje) + 1;*/
+		char* p2 = string_from_format("%d", ULTIMOPCB->pid);
+		int* fd2= dictionary_get(fileDescriptors, p2);
+		//enviarDatos(*fd2, tam, mensaje, logs);
+		tam->menu = ERROR;
+		enviarMenu(*fd2, tam, logs);
 		log_error(logs,
 				"Se interrumpio el proceso con el PID: %d debido a que la CPU esta caida",
-				unPCB->pid);
+				ULTIMOPCB->pid);
 
-		ponerCola(ULTIMOPCB, READY, &mutexREADY, &hayAlgoEnReady);
 		log_error(logs, "Se cierra la CPU.");
 		pthread_exit(1);
 

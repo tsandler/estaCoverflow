@@ -73,7 +73,7 @@ int main(int argc, char** argv){
 		cargar_diccionario();
 
 		systemCall = false;
-		ejecutando = 1; //Si se llama la senial SIGUSR1 espera a que concluya el quantum
+		ejecutando = 1;
 		while (quantum > cont && !systemCall){
 			pc = pcb->program_counter;
 
@@ -99,7 +99,7 @@ int main(int argc, char** argv){
 			cerrarSocket(socketKernel);
 			cerrarSocket(socketUMV);
 		}
-		dictionary_clean(diccionarioDeVariables);
+		dictionary_clean_and_destroy_elements(diccionarioDeVariables, NULL);
 	}
 
 	liberar_estructuras();

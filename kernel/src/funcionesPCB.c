@@ -11,6 +11,8 @@
 #include <commons/log.h>
 #include "funcionesPCB.h"
 
+
+extern t_dictionary * fileDescriptors;
 extern int socket_UMV;
 extern t_config* config;
 extern t_log* logs;
@@ -141,6 +143,10 @@ registroPCB* armarPCB(char* program, int fd){
 
 	unPCB=malloc(sizeof(registroPCB));
 
+	char * keyPID= string_from_format("%d", identificadorUnico);
+	int* f = malloc(sizeof(int));
+	*f = fd;
+	dictionary_put(fileDescriptors,keyPID,f);
 
 	unPCB->program_counter=metadataP->instruccion_inicio;
 	unPCB->fd=fd;
@@ -150,6 +156,7 @@ registroPCB* armarPCB(char* program, int fd){
 	unPCB->tamanio_indice_etiquetas = metadataP->etiquetas_size;
     unPCB->pid = identificadorUnico;
     unPCB->tamanio_contexto= 0;
+    unPCB->cursor_anterior = 0;
     unPCB->tamanio_indice_codigo=metadataP->instrucciones_size * sizeof(t_intructions);
     unPCB->indice_etiquetas = crearSegmento(unPCB,logs,unPCB->tamanio_indice_etiquetas,socket_UMV);
     unPCB->segmento_stack = crearSegmento(unPCB,logs,tamanioStack,socket_UMV);

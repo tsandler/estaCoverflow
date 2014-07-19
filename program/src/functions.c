@@ -51,6 +51,10 @@ char* recibir_sentencia(){
 					return string_from_format("%s", &sent);
 				}
 				break;
+			case ERROR:
+				tam->menu = FINALIZAR;
+				printf("El programa tuvo que finalizar insatisfactoriamente");
+				break;
 			default:
 				tam->menu = FINALIZAR;
 				break;

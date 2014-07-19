@@ -34,6 +34,7 @@ t_log *logs;
 t_dictionary * dispositivosIO;
 t_dictionary * variablesCompartidas;
 t_dictionary * semaforos;
+t_dictionary * fileDescriptors;
 int socket_UMV;
 int socketCPU; // LO PUSE PARA CERRARLO MAS ABAJO CUALQUIER COSA VEMOS SI LO CERRAMOS DIRECTAMENTE EN EL PCP....
 void plp(void* ptr);
@@ -44,6 +45,7 @@ int tamanioStack;
 
 
 int main(int argc, char **argv) {
+
 
 	logs = log_create("log_Principal", "kernel.c", 1, LOG_LEVEL_TRACE); //LOG
 	/*
@@ -105,6 +107,7 @@ int main(int argc, char **argv) {
 	pthread_t thread1, thread2;
 	dispositivosIO = dictionary_create(); // creo diccionario (?)
 	variablesCompartidas = dictionary_create();
+	fileDescriptors =dictionary_create();
 	semaforos = dictionary_create();
 	logs = log_create("log_Principal", "kernel.c", 1, LOG_LEVEL_TRACE); //LOG
 	int iret1, iret2;

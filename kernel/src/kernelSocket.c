@@ -92,7 +92,8 @@ int openSocketServerPLP(int PORT) {
 			if (recibirDatos(newfd, tam, (void*)buf, logs)==1) {
 				puts("llego");
 				log_info(logs,"%s \n",&buf);
-				registroPCB* unPCB = armarPCB(&buf,newfd);
+				registroPCB* unPCB = malloc(sizeof(registroPCB));
+				unPCB = armarPCB(&buf,newfd);
 
 				ponerCola(unPCB,NEW,&mutexNEW, &hayAlgo);
 				log_info(logs,"Se coloco en la cola NEW el programa %i",unPCB->pid);

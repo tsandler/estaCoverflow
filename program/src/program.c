@@ -17,6 +17,7 @@ int main(int argc, char **argv) {
 
 	inicializar_variables();
 
+	logs = log_create("log", "program.c", 1, LOG_LEVEL_TRACE);
 	if (argc < 2){
 		log_error(logs, "No se paso ningun script para procesar");
 		liberar_estructuras();
@@ -38,6 +39,7 @@ int main(int argc, char **argv) {
 	log_info(logs, "El proceso se conecto correctamente con el kernel");
 
 	enviar_programa_al_kernel(argv[1]);
+
 	printf("\n\n");
 	while (tam->menu != FINALIZAR){
 		char* sentencia = recibir_sentencia();
