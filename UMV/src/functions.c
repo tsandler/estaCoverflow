@@ -1,9 +1,10 @@
 #include "functions.h"
 
 extern sem_t yaEscribio;
-
+extern sem_t mutexOpera;
 extern int retardoActual;
 extern int encontroHueco;
+extern int algoritmoActual;
 
 
 /*Funcion que llama el hilo cada vez que se conecta algun CPU a la UMV*/
@@ -36,6 +37,7 @@ void funcion_CPU(int socket){
 
 		switch(tam->menu){
 			case PID_ACTUAL:
+				sem_wait(&mutexOpera);
 				retardo();
 				log_info(logs,"[HILO CPU] Entra a cambiar el pidActivo");
 				if(!recibirDato(socket, tam->length, (void*)&pid, logs)){
@@ -45,9 +47,11 @@ void funcion_CPU(int socket){
 				log_debug(logs,"Pid actual por CPU: %d", pid);
 				cambiar_pid_activo(pid);
 				log_info(logs,"[HILO CPU] Ya cambio el pidActivo");
+				sem_post(&mutexOpera);
 				break;
 			case ESCRIBIR_SEGMENTO:
 				retardo();
+				sem_wait(&mutexOpera);
 				log_info(logs,"[HILO CPU] Entra a escribir segmento");
 
 				if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
@@ -73,10 +77,11 @@ void funcion_CPU(int socket){
 
 				escribir_segmento(base,tamanio,offset,cod);
 				log_debug(logs,"Ya se escribio el segmento");
+				sem_post(&mutexOpera);
 				break;
-
 			case RETORNO_DE_STACK:
 				retardo();
+				sem_wait(&mutexOpera);
 				log_info(logs,"[HILO CPU] Entra a envio de stack");
 
 				if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
@@ -109,9 +114,11 @@ void funcion_CPU(int socket){
 				log_debug(logs,"Ya se escribio el segmento");
 				tam->menu = OK;
 				enviarMenu(socket, tam, logs);
+				sem_post(&mutexOpera);
 				break;
 			case PEDIR_SENTENCIA:
 				retardo();
+				sem_wait(&mutexOpera);
 				log_info(logs,"[HILO CPU] Entra a pedir sentencia");
 				if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
@@ -149,14 +156,14 @@ void funcion_CPU(int socket){
 					log_error(logs,"Error al enviarse la sentencia");
 
 				log_info(logs,"[HILO CPU] Sale de pedir sentencia");
+				sem_post(&mutexOpera);
 				break;
 			case LEER_SEGMENTO:
 				retardo();
+				sem_wait(&mutexOpera);
 				log_info(logs,"[HILO CPU] Entra a leer segmento");
 
-
-
-	if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
+				if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
 					break;
 				}
@@ -171,6 +178,7 @@ void funcion_CPU(int socket){
 				tam->length = etiq->tamanio;
 				enviarDatos(socket, tam, codigo, logs);
 				log_info(logs,"[HILO CPU] Ya envio el buf");
+				sem_post(&mutexOpera);
 				break;
 			default:
 				log_error(logs,"[HILO CPU] Se recibio una operacion invalida");
@@ -204,6 +212,7 @@ void funcion_kernel(int socket){
 		switch(tam->menu){
 			case PID_ACTUAL:
 				retardo();
+				sem_wait(&mutexOpera);
 				log_debug(logs,"[HILO KERNEL] Cambia pid activo");
 				if(!recibirDato(socket, tam->length, (void*)&pid, logs)){
 					log_error(logs, "Se produjo un error recibiendo el pid");
@@ -211,9 +220,11 @@ void funcion_kernel(int socket){
 				}
 				cambiar_pid_activo(pid);
 				log_debug(logs,"[HILO KERNEL] Se cambio el pid activo a %d", pid);
+				sem_post(&mutexOpera);
 				break;
 			case ESCRIBIR_SEGMENTO:
 				retardo();
+				sem_wait(&mutexOpera);
 				log_debug(logs,"Entra a escribir segmento");
 				if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
@@ -232,10 +243,7 @@ void funcion_kernel(int socket){
 				}
 				int base=etiq->base;
 				int offset=etiq->offset;
-
-
-
-	int tamanio=etiq->tamanio;
+				int tamanio=etiq->tamanio;
 				char buffer[1024];
 				if(!recibirDatos(socket,tam,(void*)&buffer,logs)){
 					log_error(logs,"Se produjo un error recibiendo el codigo");
@@ -246,12 +254,12 @@ void funcion_kernel(int socket){
 				log_debug(logs,"Ya se escribio el segmento");
 
 				segEscritos++;
+				sem_post(&mutexOpera);
 				sem_post(&yaEscribio);
-
 				break;
-
 			case CREAR_SEGMENTO:
 				retardo();
+				sem_wait(&mutexOpera);
 				log_debug(logs,"Entra kernel a crear segmento");
 				if(!recibirDato(socket, tam->length, (void*)pidTam, logs)){
 					log_error(logs, "Se produjo un error recibiendo pid-tamanio");
@@ -261,9 +269,11 @@ void funcion_kernel(int socket){
 				int baseLog = crear_agregar_segmento(pidTam->pid,pidTam->tamanio);
 				tam->length = sizeof(int);
 				enviarDatos(socket, tam, &baseLog, logs);
+				sem_post(&mutexOpera);
 				break;
 			case ELIMINAR_SEGMENTOS:
 				retardo();
+				sem_wait(&mutexOpera);
 				log_info(logs,"[HILO KERNEL] Entra a eliminar segmentos");
 				if(!recibirDato(socket, tam->length, (void*)&pid, logs)){
 					log_error(logs, "Se produjo un error recibiendo el pid");
@@ -271,6 +281,7 @@ void funcion_kernel(int socket){
 				}
 				log_debug(logs,"[HILO KERNEL] Entra a eliminar segmentos");
 				destruir_segmentos(pid);
+				sem_post(&mutexOpera);
 				break;
 			default:
 				retardo();
@@ -284,9 +295,7 @@ void funcion_kernel(int socket){
 			break;
 	}
 	log_error(logs,"[HILO KERNEL]La UMV desconectó al kernel por fallo");
-
 }
-
 
 
 bool validacion_escribir_seg(int base){

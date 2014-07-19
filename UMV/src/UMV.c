@@ -11,6 +11,7 @@
 #include "functions.h"
 
 sem_t yaEscribio;
+sem_t mutexOpera;
 
 int main(int argc, char** argv){
 
@@ -33,6 +34,7 @@ int main(int argc, char** argv){
 
 
 	sem_init(&yaEscribio,0,0);
+	sem_init(&mutexOpera,0,1);
 
 	int termina = 0;
 	int socket;
