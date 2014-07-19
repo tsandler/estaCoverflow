@@ -47,12 +47,12 @@ int tamanioStack;
 int main(int argc, char **argv) {
 
 
-	logs = log_create("log_Principal", "kernel.c", 1, LOG_LEVEL_TRACE); //LOG
-	/*
+	logs = log_create("log_Principal", "kernel.c", 0, LOG_LEVEL_TRACE); //LOG
+
 	 if (argc < 2){
-	 log_error(logs, "No se pasaron parametros.");
-	 log_destroy(logs);
-	 return 0;
+		 log_error(logs, "No se pasaron parametros.");
+		 log_destroy(logs);
+		 return 0;
 	 }
 
 	 config = config_create(argv[1]);
@@ -64,10 +64,7 @@ int main(int argc, char **argv) {
 	 }
 
 
-	 */
-
 	log_debug(logs, "inicia kernel");
-	config = config_create("config");
 
 	NEW = queue_create(); //COLAS
 	READY = queue_create();

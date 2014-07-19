@@ -263,6 +263,7 @@ void wait(t_nombre_semaforo identificador_semaforo){
 		log_debug(logs, "El semaforo se bloqueo");
 		retorno_de_stack();
 		tam->length = sizeof(registroPCB);
+		log_debug(logs, "PCB enviado: %d", pcb->pid);
 		if (!enviarDatos(socketKernel, tam, pcb, logs))
 			log_error(logs, "Se produjo un error al notificar al enviar el PCB porque se bloqueo el semaforo");
 	}

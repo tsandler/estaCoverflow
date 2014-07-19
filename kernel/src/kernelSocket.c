@@ -96,6 +96,7 @@ int openSocketServerPLP(int PORT) {
 				unPCB = armarPCB(&buf,newfd);
 
 				ponerCola(unPCB,NEW,&mutexNEW, &hayAlgo);
+				muestraNombres(NEW,"NEW");
 				log_info(logs,"Se coloco en la cola NEW el programa %i",unPCB->pid);
 
 

@@ -34,7 +34,7 @@ bool condicion(registroPCB* pcb) {
 ;
 
 void manejoCPU(int fd) {
-	t_log * logs = log_create("log_PCP_En_CPU", "manejoCPU.c", 1,
+	t_log * logs = log_create("log_PCP_En_CPU", "manejoCPU.c", 0,
 			LOG_LEVEL_TRACE);
 	log_info(logs, "Corriendo manejo del CPU");
 	int tiempo;
@@ -61,11 +61,13 @@ void manejoCPU(int fd) {
 	enviarDatos(fd, tam, &stack, logs);
 	enviarDatos(fd, tam, &retardo, logs);
 	unPCB = sacarCola(READY, &mutexREADY, &hayAlgoEnReady); //para mandar a exec
+	muestraNombres(READY,"READY");
 	ULTIMOPCB = unPCB;
 	log_info(logs, "Se saco de la cola Ready el proceso %i", unPCB->pid);
 
 	sem_wait(&mutexMandarColaEXEC);	//envio datos y pongo en exec atomicamente
 	ponerCola(unPCB, EXEC, &mutexEXEC, &hayAlgoEnExec);
+	muestraNombres(EXEC,"EXEC");
 	log_info(logs, "Se Coloco en la cola EXEC el PCB %i", unPCB->pid);
 	tam->length = sizeof(registroPCB);
 	enviarDatos(fd, tam, unPCB, logs);
@@ -74,7 +76,7 @@ void manejoCPU(int fd) {
 	while (1) {
 		tam->menu = OK;
 		recibirMenu(fd, tam, logs);
-
+		registroPCB* pcb = malloc(sizeof(registroPCB));
 		switch (tam->menu) {
 		char* var;
 		int pidRecibido;
@@ -158,15 +160,18 @@ void manejoCPU(int fd) {
 		sem_wait(&mutexSemaforos);
 		tSem = dictionary_get(semaforos, sem);
 		if (tSem->valor <= 0) {
-			tSem->valor = tSem->valor - 1;
+			//tSem->valor = tSem->valor - 1;
+			tSem->valor =0;
 			bloqueado = 1;
 			log_info(logs, "y su valor es %i", tSem->valor);
 			tam->length = sizeof(int);
 			enviarDatos(fd, tam, &bloqueado, logs);
-			recibirDatos(fd, tam, (void*) PCBrecibido, logs);
-			ponerCola(PCBrecibido, tSem->cola, &tSem->mutex, &tSem->hayAlgo);
-
+			recibirDatos(fd, tam, (void*) pcb, logs);
+			ponerCola(pcb, tSem->cola, &tSem->mutex, &tSem->hayAlgo);
+			muestraNombres(tSem->cola,"WAIT BLOQUEADOS");
+			muestraNombres(READY,"READY ANTES wait luego de bloquear");
 			PCBPOP = sacarCola(READY, &mutexREADY, &hayAlgoEnReady); //mando de nuevo.
+			muestraNombres(READY,"READY DESPUES wait luego de bloquear");
 			ULTIMOPCB = PCBPOP;
 			sem_wait(&mutexMandarColaEXEC);	//envio datos y pongo en exec atomicamente
 			ponerCola(PCBPOP, EXEC, &mutexEXEC, &hayAlgoEnExec);
@@ -198,9 +203,15 @@ void manejoCPU(int fd) {
 		tSem->valor = tSem->valor + 1;
 		if (tSem->valor >= 0) {
 			if (queue_size(tSem->cola) != 0) {
+				muestraNombres(tSem->cola,"ANTES SIGNAL BLOQUEADOS");
 				PCBPOP = sacarCola(tSem->cola, &tSem->mutex, &tSem->hayAlgo);
+				muestraNombres(tSem->cola,"SIGNAL BLOQUEADOS");
 				ULTIMOPCB = PCBPOP;
+
+				printf("voya poner en ready el PID IMPORTANTE");
+				muestraNombres(READY,"READYs antes luego de desbloquear");
 				ponerCola(PCBPOP, READY, &mutexREADY, &hayAlgoEnReady);
+				muestraNombres(READY,"READYs despues luego de desbloquear");
 			}
 
 		}
@@ -210,20 +221,19 @@ void manejoCPU(int fd) {
 		break;
 	case CONCLUYO_UN_QUANTUM:
 
-		recibirDato(fd, tam->length, (void*) PCBrecibido, logs);
-		log_info(logs, "Se saca de EXEC el proceso %i", PCBrecibido->pid);
-		//saco de exec el PCBrecibido
+		recibirDato(fd, tam->length, (void*) pcb, logs);
+		log_info(logs, "Se saca de EXEC el proceso %i", pcb->pid);
+		printf("recibi de tobi el pid %d",pcb->pid);
 
-		/*sem_wait(&mutexEXEC);
-		EXEC = list_filter(EXEC, (void*)condicion); //saco de la cola exec
-		log_info(logs, "se Saco de la cola EXEC el procecso %i",
-				PCBrecibido->pid);
-		sem_post(&mutexEXEC);
-*/
-		ponerCola(PCBrecibido, READY, &mutexREADY, &hayAlgoEnReady); //lo pongo en ready
+
+		muestraNombres(READY,"QUANTUM READY antes pongo");
+		ponerCola(pcb, READY, &mutexREADY, &hayAlgoEnReady); //lo pongo en ready
+		muestraNombres(READY,"QUANTUM READY despues pongo");
 		log_info(logs, "Se coloco en la cola Ready el proceso %i",
-				PCBrecibido->pid);
+				pcb->pid);
+		muestraNombres(READY,"QUATUM READY  antes saco");
 		PCBPOP = sacarCola(READY, &mutexREADY, &hayAlgoEnReady); //saco de ready
+		muestraNombres(READY,"QUATUM READY  despues saco");
 		ULTIMOPCB = PCBPOP;
 		log_info(logs, "Se saco de la cola Ready el proceso %i", PCBPOP->pid);
 		sem_wait(&mutexMandarColaEXEC);	//envio datos y pongo en exec atomicamente
