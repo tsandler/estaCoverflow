@@ -43,7 +43,6 @@ registroPCB* armarPCB(char* program, int fd);
 int algoritmoDePeso(int cantEtq, int cantfc, t_size cantInstruc);
 void eliminarSegmentoUMV(int socket_UMV, t_log* logs,registroPCB* PCBprograma);
 void conectarseUMV();
-void intercambiarDatosUMV(int socket_UMV, t_log* logs, registroPCB* PCBprograma, char* buf);
 
 int crearSegmento(registroPCB* PCBprograma,t_log* logs , int tamanio);
 void escribirSegmento(registroPCB* PCBprograma, int base ,int tamanio, void* datoAEnviar);
