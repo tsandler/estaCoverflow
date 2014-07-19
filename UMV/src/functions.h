@@ -56,6 +56,7 @@ void generar_archivo(unsigned char* resultado, int nroOp);
 
 void funcion_kernel(int socket);
 void funcion_CPU(int socket);
+t_elem_cola_cpu *desencolar_peticion(int socket);
 
 void compactar_memoria();
 void buscar_segmento_y_desplazarlo();

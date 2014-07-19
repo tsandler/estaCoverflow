@@ -21,6 +21,7 @@
 #include <commons/txt.h>
 #include <libs/sockets.h>
 #include <semaphore.h>
+#include <commons/collections/queue.h>
 
 
 pthread_t pthread_kernel, pthread_CPU, pthread_consola;
@@ -29,6 +30,8 @@ t_dictionary *tablaPidSeg;
 t_list *listaHuecos;
 t_config* config;
 t_length* tam;
+t_queue* colaKernel;
+t_list* colaCPUs;
 int tamanioUMV;
 int retardoActual;
 int algoritmoActual;
@@ -42,6 +45,15 @@ char* ramAux;
 char* dirHueco;
 int tamHueco;
 int encontroHueco;
+
+typedef struct{
+	t_length* tama;
+}t_elem_cola_kernel;
+
+typedef struct{
+	int socket;
+	t_length* tama;
+}t_elem_cola_cpu;
 
 typedef struct{
 	int tamanio;

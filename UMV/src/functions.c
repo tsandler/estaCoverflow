@@ -7,6 +7,25 @@ extern int encontroHueco;
 extern int algoritmoActual;
 
 
+t_elem_cola_cpu *desencolar_peticion(int socket){
+	t_elem_cola_cpu* unaPeticion;
+	int i= colaCPUs->elements_count;
+	while(i>0){
+		if(list_size(colaCPUs) == 1){
+			unaPeticion = list_get(colaCPUs,0);
+			if(unaPeticion->socket ==  socket)
+				return list_remove(colaCPUs,0);
+		}else{
+			unaPeticion = list_get(colaCPUs,i);
+			if(unaPeticion->socket ==  socket)
+				return list_remove(colaCPUs,i);
+			}
+		i--;
+	}
+	return NULL;
+}
+
+
 /*Funcion que llama el hilo cada vez que se conecta algun CPU a la UMV*/
 void funcion_CPU(int socket){
 
@@ -14,6 +33,7 @@ void funcion_CPU(int socket){
 	int termina=0;
 	t_length* tam = malloc(sizeof(t_length));
 	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
+	t_elem_cola_cpu* unaPeticion = malloc(sizeof(t_elem_cola_cpu));
 	unsigned char* codigo;
 	int base;
 	int offset;
@@ -26,7 +46,6 @@ void funcion_CPU(int socket){
 	if(segEscritos == 3)
 		sem_wait(&yaEscribio);
 
-
 	while(1){
 		printf("\n\n\n");
 		log_info(logs,"[HILO CPU] Esperando menu...");
@@ -35,7 +54,12 @@ void funcion_CPU(int socket){
 			break;
 		}
 
-		switch(tam->menu){
+		unaPeticion->socket = socket;
+		unaPeticion->tama = tam;
+		list_add_in_index(colaCPUs,0,unaPeticion);
+		unaPeticion = desencolar_peticion(socket);
+
+		switch(unaPeticion->tama->menu){
 			case PID_ACTUAL:
 				sem_wait(&mutexOpera);
 				retardo();
@@ -200,6 +224,7 @@ void funcion_kernel(int socket){
 	t_length* tam = malloc(sizeof(t_length));
 	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
 	datos_crearSeg* pidTam = malloc(sizeof(datos_crearSeg));
+	t_elem_cola_kernel* unaPeticion = malloc(sizeof(t_elem_cola_kernel));
 	segEscritos = 0;
 
 	while(1){
@@ -209,8 +234,12 @@ void funcion_kernel(int socket){
 			log_error(logs, "[HILO KERNEL] Error al recibir el menu");
 			break;
 		}
+		unaPeticion->tama = tam;
+		queue_push(colaKernel,unaPeticion);
+		unaPeticion = queue_pop(colaKernel);
+
  		log_info(logs,"[HILO KERNEL] Entra al switch");
-		switch(tam->menu){
+		switch(unaPeticion->tama->menu){
 			case PID_ACTUAL:
 				retardo();
 				sem_wait(&mutexOpera);
@@ -314,6 +343,8 @@ void inicializar_umv(int tamanioUMV){
 
 	tablaPidSeg = dictionary_create();
 	listaHuecos = list_create();
+	colaKernel = queue_create();
+	colaCPUs = list_create();
 	nodoHuecos* unElem= malloc(sizeof(nodoHuecos));
 	unElem->dirFisica=malloc(tamanioUMV);
 	unElem->tamanioSegmento=tamanioUMV;
