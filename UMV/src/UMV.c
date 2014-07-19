@@ -32,7 +32,6 @@ int main(int argc, char** argv){
 	inicializar_umv(tamanioUMV);
 	log_debug(logs,"Ya se creo la umv");
 
-
 	sem_init(&yaEscribio,0,0);
 	sem_init(&mutexOpera,0,1);
 

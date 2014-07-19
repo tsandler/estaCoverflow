@@ -53,7 +53,7 @@ void funcion_CPU(int socket){
 				retardo();
 				sem_wait(&mutexOpera);
 				log_info(logs,"[HILO CPU] Entra a escribir segmento");
-
+				cambiar_pid_activo(pid);
 				if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
 					break;
@@ -83,7 +83,7 @@ void funcion_CPU(int socket){
 				retardo();
 				sem_wait(&mutexOpera);
 				log_info(logs,"[HILO CPU] Entra a envio de stack");
-
+				cambiar_pid_activo(pid);
 				if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
 					break;
@@ -120,6 +120,7 @@ void funcion_CPU(int socket){
 				retardo();
 				sem_wait(&mutexOpera);
 				log_info(logs,"[HILO CPU] Entra a pedir sentencia");
+				cambiar_pid_activo(pid);
 				if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
 					break;
@@ -162,7 +163,7 @@ void funcion_CPU(int socket){
 				retardo();
 				sem_wait(&mutexOpera);
 				log_info(logs,"[HILO CPU] Entra a leer segmento");
-
+				cambiar_pid_activo(pid);
 				if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
 					break;
@@ -226,6 +227,7 @@ void funcion_kernel(int socket){
 				retardo();
 				sem_wait(&mutexOpera);
 				log_debug(logs,"Entra a escribir segmento");
+				cambiar_pid_activo(pid);
 				if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
 					break;
@@ -261,6 +263,7 @@ void funcion_kernel(int socket){
 				retardo();
 				sem_wait(&mutexOpera);
 				log_debug(logs,"Entra kernel a crear segmento");
+				cambiar_pid_activo(pid);
 				if(!recibirDato(socket, tam->length, (void*)pidTam, logs)){
 					log_error(logs, "Se produjo un error recibiendo pid-tamanio");
 					break;
@@ -275,6 +278,7 @@ void funcion_kernel(int socket){
 				retardo();
 				sem_wait(&mutexOpera);
 				log_info(logs,"[HILO KERNEL] Entra a eliminar segmentos");
+				cambiar_pid_activo(pid);
 				if(!recibirDato(socket, tam->length, (void*)&pid, logs)){
 					log_error(logs, "Se produjo un error recibiendo el pid");
 					break;
