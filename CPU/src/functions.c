@@ -72,13 +72,19 @@ int recibir(int dato){
 /* Funcion que carga el diccionario de variables para el contexto de ejecucion actual */
 void cargar_diccionario(){
 	t_nombre_variable variable;
-	int inicial = pcb->cursor_anterior;
+	int inicial;
+	if (pcb->cursor_stack != pcb->cursor_anterior)
+		inicial = pcb->cursor_stack - 5 * pcb->tamanio_contexto;
+	else{
+		inicial = pcb->cursor_stack;
+		pcb->cursor_stack += 5 * pcb->tamanio_contexto;
+	}
 	t_puntero* pos = malloc(sizeof(t_puntero) * pcb->tamanio_contexto);
 	printf("\n\n\n\n");
 	int i, cont = 0;
 	for (i=0; i < pcb->tamanio_contexto; i++){
 		int aux = inicial + (i*5);
-		memcpy(pos + aux, &aux, 4);
+		memcpy(pos + (i*5), &aux, 4);
 		memcpy(&variable, stack + aux, 1);
 		char var[2];
 		var[0] = variable;
@@ -86,7 +92,7 @@ void cargar_diccionario(){
 		dictionary_put(diccionarioDeVariables, var, pos + (i*5));
 		cont++;
 	}
-	pcb->cursor_stack = cont * 5;
+	//pcb->cursor_stack =  cont * 5;
 	log_info(logs, "Se cargo el diccionario de variables");
 	printf("\n\n\n\n");
 }
@@ -185,11 +191,30 @@ static char* _depurar_sentencia(char* sentencia, int tamanio){
 	while (string_ends_with(sent, "\n")){
 		sent = string_substring_until(sent, i-1);
 	}
-	while (string_starts_with(sent, "\t")){
+	/*while (string_starts_with(sent, "\t")){
 		sent = string_substring_from(sent, 1);
+	}*/
+	char** sub = string_split(sent, "\t");
+	char* sentenciaCasiFinal = string_new();
+	i = 0;
+	while (sub[i] != NULL){
+		if (!string_equals_ignore_case(sub[i], ","))
+			string_append(&sentenciaCasiFinal, " ");
+		string_append(&sentenciaCasiFinal, sub[i]);
+		i++;
 	}
-	log_info(logs, "Sentencia depurada: %s", sent);
-	return sent;
+	char** sub2 = string_split(sentenciaCasiFinal, " ");
+	char* sentenciaFinal = string_new();
+	i = 0;
+	while (sub2[i] != NULL){
+		if (!string_equals_ignore_case(sub2[i], ","))
+			string_append(&sentenciaFinal, " ");
+		string_append(&sentenciaFinal, sub2[i]);
+		i++;
+	}
+	string_trim(&sentenciaFinal);
+	log_info(logs, "Sentencia depurada: %s", sentenciaFinal);
+	return sentenciaFinal;
 }
 
 /* Funcion que libera las estructuras usadas */

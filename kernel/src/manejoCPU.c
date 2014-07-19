@@ -158,8 +158,7 @@ void manejoCPU(int fd) {
 		sem_wait(&mutexSemaforos);
 		tSem = dictionary_get(semaforos, sem);
 		if (tSem->valor <= 0) {
-			//tSem->valor = tSem->valor - 1;
-			tSem->valor = 0;
+			tSem->valor = tSem->valor - 1;
 			bloqueado = 1;
 			log_info(logs, "y su valor es %i", tSem->valor);
 			tam->length = sizeof(int);
@@ -215,12 +214,12 @@ void manejoCPU(int fd) {
 		log_info(logs, "Se saca de EXEC el proceso %i", PCBrecibido->pid);
 		//saco de exec el PCBrecibido
 
-		sem_wait(&mutexEXEC);
-		//EXEC = list_filter(EXEC, (void*)condicion); //saco de la cola exec
+		/*sem_wait(&mutexEXEC);
+		EXEC = list_filter(EXEC, (void*)condicion); //saco de la cola exec
 		log_info(logs, "se Saco de la cola EXEC el procecso %i",
 				PCBrecibido->pid);
 		sem_post(&mutexEXEC);
-
+*/
 		ponerCola(PCBrecibido, READY, &mutexREADY, &hayAlgoEnReady); //lo pongo en ready
 		log_info(logs, "Se coloco en la cola Ready el proceso %i",
 				PCBrecibido->pid);

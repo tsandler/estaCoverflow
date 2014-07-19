@@ -134,7 +134,7 @@ void ir_al_label(t_nombre_etiqueta etiqueta){
 
 /* Primitiva que se invoca en los procedimientos, cambia el contexto de ejecucion a una etiqueta dada */
 void llamar_sin_retorno(t_nombre_etiqueta etiqueta){;
-	 pcb->cursor_anterior = pcb->cursor_stack  - pcb->tamanio_contexto * 5;
+	pcb->cursor_anterior = pcb->cursor_stack  - pcb->tamanio_contexto * 5;
 	memcpy(stack + pcb->cursor_stack, &pcb->cursor_anterior, 4);
 	pcb->cursor_stack += 4;
 	int pc = pcb->program_counter+1;
@@ -156,8 +156,19 @@ void llamar_con_retorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar){
 
 /* Primitiva que finaliza el contexto actual */
 void finalizar(){
-	if (pcb->tamanio_contexto * 5 < pcb->cursor_stack){
-		pcb->cursor_stack -= pcb->tamanio_contexto * 5;
+	if (pcb->tamanio_contexto * 5 == pcb->cursor_stack){
+		retorno_de_stack();
+		tam->menu = FINALIZAR;
+		tam->length = sizeof(registroPCB);
+		if (!enviarDatos(socketKernel, tam, pcb, logs))
+			log_error(logs, "Se produjo un error al notificar al pcp que concluyo el programa");
+		log_info(logs, "Finalizando el programa");
+		systemCall = true;
+	}else{
+		if (!llamoRetornar)
+			pcb->cursor_stack -= pcb->tamanio_contexto * 5;
+
+		llamoRetornar = 0;
 		pcb->cursor_stack -= 4;
 		memcpy(&pcb->program_counter, stack + pcb->cursor_stack, 4);
 		pcb->cursor_stack -= 4;
@@ -166,19 +177,13 @@ void finalizar(){
 		pcb->tamanio_contexto = (pcb->cursor_stack - pcb->cursor_anterior) / 5;
 		pcb->cursor_stack = pcb->cursor_anterior;
 		cargar_diccionario();
-	}else{
-		retorno_de_stack();
-		tam->menu = FINALIZAR;
-		tam->length = sizeof(registroPCB);
-		if (!enviarDatos(socketKernel, tam, pcb, logs))
-			log_error(logs, "Se produjo un error al notificar al pcp que concluyo el programa");
-		log_info(logs, "Finalizando el programa");
-		systemCall = true;
 	}
 }
 
 /* Primitiva que finaliza el contexto actual y asigna el valor a retornar en su posicion correspondiente en el stack */
 void retornar(t_valor_variable retorno){
+	pcb->cursor_stack -= pcb->tamanio_contexto * 5;
+	llamoRetornar = 1;
 	t_puntero* posicion = malloc(sizeof(t_puntero));
 	pcb->cursor_stack -= 4;
 	memcpy(posicion, stack + pcb->cursor_stack, 4);

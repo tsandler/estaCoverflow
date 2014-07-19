@@ -26,7 +26,6 @@ int main(int argc, char** argv){
 	config = config_create("config");
 	diccionarioDeVariables = dictionary_create();
 	tam = malloc(sizeof(t_length));
-
 	if (!archivo_de_configuracion_valido()){
 		log_error(logs, "El archivo de configuracion no tiene todos los campos necesarios");
 		liberar_estructuras();
@@ -51,6 +50,7 @@ int main(int argc, char** argv){
 	diccionarioDeVariables = dictionary_create();
 
 	int pc;
+	llamoRetornar = 0;
 	seguir = 1;
 
 	signal(SIGUSR1, manejar_senial);

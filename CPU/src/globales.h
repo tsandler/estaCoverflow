@@ -28,6 +28,7 @@ bool systemCall;
 int ejecutando;
 int signalCall;
 int tamanioStack;
+int llamoRetornar;
 
 AnSISOP_funciones functions;
 AnSISOP_kernel kernel_functions;
