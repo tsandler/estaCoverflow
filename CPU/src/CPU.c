@@ -16,13 +16,14 @@ int main(int argc, char** argv){
 
 	logs = log_create("log", "CPU.c", 1, LOG_LEVEL_TRACE);
 
-	if (argc < 2){
+	/*if (argc < 2){
 		log_error(logs, "No se pasaron parametros.");
 		log_destroy(logs);
 		return 0;
-	}
+	}*/
 
-	config = config_create(argv[1]);
+//	config = config_create(argv[1]);
+	config=config_create("config");
 	diccionarioDeVariables = dictionary_create();
 	tam = malloc(sizeof(t_length));
 	if (!archivo_de_configuracion_valido()){
@@ -58,6 +59,8 @@ int main(int argc, char** argv){
 		int cont = 0;
 		ejecutando = 0;
 		log_debug(logs, "Recibiendo un PCB...");
+		if(!seguir)
+			break;
 		if(!recibirDatos(socketKernel, tam, (void*)pcb, logs)){
 			log_error(logs, "Se produjo un error al recibir el PCB del kernel");
 			break;
@@ -65,15 +68,21 @@ int main(int argc, char** argv){
 		tam->menu = PID_ACTUAL;
 		tam->length = sizeof(int);
 		log_debug(logs, "Enviando el pid %d a la UMV", pcb->pid);
+		if(!seguir)
+			break;
 		if(!enviarDatos(socketUMV, tam, &pcb->pid, logs))
 			log_error(logs, "Se produjo un error enviando el pid a la UMV");
 
+		if(!seguir)
+			break;
 		pedir_stack();
 		cargar_diccionario();
 
 		systemCall = false;
-		ejecutando = 1;
+		if (!seguir)
+			break;
 		while (quantum > cont && !systemCall){
+			ejecutando = 1;
 			pc = pcb->program_counter;
 
 			char* sentencia = recibir_sentencia();
@@ -85,24 +94,24 @@ int main(int argc, char** argv){
 			log_debug(logs, "Concluyo el quantum %d\n\n\n", cont);
 			sleep(retardo/1000);
 		}
-		if (!systemCall){
+		if (!systemCall)
 			tam->menu = CONCLUYO_UN_QUANTUM;
-			tam->length = sizeof(registroPCB);
-			log_debug(logs, "PCB enviado: %d", pcb->pid);
-			if (!enviarDatos(socketKernel, tam, pcb, logs))
-				log_error(logs, "Se produjo un error al notificar al pcp que concluyo un quantum.");
-			retorno_de_stack();
-		}
 
+		tam->length = sizeof(registroPCB);
+		if (!enviarDatos(socketKernel, tam, pcb, logs))
+			log_error(logs, "Se produjo un error al notificar al pcp que concluyo un quantum.");
+		retorno_de_stack();
 
 		if (signalCall){
+			tam->menu = ERROR;
+			enviarMenu(socketKernel,tam,logs);
 			cerrarSocket(socketKernel);
 			cerrarSocket(socketUMV);
 		}
 		vaciarDiccionario();
 	}
-
+	log_info(logs, "Se llamo a la senial SIGUSR1");
+	log_info(logs, "Cerrando la CPU...");
 	liberar_estructuras();
-
 	return 0;
 }

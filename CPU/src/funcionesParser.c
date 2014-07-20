@@ -236,10 +236,7 @@ void entrada_salida(t_nombre_dispositivo dispositivo, int tiempo){
 	tam->length = strlen(dispositivo) + 1;
 	if (!enviarDatos(socketKernel, tam, dispositivo, logs))
 		log_error(logs, "Se produjo un error enviando el nombre del dispositivo de entrada y salida al kernel");
-	tam->length = sizeof(registroPCB);
-	pcb->program_counter++;
-	if (!enviarDatos(socketKernel, tam, pcb, logs))
-		log_error(logs, "Se produjo un error al enviar el PCB por un systemCall");
+
 	log_info(logs, "El dispositivo %s fue a E/S con %d tiempos", dispositivo, tiempo);
 	systemCall = true;
 }
@@ -259,14 +256,9 @@ void wait(t_nombre_semaforo identificador_semaforo){
 	else
 		log_info(logs, "Se recibio correctamente el resultado de la senial wait del kernel");
 
-	if (systemCall){
+	if (systemCall)
 		log_debug(logs, "El semaforo se bloqueo");
-		retorno_de_stack();
-		tam->length = sizeof(registroPCB);
-		log_debug(logs, "PCB enviado: %d", pcb->pid);
-		if (!enviarDatos(socketKernel, tam, pcb, logs))
-			log_error(logs, "Se produjo un error al notificar al enviar el PCB porque se bloqueo el semaforo");
-	}
+
 }
 
 /* Primitiva que envia la senial de signal de un semaforo al kernel */

@@ -193,9 +193,6 @@ static char* _depurar_sentencia(char* sentencia, int tamanio){
 	while (string_ends_with(sent, "\n")){
 		sent = string_substring_until(sent, i-1);
 	}
-	/*while (string_starts_with(sent, "\t")){
-		sent = string_substring_from(sent, 1);
-	}*/
 	char** sub = string_split(sent, "\t");
 	char* sentenciaCasiFinal = string_new();
 	i = 0;
@@ -232,9 +229,11 @@ void liberar_estructuras(){
 void manejar_senial(){
 	seguir = 0;
 	if (!ejecutando){
+		tam->menu = ERROR;
+		enviarMenu(socketKernel,tam,logs);
 		cerrarSocket(socketKernel);
 		cerrarSocket(socketUMV);
+	}else{//Flag para finalizar la ejecucion cuando concluya el quantum
+		signalCall = 1;
 	}
-	signalCall = 1;
-	log_debug(logs, "Se llamo a la senial SIGUSR1");
 }
