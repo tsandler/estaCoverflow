@@ -200,7 +200,7 @@ void manejoCPU(int fd) {
 				sem_wait(&mutexSemaforos);
 				tSem = dictionary_get(semaforos, sem);
 				tSem->valor = tSem->valor + 1;
-				if (tSem->valor >= 0) {
+				if (!queue_is_empty(tSem->cola)) {
 					if (queue_size(tSem->cola) != 0) {
 
 						PCBPOP = sacarCola(tSem->cola, &tSem->mutex, &tSem->hayAlgo);
