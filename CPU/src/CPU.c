@@ -57,6 +57,7 @@ int main(int argc, char** argv){
 	pcb = malloc(sizeof(registroPCB));
 	while (seguir){
 		int cont = 0;
+		finalizo = 0;
 		ejecutando = 0;
 		log_debug(logs, "Recibiendo un PCB...");
 		if(!seguir)
@@ -100,7 +101,8 @@ int main(int argc, char** argv){
 		tam->length = sizeof(registroPCB);
 		if (!enviarDatos(socketKernel, tam, pcb, logs))
 			log_error(logs, "Se produjo un error al notificar al pcp que concluyo un quantum.");
-		retorno_de_stack();
+		if (!finalizo)
+			retorno_de_stack();
 
 		if (signalCall){
 			tam->menu = ERROR;

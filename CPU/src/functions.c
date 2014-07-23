@@ -132,7 +132,6 @@ void retorno_de_stack(){
 
 	if(!enviarDatos(socketUMV, tam, stack, logs))
 		log_error(logs, "Se produjo un error al devolverle el stack a la umv");
-
 }
 /* Funcion que verifica que sea un archivo de configuracion valido */
 int archivo_de_configuracion_valido(){
@@ -148,9 +147,8 @@ int archivo_de_configuracion_valido(){
 }
 
 void vaciarDiccionario(){
-	if (!dictionary_is_empty(diccionarioDeVariables)){
+	if (!dictionary_is_empty(diccionarioDeVariables))
 		dictionary_clean(diccionarioDeVariables);
-	}
 }
 
 /* Funcion que recibe la sentencia de la UMV */
@@ -220,6 +218,7 @@ static char* _depurar_sentencia(char* sentencia, int tamanio){
 void liberar_estructuras(){
 	free(pcb);
 	free(tam);
+	free(stack);
 	dictionary_destroy(diccionarioDeVariables);
 	config_destroy(config);
 	log_destroy(logs);

@@ -49,14 +49,14 @@ int main(int argc, char **argv) {
 
 	logs = log_create("log_Principal", "kernel.c", 0, LOG_LEVEL_TRACE); //LOG
 
-	 if (argc < 2){
+	 /*if (argc < 2){
 		 log_error(logs, "No se pasaron parametros.");
 		 log_destroy(logs);
 		 return 0;
-	 }
+	 }*/
 
-	 config = config_create(argv[1]);
-
+	 //config = config_create(argv[1]);
+	config = config_create("config");
 	 if (!archivo_configuracion_valido()){
 	 log_error(logs, "El archivo de configuracion no tiene todos los campos necesarios");
 	 config_destroy(config);

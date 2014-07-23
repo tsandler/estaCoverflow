@@ -157,11 +157,8 @@ void llamar_con_retorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar){
 /* Primitiva que finaliza el contexto actual */
 void finalizar(){
 	if (pcb->tamanio_contexto * 5 == pcb->cursor_stack){
-		retorno_de_stack();
+		finalizo = 1;
 		tam->menu = FINALIZAR;
-		tam->length = sizeof(registroPCB);
-		if (!enviarDatos(socketKernel, tam, pcb, logs))
-			log_error(logs, "Se produjo un error al notificar al pcp que concluyo el programa");
 		log_info(logs, "Finalizando el programa");
 		systemCall = true;
 	}else{
@@ -248,13 +245,9 @@ void wait(t_nombre_semaforo identificador_semaforo){
 
 	if (!enviarDatos(socketKernel, tam, identificador_semaforo, logs))
 		log_error(logs, "Se produjo un error enviando la senial de wait al semaforo %s", identificador_semaforo);
-	else
-		log_info(logs, "Se envio correctamente la senial de wait al semaforo %s", identificador_semaforo);
 
 	if (!recibirDatos(socketKernel, tam, (void*)&systemCall, logs))
 		log_error(logs, "Se produjo un error recibiendo el resultado del wait a un semaforo");
-	else
-		log_info(logs, "Se recibio correctamente el resultado de la senial wait del kernel");
 
 	if (systemCall)
 		log_debug(logs, "El semaforo se bloqueo");
@@ -268,7 +261,6 @@ void signal_parser(t_nombre_semaforo identificador_semaforo){
 
 	if (!enviarDatos(socketKernel, tam, identificador_semaforo, logs))
 		log_error(logs, "Se produjo un error enviando la senial de signal al semaforo %s", identificador_semaforo);
-	else
-		log_info(logs, "Se envio correctamente la senial de signal al semaforo %s", identificador_semaforo);
+
 }
 
