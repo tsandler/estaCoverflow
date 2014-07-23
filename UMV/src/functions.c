@@ -19,7 +19,7 @@ t_elem_cola_cpu *desencolar_peticion(int socket){
 			unaPeticion = list_get(colaCPUs,i);
 			if(unaPeticion->socket ==  socket)
 				return list_remove(colaCPUs,i);
-			}
+		}
 		i--;
 	}
 	return NULL;
@@ -29,6 +29,7 @@ t_elem_cola_cpu *desencolar_peticion(int socket){
 /*Funcion que llama el hilo cada vez que se conecta algun CPU a la UMV*/
 void funcion_CPU(int socket){
 
+	int pidLocal=-1;
 	int pid;
 	int termina=0;
 	t_length* tam = malloc(sizeof(t_length));
@@ -40,6 +41,7 @@ void funcion_CPU(int socket){
 	int tamanio;
 	char buffer[1024];
 	char* cod;
+	int nroSegmento;
 
 	sem_wait(&yaEscribio);
 	sem_wait(&yaEscribio);
@@ -47,8 +49,7 @@ void funcion_CPU(int socket){
 		sem_wait(&yaEscribio);
 
 	while(1){
-		printf("\n\n\n");
-		log_info(logs,"[HILO CPU] Esperando menu...");
+		log_info(logs,"[HILO CPU] Esperando una peticion...");
 		if(!recibirMenu(socket, tam, logs)){
 			log_error(logs, "Se produjo un error recibiendo el menu");
 			break;
@@ -59,25 +60,24 @@ void funcion_CPU(int socket){
 		list_add_in_index(colaCPUs,0,unaPeticion);
 		unaPeticion = desencolar_peticion(socket);
 
+		if(!unaPeticion)
+			log_error(logs,"[HILO CPU] No hay peticion");
+
 		switch(unaPeticion->tama->menu){
 			case PID_ACTUAL:
 				sem_wait(&mutexOpera);
 				retardo();
-				log_info(logs,"[HILO CPU] Entra a cambiar el pidActivo");
 				if(!recibirDato(socket, tam->length, (void*)&pid, logs)){
 					log_error(logs, "Se produjo un error recibiendo el pid");
 					break;
 				}
-				log_debug(logs,"Pid actual por CPU: %d", pid);
-				cambiar_pid_activo(pid);
-				log_info(logs,"[HILO CPU] Ya cambio el pidActivo");
+				pidLocal = pid;
+				log_info(logs,"[HILO CPU] Se cambio el pid activo a: %d",pidLocal);
 				sem_post(&mutexOpera);
 				break;
 			case ESCRIBIR_SEGMENTO:
 				retardo();
 				sem_wait(&mutexOpera);
-				log_info(logs,"[HILO CPU] Entra a escribir segmento");
-				cambiar_pid_activo(pid);
 				if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
 					break;
@@ -96,18 +96,16 @@ void funcion_CPU(int socket){
 					log_error(logs,"[HILO CPU] Se produjo un error recibiendo el codigo");
 					break;
 				}
-
 				cod = string_from_format("%s", &buffer);
 
-				escribir_segmento(base,tamanio,offset,cod);
-				log_debug(logs,"Ya se escribio el segmento");
+				escribir_segmento(base,tamanio,offset,cod,pidLocal);
+				nroSegmento++;
+				log_debug(logs,"[HILO CPU] El CPU: %d Escribio el segmento nro: %d",socket,nroSegmento);
 				sem_post(&mutexOpera);
 				break;
 			case RETORNO_DE_STACK:
 				retardo();
 				sem_wait(&mutexOpera);
-				log_info(logs,"[HILO CPU] Entra a envio de stack");
-				cambiar_pid_activo(pid);
 				if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
 					break;
@@ -134,21 +132,20 @@ void funcion_CPU(int socket){
 				offset=etiq->offset;
 				tamanio=etiq->tamanio;
 
-				escribir_segmento(base,tamanio,offset,stack);
-				log_debug(logs,"Ya se escribio el segmento");
+				escribir_segmento(base,tamanio,offset,stack,pidLocal);
+				log_debug(logs,"[HILO CPU] El CPU: %d Retono el stack",socket);
 				sem_post(&mutexOpera);
 				break;
 			case PEDIR_SENTENCIA:
 				retardo();
 				sem_wait(&mutexOpera);
-				log_info(logs,"[HILO CPU] Entra a pedir sentencia");
-				cambiar_pid_activo(pid);
+
 				if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
 					break;
 				}
 
-				codigo = leer_segmento(etiq->base,etiq->tamanio,etiq->offset);
+				codigo = leer_segmento(etiq->base,etiq->tamanio,etiq->offset,pidLocal);
 
 				if(!codigo){
 					termina = 1;
@@ -156,7 +153,6 @@ void funcion_CPU(int socket){
 					break;
 				}
 				tam->length = etiq->tamanio;
-
 				if(!enviarDatos(socket, tam, codigo, logs))
 					log_error(logs,"Error al enviarse el codigo");
 
@@ -165,7 +161,7 @@ void funcion_CPU(int socket){
 					break;
 				}
 
-				codigo = leer_segmento(etiq->base,etiq->tamanio,etiq->offset);
+				codigo = leer_segmento(etiq->base,etiq->tamanio,etiq->offset,pidLocal);
 
 				if(!codigo){
 					termina = 1;
@@ -178,14 +174,13 @@ void funcion_CPU(int socket){
 				if(!enviarDatos(socket, tam, codigo, logs))
 					log_error(logs,"Error al enviarse la sentencia");
 
-				log_info(logs,"[HILO CPU] Sale de pedir sentencia");
+				log_info(logs,"[HILO CPU] Se envio al CPU nro: %d La sentencia: %s",socket,codigo);
 				sem_post(&mutexOpera);
 				break;
 			case LEER_SEGMENTO:
 				retardo();
 				sem_wait(&mutexOpera);
-				log_info(logs,"[HILO CPU] Entra a leer segmento");
-				cambiar_pid_activo(pid);
+
 				if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
 					break;
@@ -196,11 +191,11 @@ void funcion_CPU(int socket){
 					break;
 				}
 
-				codigo = leer_segmento(etiq->base,etiq->tamanio,etiq->offset);
+				codigo = leer_segmento(etiq->base,etiq->tamanio,etiq->offset,pidLocal);
 
 				tam->length = etiq->tamanio;
 				enviarDatos(socket, tam, codigo, logs);
-				log_info(logs,"[HILO CPU] Ya envio el buf");
+				log_info(logs,"[HILO CPU] Se envio el segmento al CPU nro: %d",socket);
 				sem_post(&mutexOpera);
 				break;
 			default:
@@ -218,6 +213,7 @@ void funcion_CPU(int socket){
 void funcion_kernel(int socket){
 	log_info(logs,"[HILO KERNEL]Entra al hilo");
 	int pid;
+	int pidLocal = -1;
 	int termina=0;
 	t_length* tam = malloc(sizeof(t_length));
 	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
@@ -226,35 +222,31 @@ void funcion_kernel(int socket){
 	segEscritos = 0;
 
 	while(1){
-		printf("\n\n\n");
-		log_debug(logs,"[HILO KERNEL] Esperando menu...");
+		log_info(logs,"[HILO KERNEL] Esperando peticion...");
 		if(!recibirMenu(socket, tam, logs)){
-			log_error(logs, "[HILO KERNEL] Error al recibir el menu");
+			log_error(logs, "[HILO KERNEL] Error al recibir la peticion");
 			break;
 		}
 		unaPeticion->tama = tam;
 		queue_push(colaKernel,unaPeticion);
 		unaPeticion = queue_pop(colaKernel);
 
- 		log_info(logs,"[HILO KERNEL] Entra al switch");
 		switch(unaPeticion->tama->menu){
 			case PID_ACTUAL:
 				retardo();
 				sem_wait(&mutexOpera);
-				log_debug(logs,"[HILO KERNEL] Cambia pid activo");
 				if(!recibirDato(socket, tam->length, (void*)&pid, logs)){
-					log_error(logs, "Se produjo un error recibiendo el pid");
+					log_error(logs, "[HILO KERNEL] Se produjo un error recibiendo el pid");
 					break;
 				}
-				cambiar_pid_activo(pid);
+				pidLocal = pid;
 				log_debug(logs,"[HILO KERNEL] Se cambio el pid activo a %d", pid);
 				sem_post(&mutexOpera);
 				break;
 			case ESCRIBIR_SEGMENTO:
 				retardo();
 				sem_wait(&mutexOpera);
-				log_debug(logs,"Entra a escribir segmento");
-				cambiar_pid_activo(pid);
+				segEscritos++;
 				if(!recibirDato(socket,tam->length,(void*)etiq,logs)){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
 					break;
@@ -266,7 +258,7 @@ void funcion_kernel(int socket){
 					break;
 				}
 
-				if(etiq->tamanio <= 0){
+				if(etiq->tamanio <= 0 || etiq->tamanio > 1024){
 					log_info(logs,"[HILO KERNEL] El tam es <= 0. No se escribe el segmento. No entra al recv");
 					break;
 				}
@@ -275,22 +267,19 @@ void funcion_kernel(int socket){
 				int tamanio=etiq->tamanio;
 				char buffer[1024];
 				if(!recibirDatos(socket,tam,(void*)&buffer,logs)){
-					log_error(logs,"Se produjo un error recibiendo el codigo");
+					log_error(logs,"[HILO KERNEL] Se produjo un error recibiendo el codigo");
 					break;
 				}
 
-				escribir_segmento(base,tamanio,offset,buffer);
-				log_debug(logs,"Ya se escribio el segmento");
+				escribir_segmento(base,tamanio,offset,buffer,pidLocal);
+				log_debug(logs,"Se escribio el segmento nro: %d",segEscritos);
 
-				segEscritos++;
 				sem_post(&mutexOpera);
 				sem_post(&yaEscribio);
 				break;
 			case CREAR_SEGMENTO:
 				retardo();
 				sem_wait(&mutexOpera);
-				log_debug(logs,"Entra kernel a crear segmento");
-				cambiar_pid_activo(pid);
 				if(!recibirDato(socket, tam->length, (void*)pidTam, logs)){
 					log_error(logs, "Se produjo un error recibiendo pid-tamanio");
 					break;
@@ -304,13 +293,12 @@ void funcion_kernel(int socket){
 			case ELIMINAR_SEGMENTOS:
 				retardo();
 				sem_wait(&mutexOpera);
+				segEscritos=0;
 				log_info(logs,"[HILO KERNEL] Entra a eliminar segmentos");
-				cambiar_pid_activo(pid);
 				if(!recibirDato(socket, tam->length, (void*)&pid, logs)){
 					log_error(logs, "Se produjo un error recibiendo el pid");
 					break;
 				}
-				log_debug(logs,"[HILO KERNEL] Entra a eliminar segmentos");
 				destruir_segmentos(pid);
 				sem_post(&mutexOpera);
 				break;
@@ -320,8 +308,6 @@ void funcion_kernel(int socket){
 				termina = 1;
 				break;
 		}
-
-
 		if(termina)
 			break;
 	}
@@ -401,16 +387,15 @@ int crear_agregar_segmento(int pidInt, int tamanio){
 
 	unElem->tamanioSegmento= tamanio;
 	unElem->dirLogica= obtener_proxima_dir_logica(tamanio,pid);
-	log_debug(logs,"Se obtuvo la dirLogica");
 	unElem->dirFisica = obtener_proxima_dirFisica(tamanio);
-	log_debug(logs,"Se obtuvo la dirFisica");
 	if(dictionary_is_empty(tablaPidSeg) || !(dictionary_has_key(tablaPidSeg, pid))){
 		unElem->idSegmento=1;
 		listaSeg = list_create();
 		list_add(listaSeg, (void*)unElem);
 		dictionary_put(tablaPidSeg, pid, (void*)listaSeg);
+
 		if(dictionary_has_key(tablaPidSeg,pid))
-			log_info(logs,"El nuevo campo pid/lista se agregó correctamente");
+			log_info(logs,"Se agrego el segmento nro: %d del pid: %s",unElem->idSegmento,pid);
 		else
 			log_error(logs,"El nuevo campo pid/lista no se agregó al diccionario");
 	}else if(dictionary_has_key(tablaPidSeg, pid)){
@@ -419,7 +404,7 @@ int crear_agregar_segmento(int pidInt, int tamanio){
 		unElem->idSegmento=nroSeg;
 		list_add_in_index(listaSeg,0,(void*)unElem);
 		if(nroSeg == (obtener_nuevo_nroSeg(listaSeg) - 1))
-			log_info(logs,"El nuevo segmento se agregó correctamente a la lista");
+			log_info(logs,"Se creo el segmento nro: %d del pid:",nroSeg);
 		else
 			log_error(logs,"El nuevo segmento no se agregó a la lista correspondiente");
 	}
@@ -465,7 +450,6 @@ int obtener_nuevo_nroSeg(t_list *listaSeg){
 /* Funcion que retorna una dirLogica para asignarsela a un nuevo segmento */
 
 int obtener_proxima_dir_logica(int tamanio, char* pid){
-	log_debug(logs,"Entra a obtener direccion logica");
 	if(dictionary_has_key(tablaPidSeg,pid)){
 		t_list* listaSeg = dictionary_get(tablaPidSeg,pid);
 		list_sort(listaSeg,(void*)sort_mayor_dirLogica);
@@ -477,13 +461,12 @@ int obtener_proxima_dir_logica(int tamanio, char* pid){
 
 /*Funcion que obtiene una nueva direccion fisica (segun algoritmo)*/
 char *obtener_proxima_dirFisica(int tamanio){
-	log_debug(logs,"Entra a obtener dir fisica");
 	switch(algoritmoActual){
 		case FIRST_FIT:
-			log_debug(logs,"Algoritmo de asignación: First-Fit");
+//			log_debug(logs,"Algoritmo de asignación: First-Fit");
 			return first_fit(tamanio);
 		case WORST_FIT:
-			log_debug(logs,"Algoritmo de asignación: Worst-Fit");
+//			log_debug(logs,"Algoritmo de asignación: Worst-Fit");
 			return worst_fit(tamanio);
 	}
 	return NULL;
@@ -539,13 +522,13 @@ char *manejo_memoria(nodoHuecos* unElem, int tamanio){
 }
 
 /*Funcion que lee un segmento de la umv y retorna un puntero a la posicion solicitada */
-unsigned char *leer_segmento(int dirLog, int tamanioALeer, int offset){ //solicitar_memoria_desde_una_pos();
+unsigned char *leer_segmento(int dirLog, int tamanioALeer, int offset, int pidAct){ //solicitar_memoria_desde_una_pos();
 
 	bool buscar_dirLogica(tablaSegUMV* unElem){
 		return dirLog == unElem->dirLogica;
 	}
 
-	t_list* listaSeg= dictionary_get(tablaPidSeg,string_itoa(pidActive));
+	t_list* listaSeg= dictionary_get(tablaPidSeg,string_itoa(pidAct));
 	tablaSegUMV* unElem= list_find(listaSeg,(void*)buscar_dirLogica);
 	if(unElem){
 		if( unElem->dirFisica + offset + tamanioALeer <= unElem->dirFisica + unElem->tamanioSegmento ){
@@ -561,39 +544,34 @@ unsigned char *leer_segmento(int dirLog, int tamanioALeer, int offset){ //solici
 }
 
 /*Funcion que escribe el buffer en un segmento determinado*/
-void escribir_segmento(int dirLog, int tamanioAEscribir, int offset, char* buffer){
+void escribir_segmento(int dirLog, int tamanioAEscribir, int offset, char* buffer, int pidAct){
 
 	bool buscar_dirLogica(tablaSegUMV* unElem){
 		return dirLog == unElem->dirLogica;
 	}
 	tablaSegUMV* unElem;
 
-	log_debug(logs,"entra a la funcion propia escr_seg");
-	t_list* listaSeg= dictionary_get(tablaPidSeg,string_itoa(pidActive));
+	t_list* listaSeg= dictionary_get(tablaPidSeg,string_itoa(pidAct));
 	if(listaSeg){
-		log_debug(logs,"existe la lista asociada al pid");
 		unElem= list_find(listaSeg,(void*)buscar_dirLogica);
+
+		if(unElem){
+			if(unElem->dirFisica + offset + tamanioAEscribir <= unElem->dirFisica + unElem->tamanioSegmento){
+				char* espacioSegmento = unElem->dirFisica + offset;
+				memcpy(espacioSegmento,buffer,tamanioAEscribir);
+			}else{
+				log_error(logs,"Se esta tratando de escribir fuera de los rangos del segmento");
+				puts("Segmentation fault");
+			}
+		}else
+			log_error(logs,"La direccion logica no existe");
 	}else
 		log_error(logs,"no existe la lista asociada al pid");
-
-	if(unElem){
-		log_info(logs,"La direccion logica existe");
-		if(unElem->dirFisica + offset + tamanioAEscribir <= unElem->dirFisica + unElem->tamanioSegmento){
-			char* espacioSegmento = unElem->dirFisica + offset;
-			memcpy(espacioSegmento,buffer,tamanioAEscribir);
-			printf("El segmento fue escrito");
-			log_info(logs,"El segmento fue escrito");
-		}else{
-			log_error(logs,"Se esta tratando de escribir fuera de los rangos del segmento");
-			puts("Segmentation fault");
-		}
-	}else{
-		log_error(logs,"La direccion logica no existe");
-	}
 }
 
 void retardo(){
-	usleep(retardoActual);
+	if(!retardoActual)
+		sleep(retardoActual/1000);
 }
 
 /*Funcion que cambia el retardo actual -en milisegundos-*/
@@ -617,8 +595,8 @@ void cambiarAlgoritmo(int cambioAlgoritmo){
 }
 
 /*Funcion que cambia el id del proceso activo*/
-void cambiar_pid_activo(int pid){
-	pidActive = pid;
+void cambiar_pid_activo(int pid, int pidLocal){
+	pidLocal = pid;
 }
 
 
@@ -634,7 +612,6 @@ unsigned char* ejec_operacion(int nroOp){
 			//////
 			printf("Ingresar pid: ");
 			scanf("%d",&pid);
-			cambiar_pid_activo(pid);
 			//////
 			printf("Ingresar tamanio a leer: ");
 			scanf("%d",&tamanio);
@@ -642,23 +619,20 @@ unsigned char* ejec_operacion(int nroOp){
 			scanf("%d",&dirLogica);
 			printf("Ingresar offset: ");
 			scanf("%d",&offset);
-			unsigned char* resultado = leer_segmento(dirLogica,tamanioALeer,offset);
+			unsigned char* resultado = leer_segmento(dirLogica,tamanioALeer,offset,pid);
 //			generar_archivo(resultado,nroOp);
 			return resultado;
 			break;
 		case ESCR_SEG:
 
 			log_info(logs,"[CONSOLA UMV] El usuario solicito escribir segmento");
-			//////
 			printf("Ingresar pid: ");
 			scanf("%d",&pid);
-			cambiar_pid_activo(pid);
-			//////
 //			FIXME: como poner el buffer que se escribe
 
 
 
-			escribir_segmento(dirLogica,tamanioAEscribir,offset,buffer);
+			escribir_segmento(dirLogica,tamanioAEscribir,offset,buffer,pid);
 				//generar_archivo(resultado,nroOp);
 			return NULL;
 			break;

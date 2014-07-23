@@ -15,13 +15,17 @@ sem_t mutexOpera;
 
 int main(int argc, char** argv){
 
- 	logs = log_create("log","UMV.c",0,LOG_LEVEL_TRACE);
-	if (argc < 2){
-		log_error(logs, "No se envio ningun parametro");
-		log_destroy(logs);
-		return 0;
-	}
-    config = config_create(argv[1]);
+ 	logs = log_create("log","UMV.c",1,LOG_LEVEL_TRACE);
+
+//	if (argc < 2){
+//		log_error(logs, "No se envio ningun parametro");
+//		log_destroy(logs);
+//		return 0;
+//	}
+//	config = config_create(argv[1]);
+
+	config = config_create("config");
+
 	if(!archivo_config_valido()){
 		log_error(logs,"El archivo de configuracion no tiene todos los campos necesarios");
 		log_destroy(logs);
@@ -39,12 +43,16 @@ int main(int argc, char** argv){
 	int socket;
 	t_length* tam = malloc(sizeof(t_length));
 	int s = crearServidor(puerto, logs);
-	if(!s)
+	if(s == -1){
 		log_error(logs,"No se creo el servidor");
+		return 0;
+	}
 	else
 		log_info(logs,"Se creo el servidor");
 
 	log_debug(logs,"Entra al do-while para conectar el kernel");
+
+
 
 	do{
 		socket = aceptarConexion(s, logs);
@@ -69,7 +77,6 @@ int main(int argc, char** argv){
 			}else
 				log_error(logs, "[MAIN KERNEL]Se esta esperando la conexion del kernel");
 		}
-
 		if(termina)
 			break;
 	}while(tam->menu != SOY_KERNEL);

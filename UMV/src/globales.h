@@ -35,7 +35,6 @@ t_list* colaCPUs;
 int tamanioUMV;
 int retardoActual;
 int algoritmoActual;
-int pidActive;
 int puerto;
 int segEscritos;
 

@@ -10,14 +10,18 @@
 
 #include "globales.h"
 
+void funcion_kernel(int socket);
+void funcion_CPU(int socket);
+t_elem_cola_cpu *desencolar_peticion(int socket);
+
 void inicializar_umv(int tamanioUMV);
 void eliminarUMV();
 
 int crear_agregar_segmento(int pid, int tamanio);
 void destruir_segmentos(int pidInt);
 
-unsigned char *leer_segmento(int dirLog, int tamanioALeer, int offset);
-void escribir_segmento(int dirLog, int tamanioAEscribir, int offset, char* buffer);
+unsigned char *leer_segmento(int dirLog, int tamanioALeer, int offset, int pidLocal);
+void escribir_segmento(int dirLog, int tamanioAEscribir, int offset, char* buffer, int pidLocal);
 
 int obtener_proxima_dir_logica(int tamanio, char* pid);
 char *obtener_proxima_dirFisica(int tamanio);
@@ -36,7 +40,7 @@ void consola();
 unsigned char* ejec_operacion(int nroOp);
 void retardo();
 void cambiar_retardo(int retardoNuevo);
-void cambiar_pid_activo(int pid);
+void cambiar_pid_activo(int pid, int pidLocal);
 void cambiarAlgoritmo(int cambioAlgoritmo);
 void dump();
 
@@ -53,10 +57,6 @@ void vaciarLista(t_list* listaSeg);
 //void eliminar_campos_listHuecos(nodoHuecos* unElem);
 
 void generar_archivo(unsigned char* resultado, int nroOp);
-
-void funcion_kernel(int socket);
-void funcion_CPU(int socket);
-t_elem_cola_cpu *desencolar_peticion(int socket);
 
 void compactar_memoria();
 void buscar_segmento_y_desplazarlo();
