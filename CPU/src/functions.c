@@ -79,16 +79,16 @@ void cargar_diccionario(){
 		inicial = pcb->cursor_stack;
 		pcb->cursor_stack += 5 * pcb->tamanio_contexto;
 	}
-	t_puntero* pos = malloc(sizeof(t_puntero) * pcb->tamanio_contexto);
 	int i, cont = 0;
 	for (i=0; i < pcb->tamanio_contexto; i++){
 		int aux = inicial + (i*5);
-		memcpy(pos + (i*5), &aux, 4);
+		int* pos = malloc(sizeof(int));
+		memcpy(pos, &aux, 4);
 		memcpy(&variable, stack + aux, 1);
 		char var[2];
 		var[0] = variable;
 		var[1] = '\0';
-		dictionary_put(diccionarioDeVariables, var, pos + (i*5));
+		dictionary_put(diccionarioDeVariables, var, pos);
 		cont++;
 	}
 	//pcb->cursor_stack =  cont * 5;

@@ -47,8 +47,10 @@ t_puntero definir_variable(t_nombre_variable identificador_variable){
 t_puntero obtener_posicion_variable(t_nombre_variable identificador_variable){
 	t_puntero *posicion;
 	char variable[2];
+
 	variable[0] = identificador_variable;
 	variable[1] = '\0';
+
 	posicion = dictionary_get(diccionarioDeVariables, variable);
 	log_info(logs, "La posicion de la variable %c es %d", identificador_variable, *posicion);
 	return *posicion;

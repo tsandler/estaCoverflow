@@ -60,30 +60,25 @@ int main(int argc, char** argv){
 		finalizo = 0;
 		ejecutando = 0;
 		log_debug(logs, "Recibiendo un PCB...");
-		if(!seguir)
-			break;
+
 		if(!recibirDatos(socketKernel, tam, (void*)pcb, logs)){
 			log_error(logs, "Se produjo un error al recibir el PCB del kernel");
 			break;
 		}
+		ejecutando = 1;
 		tam->menu = PID_ACTUAL;
 		tam->length = sizeof(int);
 		log_debug(logs, "Enviando el pid %d a la UMV", pcb->pid);
-		if(!seguir)
-			break;
+
 		if(!enviarDatos(socketUMV, tam, &pcb->pid, logs))
 			log_error(logs, "Se produjo un error enviando el pid a la UMV");
 
-		if(!seguir)
-			break;
 		pedir_stack();
 		cargar_diccionario();
 
 		systemCall = false;
-		if (!seguir)
-			break;
+
 		while (quantum > cont && !systemCall){
-			ejecutando = 1;
 			pc = pcb->program_counter;
 
 			char* sentencia = recibir_sentencia();
@@ -95,6 +90,7 @@ int main(int argc, char** argv){
 			log_debug(logs, "Concluyo el quantum %d\n\n\n", cont);
 			sleep(retardo/1000);
 		}
+
 		if (!systemCall)
 			tam->menu = CONCLUYO_UN_QUANTUM;
 

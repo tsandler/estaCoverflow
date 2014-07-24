@@ -201,14 +201,14 @@ void manejoCPU(int fd) {
 				tSem->valor = tSem->valor + 1;
 				if (!queue_is_empty(tSem->cola)) {
 
-						PCBPOP = sacarCola(tSem->cola, &tSem->mutex, &tSem->hayAlgo);
-						muestraNombres(tSem->cola,"SIGNAL BLOQUEADOS");
-						ULTIMOPCB = PCBPOP;
+					PCBPOP = sacarCola(tSem->cola, &tSem->mutex, &tSem->hayAlgo);
+					muestraNombres(tSem->cola,"SIGNAL BLOQUEADOS");
+					ULTIMOPCB = PCBPOP;
 
-						printf("voya poner en ready el PID IMPORTANTE");
+					printf("voya poner en ready el PID IMPORTANTE");
 
-						ponerCola(PCBPOP, READY, &mutexREADY, &hayAlgoEnReady);
-						muestraNombres(READY,"READY");
+					ponerCola(PCBPOP, READY, &mutexREADY, &hayAlgoEnReady);
+					muestraNombres(READY,"READY");
 
 				}
 				log_info(logs, "y su valor es %i", tSem->valor);
