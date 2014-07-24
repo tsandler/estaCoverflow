@@ -18,7 +18,6 @@
 #include <commons/log.h>
 #include <pthread.h>
 #include "planificador_largo_plazo.h"
-#include "planificador_corto_plazo.h"
 #include "kernelSocket.h"
 #include <commons/config.h>
 #include <commons/string.h>

@@ -5,7 +5,6 @@
  *      Author: utnso
  */
 #include "globales.h"
-#include "planificador_corto_plazo.h"
 #include "planificador_largo_plazo.h"
 #include "manejoIO.h"
 #include "funcionesPCB.h"
@@ -37,8 +36,6 @@ t_dictionary * semaforos;
 t_dictionary * fileDescriptors;
 int socket_UMV;
 int socketCPU; // LO PUSE PARA CERRARLO MAS ABAJO CUALQUIER COSA VEMOS SI LO CERRAMOS DIRECTAMENTE EN EL PCP....
-void plp(void* ptr);
-void pcp(void* ptr);
 bool archivo_configuracion_valido();
 int tamanioStack;
 
@@ -68,20 +65,16 @@ int main(int argc, char **argv) {
 
 	NEW = queue_create(); //COLAS
 	READY = queue_create();
-	BLOCK = queue_create();
 	EXIT = queue_create();
 	EXEC = queue_create();
 
 	log_debug(logs, "colas creadas");
 
-	int gradoMultiprogramacion = config_get_int_value(config,
-			"MULTIPROGRAMACION");  //CONFIG
+	int gradoMultiprogramacion = config_get_int_value(config,"MULTIPROGRAMACION");  //CONFIG
 	char** dispositivos = config_get_array_value(config, "ID_HIO");
 	char** dispRetardo = config_get_array_value(config, "HIO");
-	char** variablesComp = config_get_array_value(config,
-			"VARIABLES_COMPARTIDAS");
-	char** valorComp = config_get_array_value(config,
-			"VALOR_VARIABLES_COMPARTIDAS");
+	char** variablesComp = config_get_array_value(config,"VARIABLES_COMPARTIDAS");
+	char** valorComp = config_get_array_value(config,"VALOR_VARIABLES_COMPARTIDAS");
 	char** semaforosArray = config_get_array_value(config, "SEMAFOROS");
 	char** valorSemaforo = config_get_array_value(config, "VALOR_SEMAFORO");
 	tamanioStack = config_get_int_value(config, "TAMANIO_STACK");
@@ -101,30 +94,46 @@ int main(int argc, char **argv) {
 	sem_init(&mutexSemaforos, 0, 1);
 	sem_init(&mutexMandarColaEXEC, 0, 1);
 
-	pthread_t thread1, thread2;
 	dispositivosIO = dictionary_create(); // creo diccionario (?)
 	variablesCompartidas = dictionary_create();
 	fileDescriptors =dictionary_create();
 	semaforos = dictionary_create();
 	logs = log_create("log_Principal", "kernel.c", 1, LOG_LEVEL_TRACE); //LOG
-	int iret1, iret2;
 
 	log_info(logs, "Conectandose con la UMV...");
 	conectarseUMV();
 
-	iret1 = pthread_create(&thread1, NULL, plp, NULL );  //HILO PLP
+///////////////////////////77
 
-	if (iret1) {
-		log_error(logs, "Error en la creacion del hilo PLP");
-		log_destroy(logs);
+	pthread_t thread1;
+	pthread_t thread2;
+	pthread_t thread3;
+	pthread_t thread4;
+	int portPROGRAM=config_get_int_value(config, "PUERTO_PROG");
+	int portCPU=config_get_int_value(config,"PUERTO_CPU");
 
-		exit(EXIT_FAILURE);
+	int iret1 = pthread_create(&thread1, NULL, (void*)openSocketServerPLP,(void*)portPROGRAM);
+		if (iret1){
+			log_info(logs, "Error en la creacion del hilo openSocketServerPLP");
+			exit(EXIT_FAILURE);
+		}
 
-	}
+	int iret2 = pthread_create(&thread2, NULL, (void*)deNewAReady,NULL);
+		if (iret2){
+			log_info(logs,"Error en la creacion del hilo deNewAReady");
+			exit (EXIT_FAILURE);
+		}
 
-	iret2 = pthread_create(&thread2, NULL, pcp, NULL ); //HILO PCP
+	int iret3 = pthread_create(&thread3, NULL, (void*)manejoExit,NULL);
+		if (iret3){
+			log_info(logs,"Error en la creacion del hilo manejoExit");
+			exit (EXIT_FAILURE);
+		}
 
-	if (iret2) {
+/////////////////////////////
+	int	iret4 = pthread_create(&thread4, NULL, (void*)openSocketServerPCP,(void*)portCPU); //HILO PCP
+
+	if (iret4) {
 		log_error(logs, "Error en la creacion del hilo PCP");
 		log_destroy(logs);
 
@@ -182,9 +191,11 @@ int main(int argc, char **argv) {
 		dictionary_put(semaforos, semaforosArray[h], tSem);
 		h++;
 	}
-	pthread_join(thread1, NULL ); //esperar a q termine el otro
 
+	pthread_join(thread1, NULL ); //esperar a q termine el otro
 	pthread_join(thread2, NULL );
+	pthread_join(thread3, NULL );
+	pthread_join(thread4, NULL );
 
 	sem_destroy(&mutexNEW);
 	sem_destroy(&mutexREADY);

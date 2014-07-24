@@ -16,6 +16,8 @@ typedef struct{
 }datos_crearSeg;
 
 
+void deNewAReady();
+void manejoExit();
 
 
 

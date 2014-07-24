@@ -19,7 +19,7 @@ extern sem_t hayAlgo;
 extern sem_t hayAlgoEnReady;
 extern sem_t hayAlgoEnExit;
 extern t_log *logs;
-extern t_config *config;
+
 
 extern int socket_UMV;
 
@@ -59,7 +59,7 @@ registroPCB *queue_pop_min(t_queue *self) {
 }
 
 
-void deNewAReady(void){
+void deNewAReady(){
 	puts("Corriendo hilo de New a Ready \n");
 	while(1){
 
@@ -106,41 +106,4 @@ void manejoExit(){
 }
 
 
-void plp(void* ptr){
-
-	pthread_t thread4;
-	pthread_t thread5;
-	pthread_t thread6;
-	int port=config_get_int_value(config, "PUERTO_PROG");
-
-
-
-
-	int iret1 = pthread_create(&thread4, NULL, (void*)openSocketServerPLP,(void*)port);
-
-		if (iret1){
-			log_info(logs, "Error en la creacion del hilo openSocketServerPLP");
-			exit(EXIT_FAILURE);
-		}
-
-	int iret2 = pthread_create(&thread5, NULL, (void*)deNewAReady,NULL);
-
-		if (iret2){
-			log_info(logs,"Error en la creacion del hilo deNewAReady");
-			exit (EXIT_FAILURE);
-		}
-
-		int iret3 = pthread_create(&thread6, NULL, (void*)manejoExit,NULL);
-
-			if (iret3){
-				log_info(logs,"Error en la creacion del hilo manejoExit");
-				exit (EXIT_FAILURE);
-			}
-
-		pthread_join(thread4, NULL ); //esperar a q termine el otro
-
-		pthread_join(thread5, NULL );
-		pthread_join(thread6, NULL );
-
-}
 
