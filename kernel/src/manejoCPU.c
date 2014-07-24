@@ -157,7 +157,7 @@ void manejoCPU(int fd) {
 				sem = string_from_format("%s", &nombreSem);
 				//ESTO DEBE SER ATOMICO
 				log_info(logs, "El semaforo se llama %s", sem);
-				//sem_wait(&mutexSemaforos);
+				sem_wait(&mutexSemaforos);
 				tSem = dictionary_get(semaforos, sem);
 				if (tSem->valor <= 0) {
 					tSem->valor = tSem->valor - 1;
@@ -168,7 +168,7 @@ void manejoCPU(int fd) {
 					recibirDatos(fd, tam, (void*) pcb, logs);
 					ponerCola(pcb, tSem->cola, &tSem->mutex, &tSem->hayAlgo);
 					muestraNombres(tSem->cola,"WAIT BLOQUEADOS");
-
+					sem_post(&mutexSemaforos);
 					PCBPOP = sacarCola(READY, &mutexREADY, &hayAlgoEnReady); //mando de nuevo.
 					muestraNombres(READY,"READY ");
 					ULTIMOPCB = PCBPOP;
@@ -185,9 +185,8 @@ void manejoCPU(int fd) {
 					bloqueado = 0;
 					enviarDatos(fd, tam, &bloqueado, logs);
 					log_info(logs, "y su valor es %i", tSem->valor);
+					sem_post(&mutexSemaforos);
 				}
-
-				//sem_post(&mutexSemaforos);
 
 				break;
 			case SIGNAL:
@@ -197,7 +196,7 @@ void manejoCPU(int fd) {
 				sem = string_from_format("%s", &nombreSem);
 
 				log_info(logs, "El semaforo es %s", sem);
-				//sem_wait(&mutexSemaforos);
+				sem_wait(&mutexSemaforos);
 				tSem = dictionary_get(semaforos, sem);
 				tSem->valor = tSem->valor + 1;
 				if (!queue_is_empty(tSem->cola)) {
@@ -215,7 +214,7 @@ void manejoCPU(int fd) {
 
 				}
 				log_info(logs, "y su valor es %i", tSem->valor);
-				//sem_post(&mutexSemaforos);
+				sem_post(&mutexSemaforos);
 
 				break;
 			case CONCLUYO_UN_QUANTUM:
