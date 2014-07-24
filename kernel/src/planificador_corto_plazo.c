@@ -9,9 +9,9 @@
 #include "planificador_corto_plazo.h"
 #include "manejoCPU.h"
 extern t_config *config;
-extern t_queue *NEW;
-extern t_queue *READY;
-extern t_queue *EXIT;
+//extern t_queue *NEW;
+//extern t_queue *READY;
+//extern t_queue *EXIT;
 extern t_log *logs;
 
 void pcp(void* ptr) {

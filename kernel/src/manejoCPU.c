@@ -23,7 +23,7 @@ extern t_dictionary * fileDescriptors;
 extern t_config * config;
 extern sem_t mutexSemaforos;
 extern sem_t mutexMandarColaEXEC;
-extern int socket_UMV;
+//extern int socket_UMV;
 
 extern t_dictionary * dispositivosIO;
 registroPCB* PCBrecibido;
@@ -252,7 +252,10 @@ void manejoCPU(int fd) {
 				log_info(logs, "Se agrego a la cola EXIT el proceso %i",
 						PCBrecibido->pid);
 				tam->length = sizeof(int);
-				enviarMenu(PCBrecibido->fd, tam, logs); //aviso al programa q finalizo.
+				char* pidR = string_from_format("%d", pidRecibido);
+				int* fdTemporal = dictionary_get(fileDescriptors, pidR);
+				enviarMenu(*fdTemporal, tam, logs); //aviso al programa q finalizo.
+				dictionary_remove(fileDescriptors, pidR);
 				log_info(logs, "El programa ha finalizado");
 
 				PCBPOP = sacarCola(READY, &mutexREADY, &hayAlgoEnReady); //mando de nuevo.
@@ -286,7 +289,8 @@ void manejoCPU(int fd) {
 						ULTIMOPCB->pid);
 
 				log_error(logs, "Se cierra la CPU.");
-				pthread_exit(1);
+				int retorno = 1;
+				pthread_exit(&retorno);
 
 				break;
 				}

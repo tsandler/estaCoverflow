@@ -149,7 +149,6 @@ registroPCB* armarPCB(char* program, int fd){
 	dictionary_put(fileDescriptors,keyPID,f);
 
 	unPCB->program_counter=metadataP->instruccion_inicio;
-	unPCB->fd=fd;
 	unPCB->peso = peso;
 	unPCB->puntero_etiquetas = 0 ;
 	unPCB->cursor_stack = 0;
