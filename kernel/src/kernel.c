@@ -92,7 +92,7 @@ int main(int argc, char **argv) {
 	sem_init(&mutexREADY, 0, 1);
 	sem_init(&mutexEXEC, 0, 1);
 	sem_init(&mutexEXIT, 0, 1);
-	sem_init(&gradoProg, 0, gradoMultiprogramacion - 1);
+	sem_init(&gradoProg, 0, gradoMultiprogramacion);
 	sem_init(&hayAlgo, 0, 0);
 	sem_init(&hayAlgoEnReady, 0, 0);
 	sem_init(&hayAlgoEnExec, 0, 0);
