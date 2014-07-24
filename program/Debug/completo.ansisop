@@ -16,9 +16,8 @@ variables f,  A,  g
 	
     f = 8	  
     g <- doble !Global	
-    io impresora 20
-	:Siguiente	
-    imprimir A
+    io impresora 5
+
     textPrint Hola Mundo!
     
     sumar1 &g		
@@ -43,5 +42,7 @@ end
 function sumar1
 	*$0 = 1 + *$0
 end
-
+:Siguiente	
+    imprimir A
+goto Proximo
 
