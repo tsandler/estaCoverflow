@@ -200,7 +200,6 @@ void manejoCPU(int fd) {
 				tSem = dictionary_get(semaforos, sem);
 				tSem->valor = tSem->valor + 1;
 				if (!queue_is_empty(tSem->cola)) {
-					if (queue_size(tSem->cola) != 0) {
 
 						PCBPOP = sacarCola(tSem->cola, &tSem->mutex, &tSem->hayAlgo);
 						muestraNombres(tSem->cola,"SIGNAL BLOQUEADOS");
@@ -210,7 +209,6 @@ void manejoCPU(int fd) {
 
 						ponerCola(PCBPOP, READY, &mutexREADY, &hayAlgoEnReady);
 						muestraNombres(READY,"READY");
-					}
 
 				}
 				log_info(logs, "y su valor es %i", tSem->valor);
