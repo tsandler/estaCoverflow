@@ -25,23 +25,25 @@ t_elem_cola_cpu *desencolar_peticion(int socket){
 	return NULL;
 }
 
+bool esCorrecto_pid(int pid){
+
+	if(pid >= 0 && pid < 100)
+		return 1;
+	return 0;
+}
 
 /*Funcion que llama el hilo cada vez que se conecta algun CPU a la UMV*/
 void funcion_CPU(int socket){
 
-	int pidLocal=-1;
-	int pid;
+	int pid, pidLocal=-1;
 	int termina=0;
 	t_length* tam = malloc(sizeof(t_length));
 	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
 	t_elem_cola_cpu* unaPeticion = malloc(sizeof(t_elem_cola_cpu));
 	unsigned char* codigo;
-	int base;
-	int offset;
-	int tamanio;
+	int base, offset, tamanio, nroSegmento;
 	char buffer[1024];
 	char* cod;
-	int nroSegmento;
 
 	sem_wait(&yaEscribio);
 	sem_wait(&yaEscribio);
@@ -49,9 +51,8 @@ void funcion_CPU(int socket){
 		sem_wait(&yaEscribio);
 
 	while(1){
-		log_info(logs,"[HILO CPU] Esperando una peticion...");
 		if(!recibirMenu(socket, tam, logs)){
-			log_error(logs, "Se produjo un error recibiendo el menu");
+			log_error(logs, "Se produjo un error recibiendo una peticion");
 			break;
 		}
 
@@ -71,6 +72,11 @@ void funcion_CPU(int socket){
 					log_error(logs, "Se produjo un error recibiendo el pid");
 					break;
 				}
+				if( !esCorrecto_pid(pid) ){
+					log_error(logs,"[HILO CPU] Se recibio un pid invalido");
+					termina = 1;
+					break;
+				}
 				pidLocal = pid;
 				log_info(logs,"[HILO CPU] Se cambio el pid activo a: %d",pidLocal);
 				sem_post(&mutexOpera);
@@ -83,7 +89,7 @@ void funcion_CPU(int socket){
 					break;
 				}
 
-				if( validacion_escribir_seg(etiq->base) ){
+				if( validacion_base(etiq->base) ){
 					log_error(logs,"[HILO CPU] Error en la base al intentar escribir el segmento");
 					termina = 1;
 					break;
@@ -123,8 +129,8 @@ void funcion_CPU(int socket){
 					break;
 				}
 
-				if( validacion_escribir_seg(etiq->base) ){
-					log_error(logs,"[HILO CPU] Error en la base al intentar al enviar el stack");
+				if( validacion_base(etiq->base) ){
+					log_error(logs,"[HILO CPU] Error en la base al intentar escribir el stack");
 					termina = 1;
 					break;
 				}
@@ -174,7 +180,7 @@ void funcion_CPU(int socket){
 				if(!enviarDatos(socket, tam, codigo, logs))
 					log_error(logs,"Error al enviarse la sentencia");
 
-				log_info(logs,"[HILO CPU] Se envio al CPU nro: %d La sentencia: %s",socket,codigo);
+				log_info(logs,"[HILO CPU] Se envio al CPU nro: %d la sentencia",socket);
 				sem_post(&mutexOpera);
 				break;
 			case LEER_SEGMENTO:
@@ -186,7 +192,7 @@ void funcion_CPU(int socket){
 					break;
 				}
 
-				if( validacion_escribir_seg(etiq->base) ){
+				if( validacion_base(etiq->base) ){
 					termina = 1;
 					break;
 				}
@@ -203,10 +209,13 @@ void funcion_CPU(int socket){
 				termina = 1;
 				break;
 		}
-		if(termina)
-				break;
+		if(termina){
+			log_error(logs,"[HILO CPU]La UMV desconectó al CPU por fallo");
+			char* mje= "La UMV desconectó al CPU por fallo";
+			pthread_exit(mje);
+		}
 	}
-		log_error(logs,"[HILO CPU]La UMV desconectó al CPU por fallo");
+
 }
 
 /*Funcion que llama el hilo cuando se conecta el KERNEL a la UMV*/
@@ -252,7 +261,7 @@ void funcion_kernel(int socket){
 					break;
 				}
 
-				if( validacion_escribir_seg(etiq->base) ){
+				if( validacion_base(etiq->base) ){
 					log_error(logs,"[HILO KERNEL] Error en la base al intentar escribir el segmento");
 					termina = 1;
 					break;
@@ -299,7 +308,8 @@ void funcion_kernel(int socket){
 					log_error(logs, "Se produjo un error recibiendo el pid");
 					break;
 				}
-				destruir_segmentos(pid);
+				if(!destruir_segmentos(pid))
+					break;
 				sem_post(&mutexOpera);
 				break;
 			default:
@@ -315,8 +325,8 @@ void funcion_kernel(int socket){
 }
 
 
-bool validacion_escribir_seg(int base){
-	if( base >= 0 && base <= 2000)
+bool validacion_base(int base){
+	if( base >= 0 && base <= 4000)
 		return 0;
 	return 1;
 }
@@ -412,7 +422,7 @@ int crear_agregar_segmento(int pidInt, int tamanio){
 }
 
 /* Funcion que elimina un campo pid y sus segmentos asociados */
-void destruir_segmentos(int pidInt){
+bool destruir_segmentos(int pidInt){
 	char* pid = string_itoa(pidInt);
 
 	if( dictionary_has_key(tablaPidSeg, pid) ){
@@ -422,11 +432,14 @@ void destruir_segmentos(int pidInt){
 
 		if( dictionary_has_key(tablaPidSeg, pid)){
 			log_error(logs,"[HILO KERNEL]Los sementos no se eliminaron");
+			return 1;
 		}else
 			log_info(logs,"[HILO KERNEL]Los segmentos se eliminaron correctamente");
+		return 0;
 	}else{
 		log_error(logs,"Se intento eliminar segmentos no existentes");
 		free(pid);
+		return 1;
 	}
 }
 

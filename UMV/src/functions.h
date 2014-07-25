@@ -18,7 +18,7 @@ void inicializar_umv(int tamanioUMV);
 void eliminarUMV();
 
 int crear_agregar_segmento(int pid, int tamanio);
-void destruir_segmentos(int pidInt);
+bool destruir_segmentos(int pidInt);
 
 unsigned char *leer_segmento(int dirLog, int tamanioALeer, int offset, int pidLocal);
 void escribir_segmento(int dirLog, int tamanioAEscribir, int offset, char* buffer, int pidLocal);
@@ -69,7 +69,8 @@ void actualizar_RamAux(char* pid, t_list* listSeg);
 
 
 
-bool validacion_escribir_seg(int base);
+bool validacion_base(int base);
+bool esCorrecto_pid(int pid);
 
 
 #endif /* FUNCTIONS_H_ */

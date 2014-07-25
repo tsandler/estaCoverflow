@@ -15,6 +15,10 @@ sem_t mutexOpera;
 
 int main(int argc, char** argv){
 
+	pthread_t hilosCPU[10];
+	int i=0;
+
+
  	logs = log_create("log","UMV.c",1,LOG_LEVEL_TRACE);
 
 //	if (argc < 2){
@@ -34,7 +38,7 @@ int main(int argc, char** argv){
 	}
 	inicializar_var_config();
 	inicializar_umv(tamanioUMV);
-	log_debug(logs,"Ya se creo la umv");
+	log_debug(logs,"Se creo la umv");
 
 	sem_init(&yaEscribio,0,0);
 	sem_init(&mutexOpera,0,1);
@@ -49,10 +53,6 @@ int main(int argc, char** argv){
 	}
 	else
 		log_info(logs,"Se creo el servidor");
-
-	log_debug(logs,"Entra al do-while para conectar el kernel");
-
-
 
 	do{
 		socket = aceptarConexion(s, logs);
@@ -96,7 +96,8 @@ int main(int argc, char** argv){
 		else{
 			if (tam->menu == SOY_CPU){
 				log_debug(logs,"[MAIN CPU] Se conecto: CPU");
-				pthread_create(&pthread_CPU, NULL, (void*)funcion_CPU, (void*)socket);
+				pthread_create(&hilosCPU[i], NULL, (void*)funcion_CPU, (void*)socket);
+				i++;
 			}else{
 				log_error(logs, "[MAIN CPU] Error en handshake: NO ES CPU");
 			}

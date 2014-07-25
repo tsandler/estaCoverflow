@@ -24,7 +24,8 @@
 #include <commons/collections/queue.h>
 
 
-pthread_t pthread_kernel, pthread_CPU, pthread_consola;
+pthread_t pthread_kernel, pthread_consola;
+//pthread_t pthread_CPU;
 t_log *logs;
 t_dictionary *tablaPidSeg;
 t_list *listaHuecos;
@@ -44,6 +45,7 @@ char* ramAux;
 char* dirHueco;
 int tamHueco;
 int encontroHueco;
+
 
 typedef struct{
 	t_length* tama;
