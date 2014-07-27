@@ -26,10 +26,23 @@ t_elem_cola_cpu *desencolar_peticion(int socket){
 }
 
 bool esCorrecto_pid(int pid){
-
 	if(pid >= 0 && pid < 100)
 		return 1;
 	return 0;
+}
+
+/*Funcion que saca las peticiones de un cpu cuando se cae*/
+void bajar_cpu(int socket){
+
+	bool eliminar_peticiones(t_elem_cola_cpu* unaPeticion){
+		return unaPeticion->socket == socket;
+	}
+
+	void libera_datos(t_elem_cola_cpu* unaPeticion){
+	//	free(unaPeticion->tama);
+	}
+
+	list_remove_and_destroy_by_condition(colaCPUs,(void*)eliminar_peticiones,(void*)libera_datos);
 }
 
 /*Funcion que llama el hilo cada vez que se conecta algun CPU a la UMV*/
@@ -51,6 +64,7 @@ void funcion_CPU(int socket){
 		sem_wait(&yaEscribio);
 
 	while(1){
+
 		if(!recibirMenu(socket, tam, logs)){
 			log_error(logs, "Se produjo un error recibiendo una peticion");
 			break;
@@ -60,6 +74,24 @@ void funcion_CPU(int socket){
 		unaPeticion->tama = tam;
 		list_add_in_index(colaCPUs,0,unaPeticion);
 		unaPeticion = desencolar_peticion(socket);
+
+		if(unaPeticion->tama->menu==OK){
+			log_error(logs,"[CPU] Se perdio la conexion. Baja al cpu");
+			bajar_cpu(socket);
+
+			if(!list_size(colaCPUs))
+				log_error(logs,"[CPU] No hay cpus conectados. Se baja la conexion");
+
+			if(!recibirMenu(socket, tam, logs)){
+				log_error(logs, "Se produjo un error recibiendo una peticion");
+				break;
+			}
+
+			unaPeticion->socket = socket;
+			unaPeticion->tama = tam;
+			list_add_in_index(colaCPUs,0,unaPeticion);
+			unaPeticion = desencolar_peticion(socket);
+		}
 
 		if(!unaPeticion)
 			log_error(logs,"[HILO CPU] No hay peticion");
@@ -210,11 +242,11 @@ void funcion_CPU(int socket){
 				break;
 		}
 		if(termina){
-			log_error(logs,"[HILO CPU]La UMV desconectó al CPU por fallo");
+			log_error(logs,"[HILO CPU]La UMV desconectó a los CPU por fallo");
 			break;
 		}
+		unaPeticion->tama->menu = OK;
 	}
-
 }
 
 /*Funcion que llama el hilo cuando se conecta el KERNEL a la UMV*/
@@ -235,9 +267,11 @@ void funcion_kernel(int socket){
 			log_error(logs, "[HILO KERNEL] Error al recibir la peticion");
 			break;
 		}
+
 		unaPeticion->tama = tam;
 		queue_push(colaKernel,unaPeticion);
 		unaPeticion = queue_pop(colaKernel);
+
 
 		switch(unaPeticion->tama->menu){
 			case PID_ACTUAL:
@@ -262,7 +296,7 @@ void funcion_kernel(int socket){
 
 				if( validacion_base(etiq->base) ){
 					log_error(logs,"[HILO KERNEL] Error en la base al intentar escribir el segmento");
-					termina = 1;
+//					termina = 1;
 					break;
 				}
 
@@ -306,18 +340,20 @@ void funcion_kernel(int socket){
 					log_error(logs, "Se produjo un error recibiendo el pid");
 					break;
 				}
-				if(!destruir_segmentos(pid))
+				if(!destruir_segmentos(pid)){
 					break;
+				}
 				sem_post(&mutexOpera);
 				break;
 			default:
 				retardo();
 				log_error(logs,"[HILO KERNEL] operacion invalida para Kernel.La UMV desconecta al KERNEL");
-				termina = 1;
+//				termina = 1;
 				break;
 		}
-		if(termina)
-			break;
+//		if(termina)
+//			printf(" jejejejejeje\n"); //FIXME
+		//	break;
 	}
 	log_error(logs,"[HILO KERNEL]La UMV desconectó al kernel por fallo");
 }
@@ -342,6 +378,10 @@ void inicializar_umv(int tamanioUMV){
 	unElem->tamanioSegmento=tamanioUMV;
 	ramUMVInicial = unElem->dirFisica;
 	list_add(listaHuecos,unElem);
+	arch_dump = txt_open_for_append("dump");
+	arch_escribirPorConsola = txt_open_for_append("escribir_por_consola");
+	arch_leerPorConsola = txt_open_for_append("leer_por_consola");
+
 }
 
 /*Funcion que elimina estructuras del manejo de la UMV liberando el bloque de memoria principal*/
@@ -421,7 +461,6 @@ int crear_agregar_segmento(int pidInt, int tamanio){
 
 /* Funcion que elimina un campo pid y sus segmentos asociados */
 bool destruir_segmentos(int pidInt){ //FIXME
-	;
 
 	if( dictionary_has_key(tablaPidSeg, string_itoa(pidInt)) ){
 		t_list* listaSeg = dictionary_get(tablaPidSeg,string_itoa(pidInt));
@@ -436,7 +475,7 @@ bool destruir_segmentos(int pidInt){ //FIXME
 		return 0;
 	}else{
 		log_error(logs,"Se intento eliminar segmentos no existentes");
-		return 1;
+		return 0;
 	}
 }
 
@@ -445,6 +484,7 @@ void elimina_segmento_agrega_hueco(tablaSegUMV *unElem){
 	nodoHuecos* nodoNuevo=malloc(sizeof(nodoHuecos));
 	nodoNuevo->dirFisica = unElem->dirFisica;
 	nodoNuevo->tamanioSegmento = unElem->tamanioSegmento;
+	memcpy(nodoNuevo->dirFisica,"0000000",nodoNuevo->tamanioSegmento);
 	free(unElem);
 	list_add(listaHuecos,nodoNuevo);
 }
@@ -630,7 +670,7 @@ unsigned char* ejec_operacion(int nroOp){
 			printf("Ingresar offset: ");
 			scanf("%d",&offset);
 			unsigned char* resultado = leer_segmento(dirLogica,tamanioALeer,offset,pid);
-//			generar_archivo(resultado,nroOp);
+			generar_archivo(resultado,nroOp);
 			return resultado;
 			break;
 		case ESCR_SEG:
@@ -643,7 +683,7 @@ unsigned char* ejec_operacion(int nroOp){
 
 
 			escribir_segmento(dirLogica,tamanioAEscribir,offset,buffer,pid);
-				//generar_archivo(resultado,nroOp);
+			generar_archivo(buffer,nroOp);
 			return NULL;
 			break;
 
@@ -668,24 +708,24 @@ unsigned char* ejec_operacion(int nroOp){
 	}
 	return NULL;
 }
-
-void generar_archivo(unsigned char* resultado, int nroOp){
-	FILE* arch;
-	char* nombre;
-	log_debug(logs,"Entra a generar archivo");
-
+void generar_archivo(unsigned char* codigo, int nroOp){
+	int cantEscr=1, cantLect=1;
 	switch(nroOp){
 		case LEER_SEG:
-			log_debug(logs,"entra a leerSeg");
-			nombre ="leer";
-			arch = txt_open_for_append(nombre);
-			txt_write_in_file(arch,(char*)resultado);
+			txt_write_in_file(arch_leerPorConsola,"Lectura por consola nro:");
+			txt_write_in_file(arch_leerPorConsola,string_itoa(cantLect));
+			txt_write_in_file(arch_leerPorConsola,"\nContenido:\n");
+			txt_write_in_file(arch_leerPorConsola,(char*)codigo);
+			txt_write_in_file(arch_leerPorConsola,"===============================================");
+			cantLect++;
 			break;
 		case ESCR_SEG:
-			log_debug(logs,"entra a escribirSeg");
-			nombre = "escribir";
-			arch = txt_open_for_append(nombre);
-			txt_write_in_file(arch,(char*)resultado);
+			txt_write_in_file(arch_escribirPorConsola,"Escritura por consola nro:");
+			txt_write_in_file(arch_escribirPorConsola,string_itoa(cantEscr));
+			txt_write_in_file(arch_escribirPorConsola,"\nContenido:\n");
+			txt_write_in_file(arch_escribirPorConsola,(char*)codigo);
+			txt_write_in_file(arch_escribirPorConsola,"===============================================");
+			cantEscr++;
 			break;
 		default:
 			break;
@@ -693,48 +733,63 @@ void generar_archivo(unsigned char* resultado, int nroOp){
 }
 void dump(){
 	int nroOp;
+	int huboError=0;
 	printf("\nUsted selecciono 'Dump'\n");
 	printf("Ingrese operacion segun...\n");
 	printf("	1.Estructuras memoria\n");
 	printf("	2.Memoria principal\n");
 	printf("	3.Contenido de la memoria principal\n");
-	printf("Opcion: ");
+	printf("\nOpcion: ");
 	scanf("%d",&nroOp);
 
 	switch(nroOp){
 		case ESTRUCTURAS_MEMORIA:
 			imprime_estructuras_memoria();
+			huboError=0;
 			break;
 		case MEMORIA_PRINCIPAL:
+			txt_write_in_file(arch_dump,"						ESTRUCTURAS DE MEMORIA\n\n");
 			imprime_estado_mem_ppal();
+			huboError=0;
 			break;
-		case CONTENIDO_MEM_PPAL:
-
+		case CONTENIDO_MEM_PPAL: //TODO
+			huboError=0;
 			break;
 		default:
 			log_error(logs,"COMANDO NO VALIDO");
+			huboError=1;
 			break;
 	}
+	if(!huboError)
+		txt_write_in_file(arch_dump,"\n\n==================================================\n\n");
 }
 
 void imprime_listahuecos(){
-	log_info(logs,"Se imprime lista huecos");
 	list_iterate(listaHuecos, (void*)imprime_campos_listahuecos);
 }
 
 void imprime_campos_listatablaSegUMV(tablaSegUMV *unElem){
-	printf("Nro segmento: %d\n",unElem->idSegmento);
-	printf("  Dirección logica: %d\n",unElem->dirLogica);
-	printf("  Tamaño del segmento: %d\n",unElem->tamanioSegmento);
+	txt_write_in_file(arch_dump,"\nNro segmento: ");
+	txt_write_in_file(arch_dump, string_itoa(unElem->idSegmento));
+	txt_write_in_file(arch_dump,"\n    Dirección logica:");
+	txt_write_in_file(arch_dump, string_itoa(unElem->dirLogica));
+
+	txt_write_in_file(arch_dump,"\n    Tamaño del segmento: ");
+	txt_write_in_file(arch_dump,string_itoa(unElem->tamanioSegmento));
+	txt_write_in_file(arch_dump,"\n    Contenido:\n");
 	char* rta = malloc(unElem->tamanioSegmento);
 	memcpy(rta,unElem->dirFisica,unElem->tamanioSegmento);
-	printf("Contenido:\n	%s",rta);
+	txt_write_in_file(arch_dump,rta);
+	txt_write_in_file(arch_dump,"\n");
 	free(rta);
 }
 
 void imprime_campos_listahuecos(nodoHuecos *unElem){
-	printf("Contenido:\n");
-	printf("  Tamaño del segmento: %d\n",unElem->tamanioSegmento);
+	txt_write_in_file(arch_dump,"\nContenido:\n");
+	txt_write_in_file(arch_dump,"  Tamaño del segmento:");
+	txt_write_in_file(arch_dump,string_itoa(unElem->tamanioSegmento));
+	txt_write_in_file(arch_dump,"\n");
+
 }
 
 void imprime_estructuras_memoria(){
@@ -743,10 +798,10 @@ void imprime_estructuras_memoria(){
 		list_iterate(listaSeg, (void*)imprime_campos_listatablaSegUMV);
 	}
 	if(!dictionary_size(tablaPidSeg))
-		printf("**Actualmente no hay segmentos en memoria**");
+		txt_write_in_file(arch_dump,"**Actualmente no hay segmentos en memoria**\n\n");
 	else{
 		printf("Reporte de..\n   1.Tablas de segmentos de todos los procesos\n");
-		printf("   2.Tablas de segmentos de un proceso");
+		printf("   2.Tablas de segmentos de un proceso\n");
 		printf("Opcion: ");
 		scanf("%d",&opcion);
 
@@ -759,20 +814,16 @@ void imprime_estructuras_memoria(){
 			t_list* listSeg = dictionary_remove(tablaPidSeg,string_itoa(pid));
 			list_iterate(listSeg,(void*)imprime_campos_listatablaSegUMV);
 		}
-
-
 	}
-
-
 }
 
 void imprime_estado_mem_ppal(){
+	txt_write_in_file(arch_dump,"						ESTADO DE MEMORIA PRINCIPAL\n\n");
+	txt_write_in_file(arch_dump,"			---ESTRUCTURAS DE MEMORIA---\n\n");
 	imprime_estructuras_memoria();
-	printf("Bloques libres de memoria:\n");
+	txt_write_in_file(arch_dump,"\n			---BLOQUES LIBRES DE MEMORIA---\n");
 	imprime_listahuecos();
 }
-
-
 
 /* Funcion que retorna el mayor idSegmento entre dos elementos */
 bool sort_nroSeg(tablaSegUMV* unElem, tablaSegUMV* otroElem){
@@ -791,11 +842,8 @@ bool sort_mayor_dirLogica(tablaSegUMV* unElem, tablaSegUMV* otroElem){
 
 
 void consola(){
-
-	log_debug(logs,"Entra a consola");
 	int cambioAlgoritmo ,nroOp, operacion, retardoNuevo;
-	int i=0;
-	while(!i){
+	while(1){
 		printf("\nSeleccione la operación segun\n");
 		printf("	1.Operacion\n");
 		printf("	2.Cambiar retardo\n");
@@ -843,15 +891,7 @@ void consola(){
 				printf("**Operacion invalida**\n");
 				break;
 		}
-
-		printf("¿Desea realizar otra operacion?\n");
-		printf("	0.Si\n");
-		printf("	1.No\n");
-		printf("Opcion: ");
-		scanf("%d",&i);
 	}
-//	printf("Ha finalizado la consola. ¿Desea re-abrirla?");
-	log_info(logs,"El usuario cerro la consola");
 }
 
 

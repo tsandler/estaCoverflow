@@ -68,9 +68,9 @@ void buscar_el_primer_hueco_y_actualizar_ramAux();
 void actualizar_RamAux(char* pid, t_list* listSeg);
 
 
-
 bool validacion_base(int base);
 bool esCorrecto_pid(int pid);
+void bajar_cpu(int socket);
 
 
 #endif /* FUNCTIONS_H_ */

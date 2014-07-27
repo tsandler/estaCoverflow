@@ -33,6 +33,10 @@ t_config* config;
 t_length* tam;
 t_queue* colaKernel;
 t_list* colaCPUs;
+FILE* arch_dump;
+FILE* arch_escribirPorConsola;
+FILE* arch_leerPorConsola;
+
 int tamanioUMV;
 int retardoActual;
 int algoritmoActual;
