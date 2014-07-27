@@ -25,7 +25,7 @@
 
 
 pthread_t pthread_kernel, pthread_consola;
-//pthread_t pthread_CPU;
+pthread_t pthread_CPU;
 t_log *logs;
 t_dictionary *tablaPidSeg;
 t_list *listaHuecos;

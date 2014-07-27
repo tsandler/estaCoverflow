@@ -211,8 +211,7 @@ void funcion_CPU(int socket){
 		}
 		if(termina){
 			log_error(logs,"[HILO CPU]La UMV desconectó al CPU por fallo");
-			char* mje= "La UMV desconectó al CPU por fallo";
-			pthread_exit(mje);
+			break;
 		}
 	}
 
@@ -303,7 +302,6 @@ void funcion_kernel(int socket){
 				retardo();
 				sem_wait(&mutexOpera);
 				segEscritos=0;
-				log_info(logs,"[HILO KERNEL] Entra a eliminar segmentos");
 				if(!recibirDato(socket, tam->length, (void*)&pid, logs)){
 					log_error(logs, "Se produjo un error recibiendo el pid");
 					break;
@@ -422,23 +420,22 @@ int crear_agregar_segmento(int pidInt, int tamanio){
 }
 
 /* Funcion que elimina un campo pid y sus segmentos asociados */
-bool destruir_segmentos(int pidInt){
-	char* pid = string_itoa(pidInt);
+bool destruir_segmentos(int pidInt){ //FIXME
+	;
 
-	if( dictionary_has_key(tablaPidSeg, pid) ){
-		t_list* listaSeg = dictionary_get(tablaPidSeg,pid);
+	if( dictionary_has_key(tablaPidSeg, string_itoa(pidInt)) ){
+		t_list* listaSeg = dictionary_get(tablaPidSeg,string_itoa(pidInt));
 		list_iterate(listaSeg,(void*)elimina_segmento_agrega_hueco);
-		dictionary_remove(tablaPidSeg,pid);
+		dictionary_remove(tablaPidSeg,string_itoa(pidInt));
 
-		if( dictionary_has_key(tablaPidSeg, pid)){
-			log_error(logs,"[HILO KERNEL]Los sementos no se eliminaron");
+		if( !dictionary_has_key(tablaPidSeg, string_itoa(pidInt))){
+			log_info(logs,"[HILO KERNEL]Los segmentos del pid: %d se eliminaron",pidInt);
 			return 1;
 		}else
-			log_info(logs,"[HILO KERNEL]Los segmentos se eliminaron correctamente");
+			log_error(logs,"[HILO KERNEL]Los segmentos del pid: %d no se eliminaron",pidInt);
 		return 0;
 	}else{
 		log_error(logs,"Se intento eliminar segmentos no existentes");
-		free(pid);
 		return 1;
 	}
 }

@@ -15,10 +15,6 @@ sem_t mutexOpera;
 
 int main(int argc, char** argv){
 
-	pthread_t hilosCPU[10];
-	int i=0;
-
-
  	logs = log_create("log","UMV.c",1,LOG_LEVEL_TRACE);
 
 //	if (argc < 2){
@@ -96,8 +92,7 @@ int main(int argc, char** argv){
 		else{
 			if (tam->menu == SOY_CPU){
 				log_debug(logs,"[MAIN CPU] Se conecto: CPU");
-				pthread_create(&hilosCPU[i], NULL, (void*)funcion_CPU, (void*)socket);
-				i++;
+				pthread_create(&pthread_CPU, NULL, (void*)funcion_CPU, (void*)socket);
 			}else{
 				log_error(logs, "[MAIN CPU] Error en handshake: NO ES CPU");
 			}
