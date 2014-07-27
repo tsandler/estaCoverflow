@@ -51,6 +51,10 @@ void manejoCPU(int fd) {
 	int retardo = config_get_int_value(config, "RETARDO");
 	t_length* tam = malloc(sizeof(registroPCB));
 
+	t_dictionary *pcbCPU;
+	pcbCPU= dictionary_create();
+	char* fdMal;
+
 	PCBrecibido = malloc(sizeof(registroPCB));
 	registroPCB* PCBPOP = malloc(sizeof(registroPCB));
 	registroPCB* unPCB = malloc(sizeof(registroPCB));
@@ -71,6 +75,8 @@ void manejoCPU(int fd) {
 	log_info(logs, "Se Coloco en la cola EXEC el PCB %i", unPCB->pid);
 	tam->length = sizeof(registroPCB);
 	enviarDatos(fd, tam, unPCB, logs);
+	char* fdRecibido = string_from_format("%d", fd);
+	dictionary_put(pcbCPU,fdRecibido,unPCB);
 	sem_post(&mutexMandarColaEXEC);
 	t_log* logss = log_create("logggg", "Cpu", 1, LOG_LEVEL_TRACE);
 	while (1) {
@@ -146,6 +152,8 @@ void manejoCPU(int fd) {
 				tam->length = sizeof(registroPCB);
 				log_info(logs, "Se coloco en la Cola Ready el proceso %i", PCBPOP->pid);
 				enviarDatos(fd, tam, PCBPOP, logs);
+				fdRecibido = string_from_format("%d", fd);
+				dictionary_put(pcbCPU,fdRecibido,PCBPOP);
 				sem_post(&mutexMandarColaEXEC);
 
 				break;
@@ -175,9 +183,10 @@ void manejoCPU(int fd) {
 					sem_wait(&mutexMandarColaEXEC);	//envio datos y pongo en exec atomicamente
 					ponerCola(PCBPOP, EXEC, &mutexEXEC, &hayAlgoEnExec);
 					tam->length = sizeof(registroPCB);
-					log_info(logs, "Se coloco en la Cola EXEC el proceso %i",
-							PCBPOP->pid);
+					log_info(logs, "Se coloco en la Cola EXEC el proceso %i",PCBPOP->pid);
 					enviarDatos(fd, tam, PCBPOP, logs);
+					char* fdRecibido = string_from_format("%d", fd);
+					dictionary_put(pcbCPU,fdRecibido,PCBPOP);
 					sem_post(&mutexMandarColaEXEC);
 
 				} else {
@@ -205,7 +214,7 @@ void manejoCPU(int fd) {
 					muestraNombres(tSem->cola,"SIGNAL BLOQUEADOS");
 					ULTIMOPCB = PCBPOP;
 
-					printf("voya poner en ready el PID IMPORTANTE");
+					printf("voya poner en ready el PID desbloqueado");
 
 					ponerCola(PCBPOP, READY, &mutexREADY, &hayAlgoEnReady);
 					muestraNombres(READY,"READY");
@@ -221,9 +230,8 @@ void manejoCPU(int fd) {
 
 				ponerCola(pcb, READY, &mutexREADY, &hayAlgoEnReady); //lo pongo en ready
 				muestraNombres(READY,"READY");
-				log_info(logs, "Se coloco en la cola Ready el proceso %i",
-						pcb->pid);
-				log_debug(logss, "El FD es %d", fd);
+				log_info(logs, "Se coloco en la cola Ready el proceso %i",pcb->pid);
+				log_debug(logss, "El FD del cpu es %d", fd);
 				if (fd >= 0){
 					PCBPOP = sacarCola(READY, &mutexREADY, &hayAlgoEnReady); //saco de ready
 					muestraNombres(READY,"QUATUM READY ");
@@ -234,6 +242,8 @@ void manejoCPU(int fd) {
 					log_info(logs, "Se coloco en la cola EXEC el proceso %i", PCBPOP->pid);
 					tam->length = sizeof(registroPCB);
 					enviarDatos(fd, tam, PCBPOP, logs);
+					char* fdRecibido = string_from_format("%d", fd);
+					dictionary_put(pcbCPU,fdRecibido,PCBPOP);
 					sem_post(&mutexMandarColaEXEC);
 				}
 				break;
@@ -249,8 +259,7 @@ void manejoCPU(int fd) {
 				sem_post(&gradoProg);
 				//eliminarSegmentoUMV(socket_UMV, logs, PCBrecibido);//FIXME: haciendo esto los eliminas dos veces, porque tambien lo hace manejoExit()
 
-				log_info(logs, "Se agrego a la cola EXIT el proceso %i",
-						PCBrecibido->pid);
+				log_info(logs, "Se agrego a la cola EXIT el proceso %i",PCBrecibido->pid);
 				tam->length = sizeof(int);
 				char* pidR = string_from_format("%d", pidRecibido);
 				int* fdTemporal = dictionary_get(fileDescriptors, pidR);
@@ -265,6 +274,8 @@ void manejoCPU(int fd) {
 				tam->length = sizeof(registroPCB);
 				log_info(logs, "Se coloco en la Cola EXEC el proceso %i", PCBPOP->pid);
 				enviarDatos(fd, tam, PCBPOP, logs);
+				fdRecibido = string_from_format("%d", fd);
+				dictionary_put(pcbCPU,fdRecibido,PCBPOP);
 				sem_post(&mutexMandarColaEXEC);
 				break;
 
@@ -278,15 +289,15 @@ void manejoCPU(int fd) {
 				break;*/
 			default:
 
+				fdMal = string_from_format("%d", fd);
+				ULTIMOPCB = dictionary_get(pcbCPU,fdMal);
 				ponerCola(ULTIMOPCB,EXIT,&mutexEXIT,&hayAlgoEnExit);
 				char* p2 = string_from_format("%d", ULTIMOPCB->pid);
 				int* fd2= dictionary_get(fileDescriptors, p2);
 
 				tam->menu = ERROR;
 				enviarMenu(*fd2, tam, logs);
-				log_error(logs,
-						"Se interrumpio el proceso con el PID: %d debido a que la CPU esta caida",
-						ULTIMOPCB->pid);
+				log_error(logs,"Se interrumpio el proceso con el PID: %d debido a que la CPU esta caida",ULTIMOPCB->pid);
 
 				log_error(logs, "Se cierra la CPU.");
 				int retorno = 1;

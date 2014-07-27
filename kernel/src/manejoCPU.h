@@ -8,3 +8,5 @@
 
 void manejoCPU(int fd);
 bool condicion(registroPCB* pcb);
+
+

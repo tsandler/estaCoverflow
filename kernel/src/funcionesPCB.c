@@ -51,7 +51,7 @@ void eliminarSegmentoUMV(int socket_UMV, t_log* logs,registroPCB* PCBprograma){
 	if(!enviarDatos(socket_UMV, tam, &datos_pid,logs))
 		log_error(logs,"Error en el envio del pid, no se pudo DESTRUIR EL SEGMENTO");
 	else
-		log_info (logs, "Se pidio la destruccion del SEGMENTO de forma EXITOSA");
+		log_info (logs, "Se pidio la destruccion del SEGMENTO de forma EXITOSA relacionada al proceso: %d",datos_pid);
 }
 
 
@@ -170,6 +170,8 @@ registroPCB* armarPCB(char* program, int fd){
     	escribirSegmento(unPCB,unPCB->indice_etiquetas,unPCB->tamanio_indice_etiquetas,metadataP->etiquetas);
 
     escribirSegmento(unPCB,unPCB->segmento_codigo,(strlen(program)+1),program);
+
+    usleep(32);
 
     log_info(logs,"se creo el pcb. entra a intercambiar datos con  la UMV");
 
