@@ -168,24 +168,25 @@ int openSocketServerPCP(int PORT) {
 
 		socklen_t clilen;
 		clilen = sizeof(clientaddr);
+
 		if ((newfd = accept(listener, (struct sockaddr *) &clientaddr, &clilen))
 				== -1) {
 			log_error(logs,"Error en cuando el PCP queria aceptar la conexion");
 			exit(EXIT_FAILURE);//tendria que poner esto aca o no se pone nada y se permite que siga ejecutando
 		} else {
-			// log_info(logs, "aceptado !..."); este log es innecesario
 
+			// log_info(logs, "aceptado !..."); este log es innecesario
 				pthread_t thread;
 				int iret1 = pthread_create(&thread, NULL, manejoCPU,(void*)newfd);
 
-						if (iret1){
-							log_info(logs, "Error en la creacion del hilo CPU");
-							exit(EXIT_FAILURE);
-						}
+				if (iret1){
+					log_info(logs, "Error en la creacion del hilo CPU");
+					exit(EXIT_FAILURE);
+				}
 
-
-
+				pthread_join(iret1, NULL);
 		}
+
 
 	}
 	return 0;

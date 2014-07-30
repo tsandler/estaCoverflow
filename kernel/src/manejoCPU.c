@@ -79,6 +79,7 @@ void manejoCPU(int fd) {
 	dictionary_put(pcbCPU,fdRecibido,unPCB);
 	sem_post(&mutexMandarColaEXEC);
 	t_log* logss = log_create("logggg", "Cpu", 1, LOG_LEVEL_TRACE);
+	int finaliza = 0;
 	while (1) {
 		tam->menu = OK;
 		recibirMenu(fd, tam, logs);
@@ -146,15 +147,17 @@ void manejoCPU(int fd) {
 				PCBrecibido->retrasoIO = tiempo;
 				ponerCola(PCBrecibido, io->cola, &io->mutex, &io->hayAlgo); //lo mando al io
 				log_info(logs, "Se coloco en la Cola de IO el proceso %i",PCBrecibido->pid);
-				PCBPOP = sacarCola(READY, &mutexREADY, &hayAlgoEnReady); //mando PCB nuevo nuevo.
-				sem_wait(&mutexMandarColaEXEC);	//envio datos y pongo en exec atomicamente
-				ponerCola(PCBPOP, EXEC, &mutexEXEC, &hayAlgoEnExec);
-				tam->length = sizeof(registroPCB);
-				log_info(logs, "Se coloco en la Cola Ready el proceso %i", PCBPOP->pid);
-				enviarDatos(fd, tam, PCBPOP, logs);
-				fdRecibido = string_from_format("%d", fd);
-				dictionary_put(pcbCPU,fdRecibido,PCBPOP);
-				sem_post(&mutexMandarColaEXEC);
+				if (!finaliza){
+					PCBPOP = sacarCola(READY, &mutexREADY, &hayAlgoEnReady); //mando PCB nuevo nuevo.
+					sem_wait(&mutexMandarColaEXEC);	//envio datos y pongo en exec atomicamente
+					ponerCola(PCBPOP, EXEC, &mutexEXEC, &hayAlgoEnExec);
+					tam->length = sizeof(registroPCB);
+					log_info(logs, "Se coloco en la Cola Ready el proceso %i", PCBPOP->pid);
+					enviarDatos(fd, tam, PCBPOP, logs);
+					fdRecibido = string_from_format("%d", fd);
+					dictionary_put(pcbCPU,fdRecibido,PCBPOP);
+					sem_post(&mutexMandarColaEXEC);
+				}
 
 				break;
 
@@ -177,17 +180,19 @@ void manejoCPU(int fd) {
 					ponerCola(pcb, tSem->cola, &tSem->mutex, &tSem->hayAlgo);
 					muestraNombres(tSem->cola,"WAIT BLOQUEADOS");
 					sem_post(&mutexSemaforos);
-					PCBPOP = sacarCola(READY, &mutexREADY, &hayAlgoEnReady); //mando de nuevo.
-					muestraNombres(READY,"READY ");
-					ULTIMOPCB = PCBPOP;
-					sem_wait(&mutexMandarColaEXEC);	//envio datos y pongo en exec atomicamente
-					ponerCola(PCBPOP, EXEC, &mutexEXEC, &hayAlgoEnExec);
-					tam->length = sizeof(registroPCB);
-					log_info(logs, "Se coloco en la Cola EXEC el proceso %i",PCBPOP->pid);
-					enviarDatos(fd, tam, PCBPOP, logs);
-					char* fdRecibido = string_from_format("%d", fd);
-					dictionary_put(pcbCPU,fdRecibido,PCBPOP);
-					sem_post(&mutexMandarColaEXEC);
+					if (!finaliza){
+						PCBPOP = sacarCola(READY, &mutexREADY, &hayAlgoEnReady); //mando de nuevo.
+						muestraNombres(READY,"READY ");
+						ULTIMOPCB = PCBPOP;
+						sem_wait(&mutexMandarColaEXEC);	//envio datos y pongo en exec atomicamente
+						ponerCola(PCBPOP, EXEC, &mutexEXEC, &hayAlgoEnExec);
+						tam->length = sizeof(registroPCB);
+						log_info(logs, "Se coloco en la Cola EXEC el proceso %i",PCBPOP->pid);
+						enviarDatos(fd, tam, PCBPOP, logs);
+						char* fdRecibido = string_from_format("%d", fd);
+						dictionary_put(pcbCPU,fdRecibido,PCBPOP);
+						sem_post(&mutexMandarColaEXEC);
+					}
 
 				} else {
 					tSem->valor = tSem->valor - 1;
@@ -232,7 +237,7 @@ void manejoCPU(int fd) {
 				muestraNombres(READY,"READY");
 				log_info(logs, "Se coloco en la cola Ready el proceso %i",pcb->pid);
 				log_debug(logss, "El FD del cpu es %d", fd);
-				if (fd >= 0){
+				if (!finaliza){
 					PCBPOP = sacarCola(READY, &mutexREADY, &hayAlgoEnReady); //saco de ready
 					muestraNombres(READY,"QUATUM READY ");
 					ULTIMOPCB = PCBPOP;
@@ -244,6 +249,7 @@ void manejoCPU(int fd) {
 					enviarDatos(fd, tam, PCBPOP, logs);
 					char* fdRecibido = string_from_format("%d", fd);
 					dictionary_put(pcbCPU,fdRecibido,PCBPOP);
+
 					sem_post(&mutexMandarColaEXEC);
 				}
 				break;
@@ -279,26 +285,21 @@ void manejoCPU(int fd) {
 				sem_post(&mutexMandarColaEXEC);
 				break;
 
-			/*case ERROR:
-				ponerCola(ULTIMOPCB,EXIT, &mutexEXIT, &hayAlgoEnExit);
-				char* error = string_from_format("%d", ULTIMOPCB->pid);
-				int* fdError= dictionary_get(fileDescriptors, error);
-				enviarMenu(*fdError, tam, logs);
-				log_error(logs, "Se llamo a la senial SIGUSR1 en la CPU y finalizo su ejecucion");
-				pthread_exit(1);
-				break;*/
+			case ERROR:
+				finaliza = 1;
+				break;
 			default:
-
-				fdMal = string_from_format("%d", fd);
-				ULTIMOPCB = dictionary_get(pcbCPU,fdMal);
-				ponerCola(ULTIMOPCB,EXIT,&mutexEXIT,&hayAlgoEnExit);
-				char* p2 = string_from_format("%d", ULTIMOPCB->pid);
-				int* fd2= dictionary_get(fileDescriptors, p2);
-
-				tam->menu = ERROR;
-				enviarMenu(*fd2, tam, logs);
-				log_error(logs,"Se interrumpio el proceso con el PID: %d debido a que la CPU esta caida",ULTIMOPCB->pid);
-
+				if (!finaliza){
+					fdMal = string_from_format("%d", fd);
+					ULTIMOPCB = dictionary_get(pcbCPU,fdMal);
+					ponerCola(ULTIMOPCB,EXIT,&mutexEXIT,&hayAlgoEnExit);
+					char* p2 = string_from_format("%d", ULTIMOPCB->pid);
+					int* fd2= dictionary_get(fileDescriptors, p2);
+					finaliza = 1;
+					tam->menu = ERROR;
+					enviarMenu(*fd2, tam, logs);
+					log_error(logs,"Se interrumpio el proceso con el PID: %d debido a que la CPU esta caida",ULTIMOPCB->pid);
+				}
 				log_error(logs, "Se cierra la CPU.");
 				int retorno = 1;
 				pthread_exit(&retorno);
