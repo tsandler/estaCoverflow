@@ -15,7 +15,7 @@ sem_t mutexOpera;
 
 int main(int argc, char** argv){
 
- 	logs = log_create("log","UMV.c",1,LOG_LEVEL_ERROR);
+ 	logs = log_create("log","UMV.c",1,LOG_LEVEL_TRACE);
 
 //	if (argc < 2){
 //		log_error(logs, "No se envio ningun parametro");

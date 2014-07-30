@@ -225,7 +225,7 @@ void funcion_CPU(int socket){
 				}
 
 				if( validacion_base(etiq->base) ){
-					termina = 1;
+					log_error(logs,"[HILO CPU] no es correcta la base");
 					break;
 				}
 
@@ -254,7 +254,6 @@ void funcion_kernel(int socket){
 	log_info(logs,"[HILO KERNEL]Entra al hilo");
 	int pid;
 	int pidLocal = -1;
-	int termina=0;
 	t_length* tam = malloc(sizeof(t_length));
 	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
 	datos_crearSeg* pidTam = malloc(sizeof(datos_crearSeg));
@@ -577,19 +576,22 @@ unsigned char *leer_segmento(int dirLog, int tamanioALeer, int offset, int pidAc
 	bool buscar_dirLogica(tablaSegUMV* unElem){
 		return dirLog == unElem->dirLogica;
 	}
-
-	t_list* listaSeg= dictionary_get(tablaPidSeg,string_itoa(pidAct));
-	tablaSegUMV* unElem= list_find(listaSeg,(void*)buscar_dirLogica);
-	if(unElem){
-		if( unElem->dirFisica + offset + tamanioALeer <= unElem->dirFisica + unElem->tamanioSegmento ){
-			unsigned char* destino = malloc(sizeof(char) * tamanioALeer);
-			char* desde = unElem->dirFisica + offset;
-			memcpy(destino,desde,tamanioALeer);
-			return destino;
+	if(dictionary_has_key(tablaPidSeg,string_itoa(pidAct))){
+		t_list* listaSeg= dictionary_get(tablaPidSeg,string_itoa(pidAct));
+		tablaSegUMV* unElem= list_find(listaSeg,(void*)buscar_dirLogica);
+		if(unElem){
+			if( unElem->dirFisica + offset + tamanioALeer <= unElem->dirFisica + unElem->tamanioSegmento ){
+				unsigned char* destino = malloc(sizeof(char) * tamanioALeer);
+				char* desde = unElem->dirFisica + offset;
+				memcpy(destino,desde,tamanioALeer);
+				return destino;
+			}else
+				log_error(logs,"se esta tratando de acceder fuera de los rangos del segmento-segmentation fault-");
 		}else
-			log_error(logs,"se esta tratando de acceder fuera de los rangos del segmento-segmentation fault-");
-	}else
-		log_error(logs,"se intento acceder a una base inexistente");
+			log_error(logs,"se intento acceder a una base inexistente");
+	}
+	else
+		log_error(logs,"no existe el pid: %d al tratar de leer el seg",pidAct);
 	return NULL;
 }
 
