@@ -291,7 +291,7 @@ void manejoCPU(int fd) {
 			default:
 				if (!finaliza){
 					fdMal = string_from_format("%d", fd);
-					ULTIMOPCB = dictionary_get(pcbCPU,fdMal);
+					ULTIMOPCB = dictionary_remove(pcbCPU,fdMal);
 					ponerCola(ULTIMOPCB,EXIT,&mutexEXIT,&hayAlgoEnExit);
 					char* p2 = string_from_format("%d", ULTIMOPCB->pid);
 					int* fd2= dictionary_get(fileDescriptors, p2);
