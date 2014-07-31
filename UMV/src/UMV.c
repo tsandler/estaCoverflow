@@ -9,13 +9,14 @@
  */
 
 #include "functions.h"
+#include "func_consola.h"
 
 sem_t yaEscribio;
 sem_t mutexOpera;
 
 int main(int argc, char** argv){
 
- 	logs = log_create("log","UMV.c",1,LOG_LEVEL_TRACE);
+ 	logs = log_create("log","UMV.c",1,LOG_LEVEL_ERROR);
 
 //	if (argc < 2){
 //		log_error(logs, "No se envio ningun parametro");
@@ -66,7 +67,7 @@ int main(int argc, char** argv){
 			if (tam->menu == SOY_KERNEL){
 
 				log_debug(logs,"Levanto el hilo: Consola");
-				pthread_create(&pthread_consola, NULL, (void*)consola, NULL);
+				pthread_create(&pthread_consola, NULL, (void*)manejo_consola, NULL);
 
 				log_debug(logs,"[MAIN KERNEL]Se conecto: Kernel");
 				pthread_create(&pthread_kernel, NULL, (void*)funcion_kernel, (void*)socket);

@@ -347,12 +347,9 @@ void funcion_kernel(int socket){
 			default:
 				retardo();
 				log_error(logs,"[HILO KERNEL] operacion invalida para Kernel.La UMV desconecta al KERNEL");
-//				termina = 1;
 				break;
 		}
-//		if(termina)
-//			printf(" jejejejejeje\n"); //FIXME
-		//	break;
+
 	}
 	log_error(logs,"[HILO KERNEL]La UMV desconectó al kernel por fallo");
 }
@@ -377,10 +374,8 @@ void inicializar_umv(int tamanioUMV){
 	unElem->tamanioSegmento=tamanioUMV;
 	ramUMVInicial = unElem->dirFisica;
 	list_add(listaHuecos,unElem);
-	arch_dump = txt_open_for_append("dump");
-	arch_escribirPorConsola = txt_open_for_append("escribir_por_consola");
-	arch_leerPorConsola = txt_open_for_append("leer_por_consola");
-
+	reporteEstructuras = txt_open_for_append("reporteEstructuras");
+	resultadoConsola = txt_open_for_append("resultadoConsola");
 }
 
 /*Funcion que elimina estructuras del manejo de la UMV liberando el bloque de memoria principal*/
@@ -459,7 +454,7 @@ int crear_agregar_segmento(int pidInt, int tamanio){
 }
 
 /* Funcion que elimina un campo pid y sus segmentos asociados */
-bool destruir_segmentos(int pidInt){ //FIXME
+bool destruir_segmentos(int pidInt){
 
 	if( dictionary_has_key(tablaPidSeg, string_itoa(pidInt)) ){
 		t_list* listaSeg = dictionary_get(tablaPidSeg,string_itoa(pidInt));
@@ -651,180 +646,67 @@ void cambiar_pid_activo(int pid, int pidLocal){
 	pidLocal = pid;
 }
 
-
-/*Funcion que llama la consola cuando debe ejecutar una operacion*/
-unsigned char* ejec_operacion(int nroOp){
-	int dirLogica=0, offset=0;
-	void* buffer = NULL; //FIXME: preguntar cómo se inicializa
-	int pid, tamanio=0, tamanioAEscribir=0, tamanioALeer=0;
-
-	switch(nroOp){
-		case LEER_SEG:
-			log_info(logs,"[CONSOLA UMV] El usuario solicito Leer segmento");
-			//////
-			printf("Ingresar pid: ");
-			scanf("%d",&pid);
-			//////
-			printf("Ingresar tamanio a leer: ");
-			scanf("%d",&tamanio);
-			printf("Ingresar la direccion logica: ");
-			scanf("%d",&dirLogica);
-			printf("Ingresar offset: ");
-			scanf("%d",&offset);
-			unsigned char* resultado = leer_segmento(dirLogica,tamanioALeer,offset,pid);
-			generar_archivo(resultado,nroOp);
-			return resultado;
-			break;
-		case ESCR_SEG:
-
-			log_info(logs,"[CONSOLA UMV] El usuario solicito escribir segmento");
-			printf("Ingresar pid: ");
-			scanf("%d",&pid);
-//			FIXME: como poner el buffer que se escribe
-
-
-
-			escribir_segmento(dirLogica,tamanioAEscribir,offset,buffer,pid);
-			generar_archivo(buffer,nroOp);
-			return NULL;
-			break;
-
-
-		case CREAR_SEG:
-			log_info(logs,"[CONSOLA UMV] El usuario solicito crear segmento");
-			printf("Ingresar pid: ");
-			scanf("%d",&pid);
-			printf("Ingresar tamanio: ");
-			scanf("%d",&tamanio);
-			return (unsigned char*)crear_agregar_segmento(pid,tamanio);
-			break;
-		case ELIM_SEG:
-			log_info(logs,"[CONSOLA UMV] El usuario solicito eliminar segmentos");
-			printf("Ingresar pid: ");
-			scanf("%d",&pid);
-			destruir_segmentos(pid);
-			break;
-		default:
-			log_error(logs,"[CONSOLA UMV] El usuario ingreso una operacion invalida");
-			break;
-	}
-	return NULL;
-}
-void generar_archivo(unsigned char* codigo, int nroOp){
-	int cantEscr=1, cantLect=1;
-	switch(nroOp){
-		case LEER_SEG:
-			txt_write_in_file(arch_leerPorConsola,"Lectura por consola nro:");
-			txt_write_in_file(arch_leerPorConsola,string_itoa(cantLect));
-			txt_write_in_file(arch_leerPorConsola,"\nContenido:\n");
-			txt_write_in_file(arch_leerPorConsola,(char*)codigo);
-			txt_write_in_file(arch_leerPorConsola,"===============================================");
-			cantLect++;
-			break;
-		case ESCR_SEG:
-			txt_write_in_file(arch_escribirPorConsola,"Escritura por consola nro:");
-			txt_write_in_file(arch_escribirPorConsola,string_itoa(cantEscr));
-			txt_write_in_file(arch_escribirPorConsola,"\nContenido:\n");
-			txt_write_in_file(arch_escribirPorConsola,(char*)codigo);
-			txt_write_in_file(arch_escribirPorConsola,"===============================================");
-			cantEscr++;
-			break;
-		default:
-			break;
-	}
-}
-void dump(){
-	int nroOp;
-	int huboError=0;
-	printf("\nUsted selecciono 'Dump'\n");
-	printf("Ingrese operacion segun...\n");
-	printf("	1.Estructuras memoria\n");
-	printf("	2.Memoria principal\n");
-	printf("	3.Contenido de la memoria principal\n");
-	printf("\nOpcion: ");
-	scanf("%d",&nroOp);
-
-	switch(nroOp){
-		case ESTRUCTURAS_MEMORIA:
-			imprime_estructuras_memoria();
-			huboError=0;
-			break;
-		case MEMORIA_PRINCIPAL:
-			txt_write_in_file(arch_dump,"						ESTRUCTURAS DE MEMORIA\n\n");
-			imprime_estado_mem_ppal();
-			huboError=0;
-			break;
-		case CONTENIDO_MEM_PPAL: //TODO
-			huboError=0;
-			break;
-		default:
-			log_error(logs,"COMANDO NO VALIDO");
-			huboError=1;
-			break;
-	}
-	if(!huboError)
-		txt_write_in_file(arch_dump,"\n\n==================================================\n\n");
-}
-
 void imprime_listahuecos(){
 	list_iterate(listaHuecos, (void*)imprime_campos_listahuecos);
 }
 
 void imprime_campos_listatablaSegUMV(tablaSegUMV *unElem){
-	txt_write_in_file(arch_dump,"\nNro segmento: ");
-	txt_write_in_file(arch_dump, string_itoa(unElem->idSegmento));
-	txt_write_in_file(arch_dump,"\n    Dirección logica:");
-	txt_write_in_file(arch_dump, string_itoa(unElem->dirLogica));
 
-	txt_write_in_file(arch_dump,"\n    Tamaño del segmento: ");
-	txt_write_in_file(arch_dump,string_itoa(unElem->tamanioSegmento));
-	txt_write_in_file(arch_dump,"\n    Contenido:\n");
+	txt_write_in_file(reporteEstructuras,"\nNro segmento: ");
+	txt_write_in_file(reporteEstructuras, string_itoa(unElem->idSegmento));
+	txt_write_in_file(reporteEstructuras,"\n    Dirección logica:");
+	txt_write_in_file(reporteEstructuras, string_itoa(unElem->dirLogica));
+
+	txt_write_in_file(reporteEstructuras,"\n    Tamaño del segmento: ");
+	txt_write_in_file(reporteEstructuras,string_itoa(unElem->tamanioSegmento));
+	txt_write_in_file(reporteEstructuras,"\n    Contenido:\n");
 	char* rta = malloc(unElem->tamanioSegmento);
 	memcpy(rta,unElem->dirFisica,unElem->tamanioSegmento);
-	txt_write_in_file(arch_dump,rta);
-	txt_write_in_file(arch_dump,"\n");
+	txt_write_in_file(reporteEstructuras,rta);
+	txt_write_in_file(reporteEstructuras,"\n");
 	free(rta);
 }
 
 void imprime_campos_listahuecos(nodoHuecos *unElem){
-	txt_write_in_file(arch_dump,"\nContenido:\n");
-	txt_write_in_file(arch_dump,"  Tamaño del segmento:");
-	txt_write_in_file(arch_dump,string_itoa(unElem->tamanioSegmento));
-	txt_write_in_file(arch_dump,"\n");
+	txt_write_in_file(reporteEstructuras,"\nContenido:\n");
+	txt_write_in_file(reporteEstructuras,"  Tamaño del segmento:");
+	txt_write_in_file(reporteEstructuras,string_itoa(unElem->tamanioSegmento));
+	txt_write_in_file(reporteEstructuras,"\n");
 
 }
 
-void imprime_estructuras_memoria(){
-	int opcion;
+void imprime_estructuras_memoria(char** operacion){
 	void itera_diccionario(char* pid,t_list* listaSeg){
 		list_iterate(listaSeg, (void*)imprime_campos_listatablaSegUMV);
 	}
 	if(!dictionary_size(tablaPidSeg))
-		txt_write_in_file(arch_dump,"**Actualmente no hay segmentos en memoria**\n\n");
+		txt_write_in_file(reporteEstructuras,"**Actualmente no hay segmentos en memoria**\n\n");
 	else{
-		printf("Reporte de..\n   1.Tablas de segmentos de todos los procesos\n");
-		printf("   2.Tablas de segmentos de un proceso\n");
-		printf("Opcion: ");
-		scanf("%d",&opcion);
 
-		if(opcion == 1)
+		if(operacion[2] == 0)
 			dictionary_iterator(tablaPidSeg,(void*)itera_diccionario);
-		else if(opcion == 2){
-			int pid;
-			printf("Ingrese PID:");
-			scanf("%d",&pid);
+		else{
+			int pid=atoi(operacion[2]);
 			t_list* listSeg = dictionary_remove(tablaPidSeg,string_itoa(pid));
 			list_iterate(listSeg,(void*)imprime_campos_listatablaSegUMV);
 		}
 	}
 }
 
-void imprime_estado_mem_ppal(){
-	txt_write_in_file(arch_dump,"						ESTADO DE MEMORIA PRINCIPAL\n\n");
-	txt_write_in_file(arch_dump,"			---ESTRUCTURAS DE MEMORIA---\n\n");
-	imprime_estructuras_memoria();
-	txt_write_in_file(arch_dump,"\n			---BLOQUES LIBRES DE MEMORIA---\n");
+void imprime_estado_mem_ppal(char** operacion){
+	txt_write_in_file(reporteEstructuras,"			---ESTRUCTURAS DE MEMORIA---\n\n");
+	imprime_estructuras_memoria(operacion);
+	txt_write_in_file(reporteEstructuras,"\n			---BLOQUES LIBRES DE MEMORIA---\n");
 	imprime_listahuecos();
+}
+
+void reporteContenidoMp(char **operacion){
+
+//	int offset = atoi(operacion[2]);
+//	int tam =  atoi(operacion[3]);
+//	int base = ramUMVInicial; FIXME: esto es una incoherencia :)
+
+	//FIXME: char* publicacion = leer_segmento(,tam,offset,);
 }
 
 /* Funcion que retorna el mayor idSegmento entre dos elementos */
@@ -841,61 +723,6 @@ bool sort_mayor_hueco(nodoHuecos* unElem, nodoHuecos* otroElem){
 bool sort_mayor_dirLogica(tablaSegUMV* unElem, tablaSegUMV* otroElem){
 	return unElem->dirLogica > otroElem->dirLogica;
 }
-
-
-void consola(){
-	int cambioAlgoritmo ,nroOp, operacion, retardoNuevo;
-	while(1){
-		printf("\nSeleccione la operación segun\n");
-		printf("	1.Operacion\n");
-		printf("	2.Cambiar retardo\n");
-		printf("	3.Cambiar Algorimo\n");
-		printf("	4.Compactar memoria\n");
-		printf("	5.Dump\n");
-		printf("Operacion solicitada: ");
-		scanf("%d",&operacion);
-
-		switch(operacion){
-			case OPERACION:
-				printf("\nUsted selecciono 'Operacion'\n");
-				printf("Ingrese operacion segun...\n");
-				printf("	1.Leer segmento\n");
-				printf("	2.Escribir segmento\n");
-				printf("	3.Crear segmento\n");
-				printf("	4.Eliminar segmentos\n");
-				printf("Opcion: ");
-				scanf("%d",&nroOp);
-				ejec_operacion(nroOp);
-				break;
-			case CAMBIAR_RETARDO:
-				printf("\nUsted selecciono 'Cambiar retardo'\n");
-				printf("Ingrese nuevo retardo: ");
-				scanf("%d",&retardoNuevo);
-				cambiar_retardo(retardoNuevo);
-				break;
-			case CAMBIAR_ALGORITMO:
-				printf("\nUsted selecciono 'Cambiar algoritmo'\n");
-				printf("Ingrese opcion segun\n");
-				printf("	0.First-fit\n");
-				printf("	1.Worst-fit\n");
-				printf("Opcion: ");
-				scanf("%d",&cambioAlgoritmo);
-				cambiarAlgoritmo(cambioAlgoritmo);
-				break;
-			case COMPACTAR_MEMORIA:
-				compactar_memoria();
-				break;
-			case DUMP:
-				printf("\nUsted selecciono 'Dump'\n");
-				dump();
-				break;
-			default:
-				printf("**Operacion invalida**\n");
-				break;
-		}
-	}
-}
-
 
 
 void compactar_memoria(){
@@ -928,6 +755,7 @@ void compactar_memoria(){
 	}
 }
 
+//Funcion inherente a la compactacion
 void buscar_hueco_para_compactar(nodoHuecos* unElem){
 	dirHueco = unElem->dirFisica;
 	do{
@@ -937,6 +765,7 @@ void buscar_hueco_para_compactar(nodoHuecos* unElem){
 	}while(unElem);
 }
 
+//Funcion inherente a la compactacion
 void buscar_el_primer_hueco_y_actualizar_ramAux(){
 	encontroHueco = 0;
 	while(!encontroHueco){
@@ -944,6 +773,7 @@ void buscar_el_primer_hueco_y_actualizar_ramAux(){
 	}
 }
 
+//Funcion inherente a la compactacion
 void actualizar_RamAux(char* pid, t_list* listSeg){
 
 	tablaSegUMV* unElem = list_find(listSeg,(void*)buscar_ramAux_endicc);
@@ -953,14 +783,17 @@ void actualizar_RamAux(char* pid, t_list* listSeg){
 	}
 }
 
+//Funcion inherente a la compactacion
 bool buscar_ramAux_endicc(tablaSegUMV* unElem){
 	return unElem->dirFisica == ramAux;
 }
 
+//Funcion inherente a la compactacion
 void buscar_segmento_y_desplazarlo(){
 	dictionary_iterator(tablaPidSeg,(void*)busca_seg_en_diccionario);
 }
 
+//Funcion inherente a la compactacion
 void busca_seg_en_diccionario(char* pid,t_list* listaSeg){
 	nodoHuecos* nuevoElem = malloc(sizeof(nodoHuecos));
 	tablaSegUMV* unElem = list_find(listaSeg,(void*)buscar_ramAux_endicc);
@@ -979,6 +812,7 @@ void busca_seg_en_diccionario(char* pid,t_list* listaSeg){
 }
 
 
+//Funcion inherente a la compactacion
 bool buscar_ramAux_en_listaH(nodoHuecos* unElem){
 	return unElem->dirFisica == ramAux;
 }

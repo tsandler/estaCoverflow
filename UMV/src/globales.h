@@ -26,16 +26,15 @@
 
 pthread_t pthread_kernel, pthread_consola;
 pthread_t pthread_CPU;
-t_log *logs;
-t_dictionary *tablaPidSeg;
-t_list *listaHuecos;
+t_log* logs;
+t_dictionary* tablaPidSeg;
+t_list* listaHuecos;
 t_config* config;
 t_length* tam;
 t_queue* colaKernel;
 t_list* colaCPUs;
-FILE* arch_dump;
-FILE* arch_escribirPorConsola;
-FILE* arch_leerPorConsola;
+FILE* reporteEstructuras;
+FILE* resultadoConsola;
 
 int tamanioUMV;
 int retardoActual;

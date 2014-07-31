@@ -36,27 +36,23 @@ char *first_fit(int tamanio);
 char *worst_fit(int tamanio);
 char *manejo_memoria(nodoHuecos* unElem, int tamanio);
 
-void consola();
-unsigned char* ejec_operacion(int nroOp);
+
 void retardo();
 void cambiar_retardo(int retardoNuevo);
 void cambiar_pid_activo(int pid, int pidLocal);
 void cambiarAlgoritmo(int cambioAlgoritmo);
-void dump();
 
 void imprime_listahuecos();
 void imprime_campos_listatablaSegUMV(tablaSegUMV *unElem);
 void imprime_campos_listahuecos(nodoHuecos *unElem);
-void imprime_estado_mem_ppal();
 void imprime_estructuras_memoria();
+void reporteContenidoMp(char **operacion);
+void imprime_estado_mem_ppal(char** operacion);
 
 bool archivo_config_valido();
 void inicializar_var_config();
 void vaciarLista(t_list* listaSeg);
-//void eliminar_campos_listSeg(tablaSegUMV* unElem);
-//void eliminar_campos_listHuecos(nodoHuecos* unElem);
 
-void generar_archivo(unsigned char* resultado, int nroOp);
 
 void compactar_memoria();
 void buscar_segmento_y_desplazarlo();
@@ -66,7 +62,6 @@ bool buscar_ramAux_endicc(tablaSegUMV* unElem);
 void buscar_hueco_para_compactar(nodoHuecos* unElem);
 void buscar_el_primer_hueco_y_actualizar_ramAux();
 void actualizar_RamAux(char* pid, t_list* listSeg);
-
 
 bool validacion_base(int base);
 bool esCorrecto_pid(int pid);
