@@ -190,7 +190,7 @@ void manejoCPU(int fd) {
 			ULTIMOPCB = dictionary_remove(pcbCPU, fdMal);
 			muestraNombres(tSem->cola, "WAIT BLOQUEADOS");
 			sem_post(&mutexSemaforos);
-			if (!finaliza) {
+			/*if (!finaliza) {
 				PCBPOP = sacarCola(READY, &mutexREADY, &hayAlgoEnReady); //mando de nuevo.
 				muestraNombres(READY, "READY ");
 				ULTIMOPCB = PCBPOP;
@@ -203,7 +203,7 @@ void manejoCPU(int fd) {
 				char* fdRecibido = string_from_format("%d", fd);
 				dictionary_put(pcbCPU, fdRecibido, PCBPOP);
 				sem_post(&mutexMandarColaEXEC);
-			}
+			}*/
 
 		} else {
 			tSem->valor = tSem->valor - 1;
