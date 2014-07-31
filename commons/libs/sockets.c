@@ -24,6 +24,13 @@ int crearServidor(int port, t_log *logs){
 		return -1;
 	}
 
+	int yes=1;
+	if (setsockopt(s,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int)) == -1){
+		log_error(logs, "[SOCKETS] Error en el SockOpt.");
+		close(s);
+		return -1;
+	}
+
 	if (bind(s, (struct sockaddr*)&dir, sizeof(dir)) != 0){
 		log_error(logs, "[SOCKETS] Error al bindear el socket.");
 		close(s);
