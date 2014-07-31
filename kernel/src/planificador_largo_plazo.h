@@ -17,7 +17,7 @@ typedef struct{
 
 
 void deNewAReady();
-void manejoExit();
+
 
 
 

@@ -37,8 +37,7 @@ extern sem_t mutexFinalizar;
 
 void manejoCPU(int fd) {
 	registroPCB* PCBrecibido;
-	t_log * logs = log_create("log_PCP_En_CPU", "manejoCPU.c", 0,
-			LOG_LEVEL_TRACE);
+	t_log * logs = log_create("log_PCP_En_CPU", "manejoCPU.c", 0,LOG_LEVEL_TRACE);
 	log_info(logs, "Corriendo manejo del CPU");
 	int tiempo;
 	char* dispositivo;
@@ -60,7 +59,6 @@ void manejoCPU(int fd) {
 
 
 
-	//PCBrecibido = malloc(sizeof(registroPCB));
 	registroPCB* PCBPOP = malloc(sizeof(registroPCB));
 	registroPCB* unPCB = malloc(sizeof(registroPCB));
 	registroPCB* ULTIMOPCB = malloc(sizeof(registroPCB));
@@ -143,11 +141,6 @@ void manejoCPU(int fd) {
 				recibirDatos(fd, tam, (void*) &dispositivo, logs);
 				recibirDatos(fd, tam, (void*) PCBrecibido, logs);
 
-				/*sem_wait(&mutexEXEC);
-				EXEC = list_filter(EXEC, (void*)condicion); //saco de la cola exec
-				log_info(logs, "Se saco de la cola EXEC el proceso %i",
-						PCBrecibido->pid);
-				sem_post(&mutexEXEC);*/
 				char* disp = string_from_format("%s", &dispositivo);
 				t_io*io;
 				io = dictionary_get(dispositivosIO, disp);
@@ -275,9 +268,10 @@ void manejoCPU(int fd) {
 				fdMal = string_from_format("%d", fd);
 				ULTIMOPCB = dictionary_remove(pcbCPU,fdMal);
 
-				//ponerCola(PCBrecibido, EXIT, &mutexEXIT, &hayAlgoEnExit); //la pongo en exit
-				sem_post(&gradoProg);
+
 				eliminarSegmentoUMV(socket_UMV, logs, PCBrecibido);
+				ponerCola(PCBrecibido,EXIT,&mutexEXIT,&hayAlgoEnExit);
+				sem_post(&gradoProg);
 
 				log_info(logs, "Se agrego a la cola EXIT el proceso %i",PCBrecibido->pid);
 				tam->length = sizeof(int);
@@ -309,8 +303,10 @@ void manejoCPU(int fd) {
 				//if (!finaliza){ FIXME
 					fdMal = string_from_format("%d", fd);
 					ULTIMOPCB = dictionary_remove(pcbCPU,fdMal);
-					//ponerCola(ULTIMOPCB,EXIT,&mutexEXIT,&hayAlgoEnExit);
 					eliminarSegmentoUMV(socket_UMV, logs, ULTIMOPCB);
+					sem_post(&gradoProg);
+					ponerCola(PCBrecibido,EXIT,&mutexEXIT,&hayAlgoEnExit);
+
 					char* p2 = string_from_format("%d", ULTIMOPCB->pid);
 					int* fd2= dictionary_get(fileDescriptors, p2);
 					finaliza = 1;

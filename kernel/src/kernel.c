@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
 	pthread_t thread1;
 	pthread_t thread2;
 	pthread_t thread3;
-	pthread_t thread4;
+
 	int portPROGRAM=config_get_int_value(config, "PUERTO_PROG");
 	int portCPU=config_get_int_value(config,"PUERTO_CPU");
 
@@ -126,16 +126,10 @@ int main(int argc, char **argv) {
 			exit (EXIT_FAILURE);
 		}
 
-	int iret3 = pthread_create(&thread3, NULL, (void*)manejoExit,NULL);
-		if (iret3){
-			log_info(logs,"Error en la creacion del hilo manejoExit");
-			exit (EXIT_FAILURE);
-		}
-
 /////////////////////////////
-	int	iret4 = pthread_create(&thread4, NULL, (void*)openSocketServerPCP,(void*)portCPU); //HILO PCP
+	int	iret3 = pthread_create(&thread3, NULL, (void*)openSocketServerPCP,(void*)portCPU); //HILO PCP
 
-	if (iret4) {
+	if (iret3) {
 		log_error(logs, "Error en la creacion del hilo PCP");
 		log_destroy(logs);
 
@@ -197,7 +191,7 @@ int main(int argc, char **argv) {
 	pthread_join(thread1, NULL ); //esperar a q termine el otro
 	pthread_join(thread2, NULL );
 	pthread_join(thread3, NULL );
-	pthread_join(thread4, NULL );
+
 
 	sem_destroy(&mutexNEW);
 	sem_destroy(&mutexREADY);

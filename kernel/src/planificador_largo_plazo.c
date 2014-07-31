@@ -8,20 +8,20 @@
 
 extern t_queue *NEW;
 extern t_queue *READY;
-extern t_queue * EXIT;
+
 extern sem_t mutexNEW;
 extern sem_t mutexREADY;
-extern sem_t mutexEXIT;
+
 
 
 extern sem_t gradoProg;
 extern sem_t hayAlgo;
 extern sem_t hayAlgoEnReady;
-extern sem_t hayAlgoEnExit;
+
 extern t_log *logs;
 
 
-extern int socket_UMV;
+
 
 /*
  *
@@ -92,18 +92,7 @@ void deNewAReady(){
 
 }
 
-void manejoExit(){/*
-	puts("Corriendo Hilo manejoExit \n");
-	registroPCB * unPCB= malloc(sizeof(registroPCB));
 
-	while(1){
-
-		unPCB=sacarCola(EXIT,&mutexEXIT,&hayAlgoEnExit);
-		eliminarSegmentoUMV(socket_UMV,  logs,unPCB);
-		sem_post(&gradoProg);
-	}*/
-
-}
 
 
 
