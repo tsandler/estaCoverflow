@@ -110,7 +110,7 @@ void pedir_stack(){
 	if (recv (socketUMV, tam, sizeof(t_length), MSG_WAITALL) < 0){
 		log_error(logs, "[SOCKETS] Se produjo un problema al recibir el tamanio del dato");
 	}
-	stack = malloc(tam->length);
+
 	if (recv (socketUMV, stack, tam->length, MSG_WAITALL) < 0){
 		log_error(logs, "[SOCKETS] Se produjo un problema al recibir el dato");
 	}
@@ -216,6 +216,8 @@ static char* _depurar_sentencia(char* sentencia, int tamanio){
 
 /* Funcion que libera las estructuras usadas */
 void liberar_estructuras(){
+	cerrarSocket(socketKernel);
+	cerrarSocket(socketUMV);
 	free(pcb);
 	free(tam);
 	free(stack);
@@ -227,12 +229,10 @@ void liberar_estructuras(){
 /* Funcion que se lanza en el llamado de la senial SIGUSR1 */
 void manejar_senial(){
 	seguir = 0;
-	tam->menu = ERROR;
-	enviarMenu(socketKernel,tam,logs);
 	if (!ejecutando){
-		cerrarSocket(socketKernel);
-		cerrarSocket(socketUMV);
-	}else{//Flag para finalizar la ejecucion cuando concluya el quantum
-		signalCall = 1;
+		log_info(logs, "Se llamo a la senial SIGUSR1");
+		log_info(logs, "Cerrando la CPU...");
+		liberar_estructuras();
+		exit(0);
 	}
 }

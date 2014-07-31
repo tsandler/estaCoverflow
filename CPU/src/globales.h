@@ -26,7 +26,6 @@ unsigned char* stack;
 int seguir;
 bool systemCall;
 int ejecutando;
-int signalCall;
 int tamanioStack;
 int llamoRetornar;
 int finalizo;

@@ -56,6 +56,7 @@ int main(int argc, char** argv){
 
 	signal(SIGUSR1, manejar_senial);
 	pcb = malloc(sizeof(registroPCB));
+	stack = malloc(tamanioStack);
 	while (seguir){
 		int cont = 0;
 		finalizo = 0;
@@ -106,16 +107,10 @@ int main(int argc, char** argv){
 		if (!finalizo)
 			retorno_de_stack();
 
-		if (signalCall){
-			tam->menu = ERROR;
-			enviarMenu(socketKernel,tam,logs);
-			cerrarSocket(socketKernel);
-			cerrarSocket(socketUMV);
-		}
 		vaciarDiccionario();
 	}
 	log_info(logs, "Se llamo a la senial SIGUSR1");
 	log_info(logs, "Cerrando la CPU...");
 	liberar_estructuras();
-	return 0;
+	exit(0);
 }
