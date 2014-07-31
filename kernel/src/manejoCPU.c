@@ -58,7 +58,6 @@ void manejoCPU(int fd) {
 	char* fdMal;
 
 	registroPCB* PCBPOP = malloc(sizeof(registroPCB));
-	registroPCB* unPCB = malloc(sizeof(registroPCB));
 	registroPCB* ULTIMOPCB = malloc(sizeof(registroPCB));
 	tam->length = sizeof(int);
 	int stack = config_get_int_value(config, "TAMANIO_STACK");
@@ -83,10 +82,7 @@ void manejoCPU(int fd) {
 	}
 
 	sem_post(&mutexMandarColaEXEC);*/
-	char* fdRecibido = string_from_format("%d", fd);
-		dictionary_put(pcbCPU, fdRecibido, unPCB);
 	t_log* logss = log_create("logggg", "Cpu", 1, LOG_LEVEL_TRACE);
-	int finaliza = 0;
 	while (1) {
 		tam->menu = OK;
 		recibirMenu(fd, tam, logs);
@@ -321,6 +317,8 @@ void manejoCPU(int fd) {
 	case PEDIR_PCB:
 		PCBPOP = sacarCola(READY, &mutexREADY, &hayAlgoEnReady); //mando de nuevo.
 		//	ULTIMOPCB = PCBPOP;
+		char* fdRecibido = string_from_format("%d", fd);
+		dictionary_put(pcbCPU, fdRecibido, PCBPOP);
 		sem_wait(&mutexMandarColaEXEC);	//envio datos y pongo en exec atomicamente
 		ponerCola(PCBPOP, EXEC, &mutexEXEC, &hayAlgoEnExec);
 		tam->length = sizeof(registroPCB);
@@ -339,20 +337,17 @@ void manejoCPU(int fd) {
 	default:
 		fdMal = string_from_format("%d", fd);
 		ULTIMOPCB = dictionary_remove(pcbCPU, fdMal);
-		if (!finaliza) {
-			eliminarSegmentoUMV(socket_UMV, logs, ULTIMOPCB);
-			sem_post(&gradoProg);
-			ponerCola(PCBrecibido, EXIT, &mutexEXIT, &hayAlgoEnExit);
+		eliminarSegmentoUMV(socket_UMV, logs, ULTIMOPCB);
+		sem_post(&gradoProg);
 
-			char* p2 = string_from_format("%d", ULTIMOPCB->pid);
-			int* fd2 = dictionary_get(fileDescriptors, p2);
-			finaliza = 1;
-			tam->menu = ERROR;
-			enviarMenu(*fd2, tam, logs);
-			log_error(logs,
-					"Se interrumpio el proceso con el PID: %d debido a que la CPU esta caida",
-					ULTIMOPCB->pid);
-		}
+		ponerCola(ULTIMOPCB, EXIT, &mutexEXIT, &hayAlgoEnExit);
+
+		char* p2 = string_from_format("%d", ULTIMOPCB->pid);
+		int* fd2 = dictionary_get(fileDescriptors, p2);
+		tam->menu = ERROR;
+		enviarMenu(*fd2, tam, logs);
+		log_error(logs,"Se interrumpio el proceso con el PID: %d debido a que la CPU esta caida",
+				ULTIMOPCB->pid);
 		log_error(logs, "Se cierra la CPU.");
 		int retorno = 1;
 		pthread_exit(&retorno);

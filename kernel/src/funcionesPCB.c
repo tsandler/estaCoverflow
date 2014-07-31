@@ -168,7 +168,7 @@ registroPCB* armarPCB(char* program, int fd){
 
     if(unPCB->tamanio_indice_etiquetas > 0)
     	escribirSegmento(unPCB,unPCB->indice_etiquetas,unPCB->tamanio_indice_etiquetas,metadataP->etiquetas);
-
+    printf("SE ENVIA ESCRIBIR %d", unPCB->segmento_codigo);
     escribirSegmento(unPCB,unPCB->segmento_codigo,(strlen(program)+1),program);
 
     usleep(32);

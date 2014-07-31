@@ -53,10 +53,25 @@ void funcion_CPU(int socket){
 	t_length* tam = malloc(sizeof(t_length));
 	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
 	t_elem_cola_cpu* unaPeticion = malloc(sizeof(t_elem_cola_cpu));
+	unaPeticion->tama = malloc(sizeof(t_length));
 	unsigned char* codigo;
 	int base, offset, tamanio, nroSegmento;
 	char buffer[1024];
 	char* cod;
+
+
+	tam->menu = OK;
+
+	if(!recibirMenu(socket, tam, logs)){
+		log_error(logs, "Se produjo un error recibiendo una peticion");
+	}
+
+	if(tam->menu == OK){
+		log_error(logs,"[CPU] Se perdio la conexion. Baja al cpu");
+		int ret=1;
+		pthread_exit(&ret);
+	}
+	int esPrimerEjecucion = 1;
 
 	sem_wait(&yaEscribio);
 	sem_wait(&yaEscribio);
@@ -65,22 +80,19 @@ void funcion_CPU(int socket){
 
 	while(1){
 
-		if(!recibirMenu(socket, tam, logs)){
-			log_error(logs, "Se produjo un error recibiendo una peticion");
-			break;
-		}
+		if(tam->menu != OK && esPrimerEjecucion){
+			unaPeticion->socket = socket;
+			unaPeticion->tama = tam;
+			list_add_in_index(colaCPUs,0,unaPeticion);
+			unaPeticion = desencolar_peticion(socket);
+			esPrimerEjecucion = 0;
 
-		unaPeticion->socket = socket;
-		unaPeticion->tama = tam;
-		list_add_in_index(colaCPUs,0,unaPeticion);
-		unaPeticion = desencolar_peticion(socket);
+			if(!unaPeticion)
+				log_error(logs,"[HILO CPU] No hay peticion");
 
-		if(unaPeticion->tama->menu==OK){
-			log_error(logs,"[CPU] Se perdio la conexion. Baja al cpu");
-			bajar_cpu(socket);
+		}else if(!esPrimerEjecucion){
 
-			if(!list_size(colaCPUs))
-				log_error(logs,"[CPU] No hay cpus conectados. Se baja la conexion");
+			tam->menu = OK;
 
 			if(!recibirMenu(socket, tam, logs)){
 				log_error(logs, "Se produjo un error recibiendo una peticion");
@@ -91,10 +103,29 @@ void funcion_CPU(int socket){
 			unaPeticion->tama = tam;
 			list_add_in_index(colaCPUs,0,unaPeticion);
 			unaPeticion = desencolar_peticion(socket);
-		}
 
-		if(!unaPeticion)
-			log_error(logs,"[HILO CPU] No hay peticion");
+			if(unaPeticion->tama->menu==OK){
+				log_error(logs,"[CPU] Se perdio la conexion. Baja al cpu");
+				bajar_cpu(socket);
+
+				if(!list_size(colaCPUs))
+					log_info(logs,"[CPU] No hay cpus conectados. Se baja la conexion");
+
+				if(!recibirMenu(socket, tam, logs)){
+					log_error(logs, "Se produjo un error recibiendo una peticion");
+					break;
+				}
+
+				unaPeticion->socket = socket;
+				unaPeticion->tama = tam;
+				list_add_in_index(colaCPUs,0,unaPeticion);
+				unaPeticion = desencolar_peticion(socket);
+			}
+
+			if(!unaPeticion)
+				log_error(logs,"[HILO CPU] No hay peticion");
+
+		}
 
 		switch(unaPeticion->tama->menu){
 			case PID_ACTUAL:
@@ -245,7 +276,6 @@ void funcion_CPU(int socket){
 			log_error(logs,"[HILO CPU]La UMV desconectó a los CPU por fallo");
 			break;
 		}
-		unaPeticion->tama->menu = OK;
 	}
 }
 
@@ -255,12 +285,15 @@ void funcion_kernel(int socket){
 	int pid;
 	int pidLocal = -1;
 	t_length* tam = malloc(sizeof(t_length));
-	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
+//	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
 	datos_crearSeg* pidTam = malloc(sizeof(datos_crearSeg));
 	t_elem_cola_kernel* unaPeticion = malloc(sizeof(t_elem_cola_kernel));
 	segEscritos = 0;
 
 	while(1){
+		t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
+
+
 		log_info(logs,"[HILO KERNEL] Esperando peticion...");
 		if(!recibirMenu(socket, tam, logs)){
 			log_error(logs, "[HILO KERNEL] Error al recibir la peticion");
@@ -294,7 +327,7 @@ void funcion_kernel(int socket){
 				}
 
 				if( validacion_base(etiq->base) ){
-					log_error(logs,"[HILO KERNEL] Error en la base al intentar escribir el segmento");
+					log_error(logs,"[HILO KERNEL] Error en la base: %d al intentar escribir el segmento",etiq->base);
 //					termina = 1;
 					break;
 				}
@@ -330,11 +363,11 @@ void funcion_kernel(int socket){
 				tam->length = sizeof(int);
 				enviarDatos(socket, tam, &baseLog, logs);
 				sem_post(&mutexOpera);
+				segEscritos=0;
 				break;
 			case ELIMINAR_SEGMENTOS:
 				retardo();
 				sem_wait(&mutexOpera);
-				segEscritos=0;
 				if(!recibirDato(socket, tam->length, (void*)&pid, logs)){
 					log_error(logs, "Se produjo un error recibiendo el pid");
 					break;
