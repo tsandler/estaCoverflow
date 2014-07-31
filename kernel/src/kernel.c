@@ -28,6 +28,7 @@ sem_t hayAlgo;
 sem_t hayAlgoEnReady;
 sem_t hayAlgoEnExec;
 sem_t hayAlgoEnExit;
+sem_t mutexFinalizar;
 
 t_log *logs;
 t_dictionary * dispositivosIO;
@@ -93,6 +94,7 @@ int main(int argc, char **argv) {
 	sem_init(&mutexVarCompartidas, 0, 1);
 	sem_init(&mutexSemaforos, 0, 1);
 	sem_init(&mutexMandarColaEXEC, 0, 1);
+	sem_init(&mutexFinalizar,0,1);
 
 	dispositivosIO = dictionary_create(); // creo diccionario (?)
 	variablesCompartidas = dictionary_create();

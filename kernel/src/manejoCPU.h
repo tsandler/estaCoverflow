@@ -7,6 +7,6 @@
 
 
 void manejoCPU(int fd);
-bool condicion(registroPCB* pcb);
+//bool condicion(registroPCB* pcb);
 
 

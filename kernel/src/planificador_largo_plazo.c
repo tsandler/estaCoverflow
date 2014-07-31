@@ -92,7 +92,7 @@ void deNewAReady(){
 
 }
 
-void manejoExit(){
+void manejoExit(){/*
 	puts("Corriendo Hilo manejoExit \n");
 	registroPCB * unPCB= malloc(sizeof(registroPCB));
 
@@ -101,7 +101,7 @@ void manejoExit(){
 		unPCB=sacarCola(EXIT,&mutexEXIT,&hayAlgoEnExit);
 		eliminarSegmentoUMV(socket_UMV,  logs,unPCB);
 		sem_post(&gradoProg);
-	}
+	}*/
 
 }
 
