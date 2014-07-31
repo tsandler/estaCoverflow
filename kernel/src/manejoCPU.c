@@ -65,7 +65,7 @@ void manejoCPU(int fd) {
 	enviarDatos(fd, tam, &quantum, logs);
 	enviarDatos(fd, tam, &stack, logs);
 	enviarDatos(fd, tam, &retardo, logs);
-	unPCB = sacarCola(READY, &mutexREADY, &hayAlgoEnReady); //para mandar a exec
+	/*unPCB = sacarCola(READY, &mutexREADY, &hayAlgoEnReady); //para mandar a exec
 	muestraNombres(READY, "READY");
 	ULTIMOPCB = unPCB;
 	log_info(logs, "Se saco de la cola Ready el proceso %i", unPCB->pid);
@@ -81,9 +81,10 @@ void manejoCPU(int fd) {
 		int r = 1;
 		pthread_exit(&r);
 	}
+
+	sem_post(&mutexMandarColaEXEC);*/
 	char* fdRecibido = string_from_format("%d", fd);
-	dictionary_put(pcbCPU, fdRecibido, unPCB);
-	sem_post(&mutexMandarColaEXEC);
+		dictionary_put(pcbCPU, fdRecibido, unPCB);
 	t_log* logss = log_create("logggg", "Cpu", 1, LOG_LEVEL_TRACE);
 	int finaliza = 0;
 	while (1) {
@@ -153,7 +154,7 @@ void manejoCPU(int fd) {
 		ULTIMOPCB = dictionary_remove(pcbCPU, fdMal);
 		log_info(logs, "Se coloco en la Cola de IO el proceso %i",
 				PCBrecibido->pid);
-		if (!finaliza) {
+		/*if (!finaliza) {
 			PCBPOP = sacarCola(READY, &mutexREADY, &hayAlgoEnReady); //mando PCB nuevo nuevo.
 			sem_wait(&mutexMandarColaEXEC);	//envio datos y pongo en exec atomicamente
 			ponerCola(PCBPOP, EXEC, &mutexEXEC, &hayAlgoEnExec);
@@ -164,7 +165,7 @@ void manejoCPU(int fd) {
 			fdRecibido = string_from_format("%d", fd);
 			dictionary_put(pcbCPU, fdRecibido, PCBPOP);
 			sem_post(&mutexMandarColaEXEC);
-		}
+		}*/
 
 		break;
 
