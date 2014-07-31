@@ -40,7 +40,8 @@ int main(int argc, char** argv){
 		return 0;
 	}
 	tam->menu = SOY_CPU;
-	enviarMenu(socketUMV, tam, logs);
+	if(enviarMenu(socketUMV, tam, logs))
+		log_debug(logs, "Se hizo el handshake con la UMV");
 
 	int quantum = recibir(1);
 	tamanioStack = recibir(2);
@@ -60,6 +61,11 @@ int main(int argc, char** argv){
 		finalizo = 0;
 		ejecutando = 0;
 		log_debug(logs, "Recibiendo un PCB...");
+		tam->menu = PEDIR_PCB;
+		if (!enviarMenu(socketKernel, tam, logs)){
+			log_error(logs, "Se produjo un error pidiendo el PCB");
+			break;
+		}
 
 		if(!recibirDatos(socketKernel, tam, (void*)pcb, logs)){
 			log_error(logs, "Se produjo un error al recibir el PCB del kernel");

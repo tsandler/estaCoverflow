@@ -227,9 +227,9 @@ void liberar_estructuras(){
 /* Funcion que se lanza en el llamado de la senial SIGUSR1 */
 void manejar_senial(){
 	seguir = 0;
+	tam->menu = ERROR;
+	enviarMenu(socketKernel,tam,logs);
 	if (!ejecutando){
-		tam->menu = ERROR;
-		enviarMenu(socketKernel,tam,logs);
 		cerrarSocket(socketKernel);
 		cerrarSocket(socketUMV);
 	}else{//Flag para finalizar la ejecucion cuando concluya el quantum
