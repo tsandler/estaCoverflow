@@ -109,6 +109,8 @@ int main(int argc, char** argv){
 
 		vaciarDiccionario();
 	}
+	cerrarSocket(socketKernel);
+	cerrarSocket(socketUMV);
 	log_info(logs, "Se llamo a la senial SIGUSR1");
 	log_info(logs, "Cerrando la CPU...");
 	liberar_estructuras();

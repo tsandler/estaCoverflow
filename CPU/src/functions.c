@@ -216,8 +216,6 @@ static char* _depurar_sentencia(char* sentencia, int tamanio){
 
 /* Funcion que libera las estructuras usadas */
 void liberar_estructuras(){
-	cerrarSocket(socketKernel);
-	cerrarSocket(socketUMV);
 	free(pcb);
 	free(tam);
 	free(stack);
@@ -230,6 +228,8 @@ void liberar_estructuras(){
 void manejar_senial(){
 	seguir = 0;
 	if (!ejecutando){
+		cerrarSocket(socketKernel);
+		cerrarSocket(socketUMV);
 		log_info(logs, "Se llamo a la senial SIGUSR1");
 		log_info(logs, "Cerrando la CPU...");
 		liberar_estructuras();
