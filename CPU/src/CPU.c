@@ -55,6 +55,7 @@ int main(int argc, char** argv){
 	signal(SIGUSR1, manejar_senial);
 	pcb = malloc(sizeof(registroPCB));
 
+	systemCall = malloc(sizeof(bool));
 	while (seguir){
 		int cont = 0;
 		finalizo = 0;
@@ -65,6 +66,10 @@ int main(int argc, char** argv){
 			log_error(logs, "Se produjo un error pidiendo el PCB");
 			break;
 		}
+
+		recibirMenu(socketKernel, tam, logs);
+		tam->menu = OK;
+		enviarMenu(socketKernel,tam, logs);
 
 		if(!recibirDatos(socketKernel, tam, (void*)&pcb, logs)){
 			log_error(logs, "Se produjo un error al recibir el PCB del kernel");
@@ -81,9 +86,9 @@ int main(int argc, char** argv){
 		pedir_stack();
 		cargar_diccionario();
 
-		systemCall = 0;
+		*systemCall = false;
 
-		while (quantum > cont && !systemCall){
+		while (quantum > cont && !(*systemCall)){
 			pc = pcb->program_counter;
 
 			char* sentencia = recibir_sentencia();
@@ -96,7 +101,7 @@ int main(int argc, char** argv){
 			sleep(retardo/1000);
 		}
 
-		if (!systemCall)
+		if (!(*systemCall))
 			tam->menu = CONCLUYO_UN_QUANTUM;
 
 		tam->length = sizeof(registroPCB);

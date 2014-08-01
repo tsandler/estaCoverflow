@@ -44,6 +44,7 @@ int main(int argc, char **argv) {
 	while (tam->menu != FINALIZAR){
 		char* sentencia = recibir_sentencia();
 		if (tam->menu != FINALIZAR)
+			if((strcmp(sentencia,"hola") != 0))
 			printf("%s\n", sentencia);
 	}
 	printf("\n\n");

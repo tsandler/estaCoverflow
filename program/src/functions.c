@@ -51,6 +51,10 @@ char* recibir_sentencia(){
 					return sent;
 				}
 				break;
+			case OK:
+				tam->menu = SIGNAL;
+				enviarMenu(socketKernel, tam, logs);
+				break;
 			case ERROR:
 				tam->menu = FINALIZAR;
 				printf("El programa tuvo que finalizar insatisfactoriamente");
@@ -63,7 +67,7 @@ char* recibir_sentencia(){
 		log_error(logs, "Se produjo un error recibiendo la sentencia");
 		tam->menu = FINALIZAR;
 	}
-	return string_from_format("%s", "");
+	return "hola";
 }
 
 /* Funcion que se conecta al kernel y devuelve el socket al que conecto */

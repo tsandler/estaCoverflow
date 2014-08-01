@@ -47,7 +47,7 @@ void bajar_cpu(int socket){
 /*Funcion que llama el hilo cada vez que se conecta algun CPU a la UMV*/
 void funcion_CPU(int socket){
 
-int* pid, pidLocal=-1;
+	int* pid, pidLocal=-1;
 	int termina=0;
 	t_length* tam = malloc(sizeof(t_length));
 	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
@@ -56,6 +56,7 @@ int* pid, pidLocal=-1;
 	unsigned char* codigo;
 	int base, offset, tamanio, nroSegmento;
 	char* buffer;
+	int seBajoCPU=0;
 
 	tam->menu = OK;
 
@@ -76,6 +77,7 @@ int* pid, pidLocal=-1;
 		sem_wait(&yaEscribio);
 
 	while(1){
+		seBajoCPU=0;
 
 		if(tam->menu != OK && esPrimerEjecucion){
 			unaPeticion->socket = socket;
@@ -104,9 +106,13 @@ int* pid, pidLocal=-1;
 			if(unaPeticion->tama->menu==OK){
 				log_error(logs,"[CPU] Se perdio la conexion. Baja al cpu");
 				bajar_cpu(socket);
+				seBajoCPU=1;
 
 				if(!list_size(colaCPUs))
 					log_info(logs,"[CPU] No hay cpus conectados. Se baja la conexion");
+
+				int ret=1;
+				pthread_exit(&ret);
 
 				if(!recibirMenu(socket, tam, logs)){
 					log_error(logs, "Se produjo un error recibiendo una peticion");
@@ -163,7 +169,16 @@ int* pid, pidLocal=-1;
 					break;
 				}
 
-				escribir_segmento(base,tamanio,offset,buffer,pidLocal);
+				int haySegFault = escribir_segmento(base,tamanio,offset,buffer,pidLocal);
+
+				if(haySegFault == -1){ //FIXME
+					tam->menu= SEG_FAULT;
+
+					enviarMenu(socket,tam,logs);
+					sem_post(&mutexOpera);
+					break;
+				}
+
 				nroSegmento++;
 				log_debug(logs,"[HILO CPU] El CPU: %d Escribio el segmento nro: %d",socket,nroSegmento);
 				sem_post(&mutexOpera);
@@ -232,7 +247,8 @@ int* pid, pidLocal=-1;
 				sem_post(&mutexOpera);
 				break;
 			default:
-				log_error(logs,"[HILO CPU] Se recibio una operacion invalida");
+				if(!seBajoCPU)
+					log_error(logs,"[HILO CPU] Se recibio una operacion invalida");
 				termina = 1;
 				break;
 		}
@@ -249,14 +265,13 @@ void funcion_kernel(int socket){
 	int* pid;
 	int pidLocal = -1;
 	t_length* tam = malloc(sizeof(t_length));
-//	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
+	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
 	datos_crearSeg* pidTam = malloc(sizeof(datos_crearSeg));
 	t_elem_cola_kernel* unaPeticion = malloc(sizeof(t_elem_cola_kernel));
 	segEscritos = 0;
+	int kernelCortado=0;
 
 	while(1){
-		t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
-
 
 		log_info(logs,"[HILO KERNEL] Esperando peticion...");
 		if(!recibirMenu(socket, tam, logs)){
@@ -267,6 +282,7 @@ void funcion_kernel(int socket){
 		unaPeticion->tama = tam;
 		queue_push(colaKernel,unaPeticion);
 		unaPeticion = queue_pop(colaKernel);
+		kernelCortado=0;
 
 
 		switch(unaPeticion->tama->menu){
@@ -290,14 +306,15 @@ void funcion_kernel(int socket){
 					break;
 				}
 
+				log_debug(logs,"[H KERNEL] Datos recibidos para escribir un seg. de base: %d, offset: %d, tamanio: %d",etiq->base,etiq->offset,etiq->tamanio);
+
 				if( validacion_base(etiq->base) ){
 					log_error(logs,"[HILO KERNEL] Error en la base: %d al intentar escribir el segmento",etiq->base);
-//					termina = 1;
 					break;
 				}
 
 				if(etiq->tamanio <= 0 || etiq->tamanio > 1024){
-					log_info(logs,"[HILO KERNEL] El tam es <= 0. No se escribe el segmento. No entra al recv");
+					log_error(logs,"[HILO KERNEL] El tam del seg a escribir es invalido. No se escribe el segmento. No entra al recv (del buffer para escribir)");
 					break;
 				}
 				int base=etiq->base;
@@ -310,6 +327,7 @@ void funcion_kernel(int socket){
 				}
 
 				escribir_segmento(base,tamanio,offset,buffer,pidLocal);
+
 				log_debug(logs,"Se escribio el segmento nro: %d",segEscritos);
 
 				sem_post(&mutexOpera);
@@ -341,11 +359,20 @@ void funcion_kernel(int socket){
 				}
 				sem_post(&mutexOpera);
 				break;
+			case OK:
+				log_error(logs,"Finalizo el kernel. La umv lo corta");
+				kernelCortado=1;
+				break;
+
 			default:
 				retardo();
 				log_error(logs,"[HILO KERNEL] operacion invalida para Kernel.La UMV desconecta al KERNEL");
 				break;
 		}
+
+		unaPeticion->tama->menu =OK;
+		if(kernelCortado)
+			break;
 
 	}
 	log_error(logs,"[HILO KERNEL]La UMV desconectó al kernel por fallo");
@@ -573,7 +600,7 @@ unsigned char *leer_segmento(int dirLog, int tamanioALeer, int offset, int pidAc
 		tablaSegUMV* unElem= list_find(listaSeg,(void*)buscar_dirLogica);
 		if(unElem){
 			if( unElem->dirFisica + offset + tamanioALeer <= unElem->dirFisica + unElem->tamanioSegmento ){
-				unsigned char* destino = malloc(sizeof(char) * tamanioALeer);
+				unsigned char* destino = malloc(sizeof(char) * tamanioALeer); //FIXME memory leak
 				char* desde = unElem->dirFisica + offset;
 				memcpy(destino,desde,tamanioALeer);
 				return destino;
@@ -588,7 +615,7 @@ unsigned char *leer_segmento(int dirLog, int tamanioALeer, int offset, int pidAc
 }
 
 /*Funcion que escribe el buffer en un segmento determinado*/
-void escribir_segmento(int dirLog, int tamanioAEscribir, int offset, char* buffer, int pidAct){
+int escribir_segmento(int dirLog, int tamanioAEscribir, int offset, char* buffer, int pidAct){
 
 	bool buscar_dirLogica(tablaSegUMV* unElem){
 		return dirLog == unElem->dirLogica;
@@ -603,14 +630,17 @@ void escribir_segmento(int dirLog, int tamanioAEscribir, int offset, char* buffe
 			if(unElem->dirFisica + offset + tamanioAEscribir <= unElem->dirFisica + unElem->tamanioSegmento){
 				char* espacioSegmento = unElem->dirFisica + offset;
 				memcpy(espacioSegmento,buffer,tamanioAEscribir);
+				return 0;
+
 			}else{
 				log_error(logs,"Se esta tratando de escribir fuera de los rangos del segmento");
-				puts("Segmentation fault");
+				return -1;
 			}
 		}else
 			log_error(logs,"La direccion logica no existe");
 	}else
 		log_error(logs,"no existe la lista asociada al pid");
+	return 1;
 }
 
 void retardo(){

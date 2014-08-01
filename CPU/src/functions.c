@@ -110,13 +110,6 @@ void pedir_stack(){
 	if (!recibirDatos(socketUMV, tam, (void*)&stack, logs))
 		log_error(logs, "Se produjo un error recibiendo el stack");
 
-	/*if (recv (socketUMV, tam, sizeof(t_length), MSG_WAITALL) < 0){ //FIXME: Podria usar la funcion aca?
-		log_error(logs, "[SOCKETS] Se produjo un problema al recibir el tamanio del dato");
-	}
-
-	if (recv (socketUMV, stack, tam->length, MSG_WAITALL) < 0){
-		log_error(logs, "[SOCKETS] Se produjo un problema al recibir el dato");
-	}*/
 }
 
 void retorno_de_stack(){
