@@ -42,31 +42,31 @@ int conectar_kernel(){
 
 /* Funcion que recibe el quantum, el tamanio del stack o el retardo */
 int recibir(int dato){
-	int valor;
+	int* valor;
 	switch(dato){
 		case 1:
 			if(!recibirDatos(socketKernel, tam, (void*)&valor, logs)){
 				log_error(logs, "Se produjo un error al recibir el quantum del kernel");
-				valor = -1;
+				*valor = -1;
 			}else
-				log_info(logs, "Se recibio el quantum de %d", valor);
+				log_info(logs, "Se recibio el quantum de %d", *valor);
 			break;
 		case 2:
 			if(!recibirDatos(socketKernel, tam, (void*)&valor, logs)){
 				log_error(logs, "Se produjo un error al recibir el tamanio del stack");
-				valor = -1;
+				*valor = -1;
 			}else
-				log_info(logs, "Se recibio el tamanio del stack de %d", valor);
+				log_info(logs, "Se recibio el tamanio del stack de %d", *valor);
 			break;
 		case 3:
 			if(!recibirDatos(socketKernel, tam, (void*)&valor, logs)){
 				log_error(logs, "Se produjo un error al recibir el quantum del kernel");
-				valor = -1;
+				*valor = -1;
 			}else
-				log_info(logs, "Se recibio el retardo %d", valor);
+				log_info(logs, "Se recibio el retardo %d", *valor);
 			break;
 	}
-	return valor;
+	return *valor;
 }
 
 /* Funcion que carga el diccionario de variables para el contexto de ejecucion actual */
@@ -107,18 +107,21 @@ void pedir_stack(){
 	if(!enviarDatos(socketUMV, tam, et, logs))
 		log_error(logs, "Se produjo un error enviando la base a la UMV");
 
-	if (recv (socketUMV, tam, sizeof(t_length), MSG_WAITALL) < 0){
+	if (!recibirDatos(socketUMV, tam, (void*)&stack, logs))
+		log_error(logs, "Se produjo un error recibiendo el stack");
+
+	/*if (recv (socketUMV, tam, sizeof(t_length), MSG_WAITALL) < 0){ //FIXME: Podria usar la funcion aca?
 		log_error(logs, "[SOCKETS] Se produjo un problema al recibir el tamanio del dato");
 	}
 
 	if (recv (socketUMV, stack, tam->length, MSG_WAITALL) < 0){
 		log_error(logs, "[SOCKETS] Se produjo un problema al recibir el dato");
-	}
+	}*/
 }
 
 void retorno_de_stack(){
 	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
-	tam->menu = RETORNO_DE_STACK;
+	tam->menu = ESCRIBIR_SEGMENTO;
 	tam->length = sizeof(t_etiqueta);
 
 	etiq->base = pcb->segmento_stack;
@@ -132,6 +135,7 @@ void retorno_de_stack(){
 
 	if(!enviarDatos(socketUMV, tam, stack, logs))
 		log_error(logs, "Se produjo un error al devolverle el stack a la umv");
+
 }
 /* Funcion que verifica que sea un archivo de configuracion valido */
 int archivo_de_configuracion_valido(){
@@ -153,7 +157,7 @@ void vaciarDiccionario(){
 
 /* Funcion que recibe la sentencia de la UMV */
 char* recibir_sentencia(){
-	t_aux* aux = malloc(sizeof(t_aux));
+	t_aux* aux;
 	t_etiqueta* et = malloc(sizeof(t_etiqueta));
 	et->base = pcb->indice_codigo;
 	et->offset = pcb->program_counter * 8;
@@ -164,7 +168,7 @@ char* recibir_sentencia(){
 	if (!enviarDatos(socketUMV, tam, et, logs))
 		log_error(logs, "Se produjo un error al enviar el indice de codigo.");
 
-	if (!recibirDatos(socketUMV, tam, (void*)aux, logs))
+	if (!recibirDatos(socketUMV, tam, (void*)&aux, logs))
 		log_error(logs, "Se produjo un error al recibir el segmento de codigo");
 	et->base = pcb->segmento_codigo;
 	et->offset = aux->offset;
@@ -179,8 +183,7 @@ char* recibir_sentencia(){
 	if (!recibirDatos(socketUMV, tam, (void*)&sentencia, logs))
 		log_error(logs, "Se produjo un error al recibir la sentencia.");
 
-	char* s = string_from_format("%s", &sentencia);
-	return _depurar_sentencia(s, tamanio);
+	return _depurar_sentencia(sentencia, tamanio);
 }
 
 /* Funcion que depura la sentencia eliminando los \n finales */

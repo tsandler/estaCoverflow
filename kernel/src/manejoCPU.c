@@ -39,12 +39,11 @@ void manejoCPU(int fd) {
 	t_log * logs = log_create("log_PCP_En_CPU", "manejoCPU.c", 0,
 			LOG_LEVEL_TRACE);
 	log_info(logs, "Corriendo manejo del CPU");
-	int tiempo;
+	int* tiempo;
 	char* dispositivo;
 	char* textoAImprimir;
 	char* nombreSem;
-	char* sem;
-	int valorMostrar;
+	int* valorMostrar;
 	char* variable;
 	int bloqueado;
 	t_semaforos* tSem;
@@ -88,28 +87,25 @@ void manejoCPU(int fd) {
 		recibirMenu(fd, tam, logs);
 		registroPCB* pcb = malloc(sizeof(registroPCB));
 		switch (tam->menu) {
-		char* var;
-		int pidRecibido;
+		int* pidRecibido;
 	case OBTENER_VALOR_COMPARTIDA: // char*
 		recibirDato(fd, tam->length, (void*) &variable, logs);
 		sem_wait(&mutexVarCompartidas);
-		var = string_from_format("%s", &variable);
-		int* valor = dictionary_get(variablesCompartidas, var);
+		int* valor = dictionary_get(variablesCompartidas, variable);
 		sem_post(&mutexVarCompartidas);
 		tam->length = sizeof(int);
 		enviarDatos(fd, tam, valor, logs);
 		break;
 
 	case ASIGNAR_VALOR_COMPARTIDA: //char*
-		recibirDato(fd, tam->length, (void*) valorCompartida, logs);
+		recibirDato(fd, tam->length, (void*)&valorCompartida, logs);
 		recibirDatos(fd, tam, (void*) &variable, logs);
 		sem_wait(&mutexVarCompartidas);
-		var = string_from_format("%s", &variable);
-		dictionary_remove(variablesCompartidas, var);
-		log_info(logs, "Se saco la variable compartida %s", var);
-		dictionary_put(variablesCompartidas, var, valorCompartida);
+		dictionary_remove(variablesCompartidas, variable);
+		log_info(logs, "Se saco la variable compartida %s", variable);
+		dictionary_put(variablesCompartidas, variable, valorCompartida);
 		log_info(logs, "Se coloco la variable compartida %s y su valor es %i",
-				var, *valorCompartida);
+				variable, *valorCompartida);
 		sem_post(&mutexVarCompartidas);
 		break;
 
@@ -117,34 +113,32 @@ void manejoCPU(int fd) {
 		recibirDato(fd, tam->length, (void*) &valorMostrar, logs);
 		recibirDatos(fd, tam, (void*) &pidRecibido, logs);
 		tam->length = sizeof(int);
-		char* p = string_from_format("%d", pidRecibido);
+		char* p = string_from_format("%d", *pidRecibido);
 		int* fdTemp = dictionary_get(fileDescriptors, p);
-		enviarDatos(*fdTemp, tam, &valorMostrar, logs);
-		log_info(logs, "El valor a imprimir es %i", valorMostrar);
+		enviarDatos(*fdTemp, tam, valorMostrar, logs);
+		log_info(logs, "El valor a imprimir es %i", *valorMostrar);
 
 		break;
 
 	case IMPRIMIR_TEXTO:
 		recibirDato(fd, tam->length, (void*) &textoAImprimir, logs);
 		recibirDatos(fd, tam, (void*) &pidRecibido, logs);
-		char* algto = string_from_format("%s", &textoAImprimir);
-		tam->length = strlen(algto) + 1;
-		char* p1 = string_from_format("%d", pidRecibido);
+		tam->length = strlen(textoAImprimir) + 1;
+		char* p1 = string_from_format("%d", *pidRecibido);
 		int* fdTemp1 = dictionary_get(fileDescriptors, p1);
-		enviarDatos(*fdTemp1, tam, algto, logs);
-		log_info(logs, "el texto a imprimir es %s", algto);
+		enviarDatos(*fdTemp1, tam, textoAImprimir, logs);
+		log_info(logs, "el texto a imprimir es %s", textoAImprimir);
 		break;
 
 	case ENTRADA_SALIDA:
 		PCBrecibido = malloc(sizeof(registroPCB));
 		recibirDato(fd, tam->length, (void*) &tiempo, logs);
 		recibirDatos(fd, tam, (void*) &dispositivo, logs);
-		recibirDatos(fd, tam, (void*) PCBrecibido, logs);
+		recibirDatos(fd, tam, (void*) &PCBrecibido, logs);
 
-		char* disp = string_from_format("%s", &dispositivo);
 		t_io*io;
-		io = dictionary_get(dispositivosIO, disp);
-		PCBrecibido->retrasoIO = tiempo;
+		io = dictionary_get(dispositivosIO, dispositivo);
+		PCBrecibido->retrasoIO = *tiempo;
 		ponerCola(PCBrecibido, io->cola, &io->mutex, &io->hayAlgo); //lo mando al io
 		fdMal = string_from_format("%d", fd);
 		ULTIMOPCB = dictionary_remove(pcbCPU, fdMal);
@@ -169,18 +163,17 @@ void manejoCPU(int fd) {
 
 		recibirDato(fd, tam->length, (void*) &nombreSem, logs);
 		log_info(logs, "SYSCALL: WAIT");
-		sem = string_from_format("%s", &nombreSem);
 		//ESTO DEBE SER ATOMICO
-		log_info(logs, "El semaforo se llama %s", sem);
+		log_info(logs, "El semaforo se llama %s", nombreSem);
 		sem_wait(&mutexSemaforos);
-		tSem = dictionary_get(semaforos, sem);
+		tSem = dictionary_get(semaforos, nombreSem);
 		if (tSem->valor <= 0) {
 			tSem->valor = tSem->valor - 1;
 			bloqueado = 1;
 			log_info(logs, "y su valor es %i", tSem->valor);
 			tam->length = sizeof(int);
 			enviarDatos(fd, tam, &bloqueado, logs);
-			recibirDatos(fd, tam, (void*) pcb, logs);
+			recibirDatos(fd, tam, (void*)&pcb, logs);
 			ponerCola(pcb, tSem->cola, &tSem->mutex, &tSem->hayAlgo);
 			fdMal = string_from_format("%d", fd);
 			ULTIMOPCB = dictionary_remove(pcbCPU, fdMal);
@@ -214,11 +207,10 @@ void manejoCPU(int fd) {
 
 		log_info(logs, "SYSCALL: SIGNAL");
 		recibirDato(fd, tam->length, (void*) &nombreSem, logs);
-		sem = string_from_format("%s", &nombreSem);
 
-		log_info(logs, "El semaforo es %s", sem);
+		log_info(logs, "El semaforo es %s", nombreSem);
 		sem_wait(&mutexSemaforos);
-		tSem = dictionary_get(semaforos, sem);
+		tSem = dictionary_get(semaforos, nombreSem);
 		tSem->valor = tSem->valor + 1;
 		if (!queue_is_empty(tSem->cola)) {
 
@@ -238,7 +230,7 @@ void manejoCPU(int fd) {
 		break;
 	case CONCLUYO_UN_QUANTUM:
 
-		recibirDato(fd, tam->length, (void*) pcb, logs);
+		recibirDato(fd, tam->length, (void*)&pcb, logs);
 
 		ponerCola(pcb, READY, &mutexREADY, &hayAlgoEnReady); //lo pongo en ready
 		muestraNombres(READY, "READY");
@@ -275,7 +267,7 @@ void manejoCPU(int fd) {
 	case FINALIZAR:
 		sem_wait(&mutexFinalizar);
 		PCBrecibido = malloc(sizeof(registroPCB));
-		recibirDato(fd, tam->length, (void*) PCBrecibido, logs);
+		recibirDato(fd, tam->length, (void*)&PCBrecibido, logs);
 
 		fdMal = string_from_format("%d", fd);
 		ULTIMOPCB = dictionary_remove(pcbCPU, fdMal);
@@ -334,6 +326,12 @@ void manejoCPU(int fd) {
 		dictionary_put(pcbCPU, fdRecibido, PCBPOP);
 		sem_post(&mutexMandarColaEXEC);
 		break;
+	case ERROR:
+		fdMal = string_from_format("%d", fd);
+		ULTIMOPCB = dictionary_remove(pcbCPU, fdMal);
+		log_error(logs, "Se cierra la CPU.");
+		int ret = 1;
+		pthread_exit(&ret);
 	default:
 		fdMal = string_from_format("%d", fd);
 		ULTIMOPCB = dictionary_remove(pcbCPU, fdMal);

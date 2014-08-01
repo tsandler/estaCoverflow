@@ -69,7 +69,7 @@ int crearSegmento(registroPCB* PCBprograma,t_log* logs , int tamanio, int socket
 	tam->length = sizeof(datos_crearSeg);
 
 
-	int datoRecibido;
+	int* datoRecibido;
 
 	datosAEnviar->pid=PCBprograma->pid;
 	log_info(logs,"%i",datosAEnviar->pid);
@@ -86,8 +86,8 @@ int crearSegmento(registroPCB* PCBprograma,t_log* logs , int tamanio, int socket
 				log_error (logs,"Error en el envio del Segmento ");
 				exit(EXIT_FAILURE);
 			}else{
-				if(datoRecibido != -1)
-					return datoRecibido;  //BASE
+				if(*datoRecibido != -1)
+					return *datoRecibido;  //BASE
 				else{
 					log_error (logs, "La UMV se quedo sin memoria");
 					log_error (logs,"Se ha abortado el proceso de CREACION DE SEGMENTOS");

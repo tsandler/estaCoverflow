@@ -74,7 +74,7 @@ void asignar(t_puntero direccion_variable, t_valor_variable valor ){
 t_valor_variable obtener_valor_compartida(t_nombre_compartida variable){
 	tam->menu = OBTENER_VALOR_COMPARTIDA;
 	tam->length = strlen(variable)+1;
-	t_valor_variable valorVariable;
+	t_valor_variable* valorVariable;
 
 	if (!enviarDatos(socketKernel, tam, variable, logs))
 		log_error(logs, "Se produjo un error enviando la variable %s para obtener su valor", variable);
@@ -86,7 +86,7 @@ t_valor_variable obtener_valor_compartida(t_nombre_compartida variable){
 	else
 		log_info(logs, "Se recibio el valor de la variable correctamente");
 
-	return valorVariable;
+	return *valorVariable;
 }
 
 /* Primitiva que envia el valor a asignarle a una variable */
@@ -120,14 +120,9 @@ void ir_al_label(t_nombre_etiqueta etiqueta){
 	else
 		log_info(logs, "Se envio el struct para pedir el segmento de etiquetas");
 
-	if (recv (socketUMV, tam, sizeof(t_length), MSG_WAITALL) < 0)
-		log_error(logs, "Se produjo un problema al recibir el tamanio del segmento de etiquetas");
-
-	char* etiquetas = malloc(tam->length);
-	if (recv (socketUMV, etiquetas, tam->length, MSG_WAITALL) < 0)
+	char* etiquetas;
+	if(!recibirDatos(socketUMV, tam, (void*)&etiquetas, logs))
 		log_error(logs, "Se produjo un error recibiendo el segmento de etiquetas");
-	else
-		log_info(logs, "Se recibio el segmento de etiquetas");
 
 	t_size tamanio = pcb->tamanio_indice_etiquetas;
 
@@ -162,7 +157,7 @@ void finalizar(){
 		finalizo = 1;
 		tam->menu = FINALIZAR;
 		log_info(logs, "Finalizando el programa");
-		systemCall = true;
+		*systemCall = true;
 	}else{
 		if (!llamoRetornar)
 			pcb->cursor_stack -= pcb->tamanio_contexto * 5;
@@ -237,7 +232,7 @@ void entrada_salida(t_nombre_dispositivo dispositivo, int tiempo){
 		log_error(logs, "Se produjo un error enviando el nombre del dispositivo de entrada y salida al kernel");
 
 	log_info(logs, "El dispositivo %s fue a E/S con %d tiempos", dispositivo, tiempo);
-	systemCall = true;
+	*systemCall = true;
 }
 
 /* Primitiva que envia la senial wait de un semaforo al kernel */
@@ -251,7 +246,7 @@ void wait(t_nombre_semaforo identificador_semaforo){
 	if (!recibirDatos(socketKernel, tam, (void*)&systemCall, logs))
 		log_error(logs, "Se produjo un error recibiendo el resultado del wait a un semaforo");
 
-	if (systemCall)
+	if (*systemCall)
 		log_debug(logs, "El semaforo se bloqueo");
 
 }

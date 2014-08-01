@@ -15,7 +15,6 @@
 int main(int argc, char** argv){
 
 	logs = log_create("log", "CPU.c", 1, LOG_LEVEL_TRACE);
-
 	/*if (argc < 2){
 		log_error(logs, "No se pasaron parametros.");
 		log_destroy(logs);
@@ -40,8 +39,7 @@ int main(int argc, char** argv){
 		return 0;
 	}
 	tam->menu = SOY_CPU;
-	if(enviarMenu(socketUMV, tam, logs))
-		log_debug(logs, "Se hizo el handshake con la UMV");
+	enviarMenu(socketUMV, tam, logs);
 
 	int quantum = recibir(1);
 	tamanioStack = recibir(2);
@@ -56,7 +54,8 @@ int main(int argc, char** argv){
 
 	signal(SIGUSR1, manejar_senial);
 	pcb = malloc(sizeof(registroPCB));
-	stack = malloc(tamanioStack);
+
+	systemCall = malloc(sizeof(bool));
 	while (seguir){
 		int cont = 0;
 		finalizo = 0;
@@ -68,7 +67,7 @@ int main(int argc, char** argv){
 			break;
 		}
 
-		if(!recibirDatos(socketKernel, tam, (void*)pcb, logs)){
+		if(!recibirDatos(socketKernel, tam, (void*)&pcb, logs)){
 			log_error(logs, "Se produjo un error al recibir el PCB del kernel");
 			break;
 		}
@@ -83,9 +82,9 @@ int main(int argc, char** argv){
 		pedir_stack();
 		cargar_diccionario();
 
-		systemCall = false;
+		*systemCall = false;
 
-		while (quantum > cont && !systemCall){
+		while (quantum > cont && !(*systemCall)){
 			pc = pcb->program_counter;
 
 			char* sentencia = recibir_sentencia();
@@ -98,7 +97,7 @@ int main(int argc, char** argv){
 			sleep(retardo/1000);
 		}
 
-		if (!systemCall)
+		if (!(*systemCall))
 			tam->menu = CONCLUYO_UN_QUANTUM;
 
 		tam->length = sizeof(registroPCB);
@@ -107,7 +106,14 @@ int main(int argc, char** argv){
 		if (!finalizo)
 			retorno_de_stack();
 
+		free(stack);
+
 		vaciarDiccionario();
+		if (!seguir){
+			tam->menu = ERROR;
+			enviarMenu(socketKernel, tam, logs);
+		}
+
 	}
 	cerrarSocket(socketKernel);
 	cerrarSocket(socketUMV);

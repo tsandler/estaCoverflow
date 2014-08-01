@@ -24,7 +24,7 @@ t_dictionary* diccionarioDeVariables;
 int socketKernel, socketUMV;
 unsigned char* stack;
 int seguir;
-bool systemCall;
+int* systemCall;
 int ejecutando;
 int tamanioStack;
 int llamoRetornar;

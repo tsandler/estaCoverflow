@@ -121,7 +121,7 @@ int recibirMenu(int socket, t_length* tam, t_log* logs){
 
 int recibirDato(int socket, int size, void** dato, t_log* logs){
 	*dato = malloc(size);
-	if (recv (socket, dato, size, MSG_WAITALL) < 0){
+	if (recv (socket, *dato, size, MSG_WAITALL) < 0){
 		log_error(logs, "[SOCKETS] Se produjo un problema al recibir el tamanio del dato");
 		return 0;
 	}
@@ -138,7 +138,7 @@ int recibirDatos(int socket, t_length* tam, void** datos, t_log* logs){
 		return 0;
 	}
 	*datos = malloc(tam->length);
-	if (recv (socket, datos, tam->length, MSG_WAITALL) < 0){
+	if (recv (socket, *datos, tam->length, MSG_WAITALL) < 0){
 		log_error(logs, "[SOCKETS] Se produjo un problema al recibir el dato");
 		return 0;
 	}

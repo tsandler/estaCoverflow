@@ -9,7 +9,7 @@
 #include <commons/string.h>
 
 #define BROKEN "BROKEN"
-#define MAXBUFFSIZE 1024
+#define MAXBUFFSIZE 1024//FIXME: Esto deberia sacarlo
 #define GREAT "GREAT"
 
 
@@ -26,7 +26,7 @@ int openSocketServerPLP(int PORT) {
 	struct sockaddr_in clientaddr;
 	int listener;
 	int newfd;
-	char buf[MAXBUFFSIZE];
+	char* buf;
 
 	int nbytes;
 	t_length* tam=malloc(sizeof(t_length));
@@ -89,11 +89,11 @@ int openSocketServerPLP(int PORT) {
 			exit(EXIT_FAILURE);
 		} else {
 			log_info(logs, "Conexion entrante aceptada :%i",clilen);
-			if (recibirDatos(newfd, tam, (void*)buf, logs)==1) {
+			if (recibirDatos(newfd, tam, (void*)&buf, logs)==1) {
 				puts("llego");
-				log_info(logs,"%s \n",&buf);
+				log_info(logs,"%s \n",buf);
 				registroPCB* unPCB = malloc(sizeof(registroPCB));
-				unPCB = armarPCB(&buf,newfd);
+				unPCB = armarPCB(buf,newfd);
 
 				ponerCola(unPCB,NEW,&mutexNEW, &hayAlgo);
 				muestraNombres(NEW,"NEW");

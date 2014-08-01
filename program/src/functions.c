@@ -38,17 +38,17 @@ static char* _obtener_programa(char* path){
 /* Funcion que recibe la sentencia a imprimir */
 char* recibir_sentencia(){
 	char* sent;
-	int val;
+	int* val;
 	if (recibirMenu(socketKernel, tam, logs)){
 		switch(tam->menu){
 			case IMPRIMIR:
 				if(recibirDato(socketKernel, tam->length, (void*)&val, logs)){
-					return string_from_format("%d", val);
+					return string_from_format("%d", *val);
 				}
 				break;
 			case IMPRIMIR_TEXTO:
 				if(recibirDato(socketKernel, tam->length, (void*)&sent, logs)){
-					return string_from_format("%s", &sent);
+					return sent;
 				}
 				break;
 			case ERROR:
