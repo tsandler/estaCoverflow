@@ -9,7 +9,6 @@
 #include <commons/string.h>
 
 #define BROKEN "BROKEN"
-#define MAXBUFFSIZE 1024//FIXME: Esto deberia sacarlo
 #define GREAT "GREAT"
 
 
@@ -116,8 +115,6 @@ int openSocketServerPCP(int PORT) {
 	struct sockaddr_in clientaddr;
 	int listener;
 	int newfd;
-	char *buf;
-	int nbytes;
 	/* para setsockopt()  */
 	int yes = 1;
 
