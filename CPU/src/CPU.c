@@ -55,7 +55,6 @@ int main(int argc, char** argv){
 	signal(SIGUSR1, manejar_senial);
 	pcb = malloc(sizeof(registroPCB));
 
-	systemCall = malloc(sizeof(bool));
 	while (seguir){
 		int cont = 0;
 		finalizo = 0;
@@ -82,9 +81,9 @@ int main(int argc, char** argv){
 		pedir_stack();
 		cargar_diccionario();
 
-		*systemCall = false;
+		systemCall = 0;
 
-		while (quantum > cont && !(*systemCall)){
+		while (quantum > cont && !systemCall){
 			pc = pcb->program_counter;
 
 			char* sentencia = recibir_sentencia();
@@ -97,7 +96,7 @@ int main(int argc, char** argv){
 			sleep(retardo/1000);
 		}
 
-		if (!(*systemCall))
+		if (!systemCall)
 			tam->menu = CONCLUYO_UN_QUANTUM;
 
 		tam->length = sizeof(registroPCB);

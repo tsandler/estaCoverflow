@@ -157,7 +157,7 @@ void finalizar(){
 		finalizo = 1;
 		tam->menu = FINALIZAR;
 		log_info(logs, "Finalizando el programa");
-		*systemCall = true;
+		systemCall = 1;
 	}else{
 		if (!llamoRetornar)
 			pcb->cursor_stack -= pcb->tamanio_contexto * 5;
@@ -232,7 +232,7 @@ void entrada_salida(t_nombre_dispositivo dispositivo, int tiempo){
 		log_error(logs, "Se produjo un error enviando el nombre del dispositivo de entrada y salida al kernel");
 
 	log_info(logs, "El dispositivo %s fue a E/S con %d tiempos", dispositivo, tiempo);
-	*systemCall = true;
+	systemCall = 1;
 }
 
 /* Primitiva que envia la senial wait de un semaforo al kernel */
@@ -243,10 +243,14 @@ void wait(t_nombre_semaforo identificador_semaforo){
 	if (!enviarDatos(socketKernel, tam, identificador_semaforo, logs))
 		log_error(logs, "Se produjo un error enviando la senial de wait al semaforo %s", identificador_semaforo);
 
-	if (!recibirDatos(socketKernel, tam, (void*)&systemCall, logs))
+	int* sysCall;
+	if (!recibirDatos(socketKernel, tam, (void*)&sysCall, logs))
 		log_error(logs, "Se produjo un error recibiendo el resultado del wait a un semaforo");
 
-	if (*systemCall)
+	systemCall = *sysCall;
+
+	free(sysCall);
+	if (systemCall)
 		log_debug(logs, "El semaforo se bloqueo");
 
 }
