@@ -202,15 +202,26 @@ void manejoCPU(int fd) {
 		if (!queue_is_empty(tSem->cola)) {
 
 			PCBPOP = sacarCola(tSem->cola, &tSem->mutex, &tSem->hayAlgo);
-			muestraNombres(tSem->cola, "SIGNAL BLOQUEADOS");
-			ULTIMOPCB = PCBPOP;
+				if (programa_valido(PCBPOP)){
+					muestraNombres(tSem->cola, "SIGNAL BLOQUEADOS");
 
-			printf("voya poner en ready el PID desbloqueado");
 
-			ponerCola(PCBPOP, READY, &mutexREADY, &hayAlgoEnReady);
-			muestraNombres(READY, "READY");
+					printf("voya poner en ready el PID desbloqueado");
+
+					ponerCola(PCBPOP, READY, &mutexREADY, &hayAlgoEnReady);
+					muestraNombres(READY, "READY");
+				}else{
+					fdMal = string_from_format("%d", fd);
+					dictionary_remove(pcbCPU, fdMal);
+					char* pidR = string_from_format("%d", pcb->pid);
+					dictionary_remove(fileDescriptors, pidR);
+					eliminarSegmentoUMV(socket_UMV, logs, pcb);
+					sem_post(&gradoProg);
+					ponerCola(pcb, EXIT, &mutexEXIT, &hayAlgoEnExit);
+			}
 
 		}
+		puts("LLEGO AL SIGNAL");
 		log_info(logs, "y su valor es %i", tSem->valor);
 		sem_post(&mutexSemaforos);
 
