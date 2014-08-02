@@ -155,31 +155,8 @@ char* recibir_sentencia(){
 static char* _depurar_sentencia(char* sentencia, int tamanio){
 	char* sent = string_substring_until(sentencia, tamanio);
 	string_trim(&sent);
-	int i = strlen(sent);
-	while (string_ends_with(sent, "\n")){
-		sent = string_substring_until(sent, i-1);
-	}
-	char** sub = string_split(sent, "\t");
-	char* sentenciaCasiFinal = string_new();
-	i = 0;
-	while (sub[i] != NULL){
-		if (!string_equals_ignore_case(sub[i], ","))
-			string_append(&sentenciaCasiFinal, " ");
-		string_append(&sentenciaCasiFinal, sub[i]);
-		i++;
-	}
-	char** sub2 = string_split(sentenciaCasiFinal, " ");
-	char* sentenciaFinal = string_new();
-	i = 0;
-	while (sub2[i] != NULL){
-		if (!string_equals_ignore_case(sub2[i], ","))
-			string_append(&sentenciaFinal, " ");
-		string_append(&sentenciaFinal, sub2[i]);
-		i++;
-	}
-	string_trim(&sentenciaFinal);
-	log_info(logs, "Sentencia depurada: %s", sentenciaFinal);
-	return sentenciaFinal;
+	log_info(logs, "Sentencia depurada: %s", sent);
+	return sent;
 }
 
 /* Funcion que libera las estructuras usadas */

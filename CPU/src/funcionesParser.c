@@ -293,8 +293,6 @@ void imprimir(t_valor_variable valor_mostrar){
 	int pid = pcb->pid;
 	if (!enviarDatos(socketKernel, tam, &pid, logs))
 		log_error(logs, "Se produjo un error enviando el PID");
-	else
-		log_info(logs, "Se envio el PID");
 }
 
 /* Primitiva que envia al kernel un texto para mostrar por consola */
@@ -310,8 +308,6 @@ void imprimir_texto(char* texto){
 	int pid = pcb->pid;
 	if (!enviarDatos(socketKernel, tam, &pid, logs))
 		log_error(logs, "Se produjo un error enviando el PID");
-	else
-		log_info(logs, "Se envio el PID");
 }
 
 /* Primitiva que le dice al kernel que fue a entrada y salida con un dispositivo por un determinado tiempo */
