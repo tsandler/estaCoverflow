@@ -27,7 +27,7 @@
 #include "funcionesPCB.h"
 #include "colas.h"
 
-void conectarseUMV();
+int conectarseUMV();
 //static pthread_mutex_t semaforo_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 typedef struct t_semaforos {

@@ -20,7 +20,7 @@ int identificadorUnico = 1;
 extern int tamanioStack;
 
 
-void conectarseUMV(){
+int conectarseUMV(){
     char *ip = config_get_string_value(config,"IP");
     int port = config_get_int_value(config,"PUERTO_UMV");
 	log_debug(logs,"el puerto es: %d", port);
@@ -39,6 +39,7 @@ void conectarseUMV(){
 				log_error(logs,"Error en la identificacion ... (LA UMV NO RECIBE AL KERNEL)");
 
 		log_debug(logs,"ya se envio el menu");
+		return socket_UMV;
 }
 // El socket de la UMV habria que cerrarlo una vez que se resfieren los datos y todo...
 
@@ -86,15 +87,10 @@ int crearSegmento(registroPCB* PCBprograma,t_log* logs , int tamanio, int socket
 				log_error (logs,"Error en el envio del Segmento ");
 				exit(EXIT_FAILURE);
 			}else{
-				if(*datoRecibido != -1)
-					return *datoRecibido;  //BASE
-				else{
-					log_error (logs, "La UMV se quedo sin memoria");
-					log_error (logs,"Se ha abortado el proceso de CREACION DE SEGMENTOS");
-					exit(EXIT_FAILURE);
+				return *datoRecibido;  //BASE
 				}
 			}
-}
+
 
 /*escribe un segmento*/
 void escribirSegmento(registroPCB* PCBprograma, int base ,int tamanio, void* datoAEnviar){
@@ -143,10 +139,7 @@ registroPCB* armarPCB(char* program, int fd){
 
 	unPCB=malloc(sizeof(registroPCB));
 
-	char * keyPID= string_from_format("%d", identificadorUnico);
-	int* f = malloc(sizeof(int));
-	*f = fd;
-	dictionary_put(fileDescriptors,keyPID,f);
+
 
 	unPCB->program_counter=metadataP->instruccion_inicio;
 	unPCB->peso = peso;
@@ -157,12 +150,30 @@ registroPCB* armarPCB(char* program, int fd){
     unPCB->tamanio_contexto= 0;
     unPCB->cursor_anterior = 0;
     unPCB->tamanio_indice_codigo=metadataP->instrucciones_size * sizeof(t_intructions);
-    unPCB->indice_etiquetas = crearSegmento(unPCB,logs,unPCB->tamanio_indice_etiquetas,socket_UMV);
-    unPCB->segmento_stack = crearSegmento(unPCB,logs,tamanioStack,socket_UMV);
-    unPCB->segmento_codigo = crearSegmento(unPCB,logs,(strlen(program)+1),socket_UMV);
-    unPCB->indice_codigo = crearSegmento(unPCB,logs,unPCB->tamanio_indice_codigo,socket_UMV);
-
     identificadorUnico = identificadorUnico + 1;
+    unPCB->indice_etiquetas = crearSegmento(unPCB,logs,unPCB->tamanio_indice_etiquetas,socket_UMV);
+    if ( unPCB->indice_etiquetas <  0){
+    	unPCB->peso =  -1;
+    	return  unPCB;
+    }
+
+    unPCB->segmento_stack = crearSegmento(unPCB,logs,tamanioStack,socket_UMV);
+    if ( unPCB->segmento_stack <  0){
+     	unPCB->peso =  -1;
+     	return  unPCB;
+     }
+    unPCB->segmento_codigo = crearSegmento(unPCB,logs,(strlen(program)+1),socket_UMV);
+    if ( unPCB->segmento_codigo <  0){
+     	unPCB->peso =  -1;
+     	return  unPCB;
+     }
+    unPCB->indice_codigo = crearSegmento(unPCB,logs,unPCB->tamanio_indice_codigo,socket_UMV);
+    if ( unPCB->indice_codigo <  0){
+     	unPCB->peso =  -1;
+     	return  unPCB;
+     }
+
+
 
     escribirSegmento(unPCB,unPCB->indice_codigo,unPCB->tamanio_indice_codigo,metadataP->instrucciones_serializado);
 
@@ -170,6 +181,11 @@ registroPCB* armarPCB(char* program, int fd){
     	escribirSegmento(unPCB,unPCB->indice_etiquetas,unPCB->tamanio_indice_etiquetas,metadataP->etiquetas);
     printf("SE ENVIA ESCRIBIR %d", unPCB->segmento_codigo);
     escribirSegmento(unPCB,unPCB->segmento_codigo,(strlen(program)+1),program);
+
+	char * keyPID = string_from_format("%d", unPCB->pid);
+	int* f = malloc(sizeof(int));
+	*f = fd;
+	dictionary_put(fileDescriptors, keyPID, f);
 
     usleep(32);
 
