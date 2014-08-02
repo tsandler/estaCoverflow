@@ -271,7 +271,7 @@ void manejoCPU(int fd) {
 			int* fdTemporal = dictionary_get(fileDescriptors, pidR);
 			enviarMenu(*fdTemporal, tam, logs); //aviso al programa q finalizo.
 		}
-		muestraNombres(EXIT, "Cola EXIT");
+		//muestraNombres(EXIT, "Cola EXIT");
 		dictionary_remove(fileDescriptors, pidR);
 		log_info(logs, "El programa ha finalizado");
 		sem_post(&mutexFinalizar);

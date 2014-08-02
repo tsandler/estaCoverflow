@@ -30,7 +30,6 @@ int openSocketServerPLP(int PORT) {
 	int newfd;
 	char* buf;
 
-	int nbytes;
 	t_length* tam=malloc(sizeof(t_length));
 	/* para setsockopt()  */
 	int yes = 1;

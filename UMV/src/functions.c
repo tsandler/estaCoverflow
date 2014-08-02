@@ -237,9 +237,13 @@ void funcion_CPU(int socket){
 				}
 
 				codigo = leer_segmento(etiq->base,etiq->tamanio,etiq->offset,pidLocal);
+				tam->menu = OK;
+				if(string_equals_ignore_case(codigo,"-1"))
+					tam->menu = SEG_FAULT;
 
 				tam->length = etiq->tamanio;
 				enviarDatos(socket, tam, codigo, logs);
+				enviarMenu(socket, tam, logs);
 				sem_post(&mutexOpera);
 				break;
 			default:
@@ -604,8 +608,10 @@ unsigned char *leer_segmento(int dirLog, int tamanioALeer, int offset, int pidAc
 				return destino;
 			}else
 				log_error(logs,"se esta tratando de leer fuera de los rangos del segmento-segmentation fault-");
-		}else
+				return string_itoa(-1);
+		}else{
 			log_error(logs,"se intento acceder a una base inexistente");
+		}
 	}
 	else
 		log_error(logs,"no existe el pid: %d al tratar de leer el seg",pidAct);

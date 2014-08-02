@@ -22,7 +22,6 @@
 #include <commons/config.h>
 #include <commons/string.h>
 #include <libs/manejoDelPCB.h>
-#include "manejoSemaforos.h"
 #include <libs/sockets.h>
 #include "funcionesPCB.h"
 #include "colas.h"

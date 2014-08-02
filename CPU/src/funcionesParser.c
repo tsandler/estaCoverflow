@@ -84,7 +84,14 @@ t_valor_variable dereferenciar(t_puntero direccion_variable){
 
 	enviarDatos(socketUMV, tam, etiq, logs);
 	recibirDatos(socketUMV, tam, (void*)&valor, logs);
-	log_info(logs, "El valor de la direccion %d es %d", direccion_variable, *valor);
+	recibirMenu(socketUMV, tam, logs);
+	if (tam->menu != SEG_FAULT)
+		log_info(logs, "El valor de la direccion %d es %d", direccion_variable, *valor);
+	else{
+		log_info(logs, "Se trato de leer fuera del rango permitido");
+		tam->menu = SEG_FAULT;
+		systemCall = 1;
+	}
 	return *valor;
 }
 
@@ -282,17 +289,19 @@ void retornar(t_valor_variable retorno){
 
 /* Primitiva que envia al kernel un valor para mostrar por consola */
 void imprimir(t_valor_variable valor_mostrar){
-	tam->menu = IMPRIMIR;
-	tam->length = sizeof(t_valor_variable);
+	if (!systemCall){
+		tam->menu = IMPRIMIR;
+		tam->length = sizeof(t_valor_variable);
 
-	if (!enviarDatos(socketKernel, tam, &valor_mostrar, logs))
-		log_error(logs, "Se produjo un error enviando el valor %d para imprimir", valor_mostrar);
-	else
-		log_info(logs, "Se envio el valor %d para imprimirlo", valor_mostrar);
-	tam->length = sizeof(int);
-	int pid = pcb->pid;
-	if (!enviarDatos(socketKernel, tam, &pid, logs))
-		log_error(logs, "Se produjo un error enviando el PID");
+		if (!enviarDatos(socketKernel, tam, &valor_mostrar, logs))
+			log_error(logs, "Se produjo un error enviando el valor %d para imprimir", valor_mostrar);
+		else
+			log_info(logs, "Se envio el valor %d para imprimirlo", valor_mostrar);
+		tam->length = sizeof(int);
+		int pid = pcb->pid;
+		if (!enviarDatos(socketKernel, tam, &pid, logs))
+			log_error(logs, "Se produjo un error enviando el PID");
+	}
 }
 
 /* Primitiva que envia al kernel un texto para mostrar por consola */

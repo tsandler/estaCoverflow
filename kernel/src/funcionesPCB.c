@@ -82,14 +82,13 @@ int crearSegmento(registroPCB* PCBprograma,t_log* logs , int tamanio, int socket
 				log_error( logs ,"Error en el envio de los datos...(FALLO EN EL ENVIO DEL SEGMENTO)");
 				exit(EXIT_FAILURE);
 			}
+			*datoRecibido  = -1;
 			log_debug(logs,"se envio el Crear Segmento");
 			if (!recibirDatos (socket_UMV,tam,(void*)&datoRecibido,logs)){ //base
-				log_error (logs,"Error en el envio del Segmento ");
-				exit(EXIT_FAILURE);
-			}else{
-				return *datoRecibido;  //BASE
-				}
+				log_error (logs,"Error recibiendo la base");
 			}
+			return *datoRecibido;
+	}
 
 
 /*escribe un segmento*/
