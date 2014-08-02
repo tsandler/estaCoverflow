@@ -220,6 +220,8 @@ void funcion_CPU(int socket){
 				if(!enviarDatos(socket, tam, codigo, logs))
 					log_error(logs,"Error al enviarse la sentencia");
 
+				tam->menu = OK;
+
 				sem_post(&mutexOpera);
 				break;
 			case LEER_SEGMENTO:

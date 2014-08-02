@@ -70,7 +70,7 @@ int crearSegmento(registroPCB* PCBprograma,t_log* logs , int tamanio, int socket
 	tam->length = sizeof(datos_crearSeg);
 
 
-	int* datoRecibido;
+	int* datoRecibido=malloc(sizeof(int));
 
 	datosAEnviar->pid=PCBprograma->pid;
 	log_info(logs,"%i",datosAEnviar->pid);

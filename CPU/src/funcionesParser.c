@@ -163,7 +163,7 @@ void ir_al_label(t_nombre_etiqueta etiqueta){
 	char* etiquetas;
 	if(!recibirDatos(socketUMV, tam, (void*)&etiquetas, logs))
 		log_error(logs, "Se produjo un error recibiendo el segmento de etiquetas");
-
+	recibirMenu(socketUMV, tam, logs);
 	t_size tamanio = pcb->tamanio_indice_etiquetas;
 
 	pcb->program_counter = metadata_buscar_etiqueta(etiqueta, etiquetas, tamanio);
@@ -252,6 +252,7 @@ void finalizar(){
 		enviarDatos(socketUMV, tam, etiq, logs);
 		recibirDatos(socketUMV, tam, (void*)&stack, logs);
 
+		recibirMenu(socketUMV, tam,  logs);
 		memcpy(&pcb->cursor_anterior, stack, 4);
 		memcpy(&pcb->program_counter, stack + 4, 4);
 
@@ -280,6 +281,7 @@ void retornar(t_valor_variable retorno){
 	enviarDatos(socketUMV, tam, etiq, logs);
 	recibirDatos(socketUMV, tam, (void*)&stack, logs);
 
+	recibirMenu(socketUMV, tam, logs);
 	memcpy(posicion, stack, 4);
 	asignar(*posicion, retorno);
 	free(stack);

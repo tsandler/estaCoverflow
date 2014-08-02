@@ -85,7 +85,7 @@ void cargar_diccionario(){
 
 		unsigned char* stack;
 		recibirDatos(socketUMV, tam, (void*)&stack, logs);
-
+		recibirMenu(socketUMV, tam, logs);
 		for (i=0; i < pcb->tamanio_contexto; i++){
 			int aux = inicial + i*5;
 			int* pos = malloc(sizeof(int));
