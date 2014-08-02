@@ -56,18 +56,27 @@ char *solicitarBytesPorConsola(char **operacion) {
 }
 
 char* retornarBufferPedido(char **operacion,char *cadena,int tamSeg){
-//	int i;
+//	FIXME
+//	int i=0;
+//	int tamACortar=0;
 //	int max= sizeof(operacion)/sizeof(operacion[0]);
 ////	cadena =  borrarEspaciosInnecesarios(cadena);
 //	for(i=0;i<=max;i++){
 //		string_length(operacion[i]);
 //
 //	}
-	char* buffer=malloc(tamSeg);
-	//FIXME
-
-	memcpy(buffer,operacion[7],tamSeg);
-	return buffer;
+//	char* buffer=malloc(tamSeg);
+//	while(i<7){
+//		tamACortar =+ string_length(operacion[i]);
+//		i++;
+//	}
+//	tamACortar =+ 7;
+//
+//
+//
+//	memcpy(buffer,operacion[7],tamSeg);
+//	return buffer;
+	return NULL;
 }
 
 char *almacenarBytesPorConsola(char **operacion,char *cadena) {
@@ -271,7 +280,7 @@ int consola(void) {
 
 				}else{
 					if(cadenasIguales(operacion[1], "estructuraMp"))
-						imprime_estado_mem_ppal(operacion);
+						imprime_estado_mem_ppal(operacion[2]);
 					else{
 						if (cadenasIguales(operacion[1], "contenidoMp"))
 							reporteContenidoMp(operacion);

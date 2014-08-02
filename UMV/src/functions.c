@@ -144,7 +144,6 @@ void funcion_CPU(int socket){
 					break;
 				}
 				pidLocal = *pid;
-				log_info(logs,"[HILO CPU] Se cambio el pid activo a: %d",pidLocal);
 				sem_post(&mutexOpera);
 				break;
 			case ESCRIBIR_SEGMENTO:
@@ -171,10 +170,9 @@ void funcion_CPU(int socket){
 
 				int haySegFault = escribir_segmento(base,tamanio,offset,buffer,pidLocal);
 
-				if(haySegFault == -1){ //FIXME
+				if(haySegFault == -1){
 					tam->menu= SEG_FAULT;
 					enviarMenu(socket,tam,logs);
-					log_debug(logs,"[HILO CPU] El CPU: %d Escribio el segmento nro: %d",socket,nroSegmento);
 				}else{
 					tam->menu= OK;
 					enviarMenu(socket,tam,logs);
@@ -222,7 +220,6 @@ void funcion_CPU(int socket){
 				if(!enviarDatos(socket, tam, codigo, logs))
 					log_error(logs,"Error al enviarse la sentencia");
 
-				log_info(logs,"[HILO CPU] Se envio al CPU nro: %d la sentencia",socket);
 				sem_post(&mutexOpera);
 				break;
 			case LEER_SEGMENTO:
@@ -243,7 +240,6 @@ void funcion_CPU(int socket){
 
 				tam->length = etiq->tamanio;
 				enviarDatos(socket, tam, codigo, logs);
-				log_info(logs,"[HILO CPU] Se envio el segmento al CPU nro: %d",socket);
 				sem_post(&mutexOpera);
 				break;
 			default:
@@ -273,7 +269,7 @@ void funcion_kernel(int socket){
 
 	while(1){
 
-		log_info(logs,"[HILO KERNEL] Esperando peticion...");
+//		log_info(logs,"[HILO KERNEL] Esperando peticion...");
 		if(!recibirMenu(socket, tam, logs)){
 			log_error(logs, "[HILO KERNEL] Error al recibir la peticion");
 			break;
@@ -294,7 +290,6 @@ void funcion_kernel(int socket){
 					break;
 				}
 				pidLocal = *pid;
-				log_debug(logs,"[HILO KERNEL] Se cambio el pid activo a %d", *pid);
 				sem_post(&mutexOpera);
 				break;
 			case ESCRIBIR_SEGMENTO:
@@ -305,8 +300,6 @@ void funcion_kernel(int socket){
 					log_error(logs,"Se produjo un error recibiendo la esctructura");
 					break;
 				}
-
-				log_debug(logs,"[H KERNEL] Datos recibidos para escribir un seg. de base: %d, offset: %d, tamanio: %d",etiq->base,etiq->offset,etiq->tamanio);
 
 				if( validacion_base(etiq->base) ){
 					log_error(logs,"[HILO KERNEL] Error en la base: %d al intentar escribir el segmento",etiq->base);
@@ -360,7 +353,6 @@ void funcion_kernel(int socket){
 //					sem_post(&mutexOpera);
 //					break;
 //				}
-
 				destruir_segmentos(*pid);
 				sem_post(&mutexOpera);
 				break;
@@ -468,10 +460,9 @@ int crear_agregar_segmento(int pidInt, int tamanio){
 		list_add(listaSeg, (void*)unElem);
 		dictionary_put(tablaPidSeg, pid, (void*)listaSeg);
 
-		if(dictionary_has_key(tablaPidSeg,pid))
-			log_info(logs,"Se agrego el segmento nro: %d del pid: %s",unElem->idSegmento,pid);
-		else
+		if(!dictionary_has_key(tablaPidSeg,pid))
 			log_error(logs,"El nuevo campo pid/lista no se agregó al diccionario");
+
 	}else if(dictionary_has_key(tablaPidSeg, pid)){
 		listaSeg = dictionary_get(tablaPidSeg,pid);
 		nroSeg = obtener_nuevo_nroSeg(listaSeg);
