@@ -22,13 +22,11 @@ registroPCB *pcb;
 t_config* config;
 t_dictionary* diccionarioDeVariables;
 int socketKernel, socketUMV;
-unsigned char* stack;
 int seguir;
-int* systemCall;
+int systemCall;
 int ejecutando;
 int tamanioStack;
 int llamoRetornar;
-int finalizo;
 
 AnSISOP_funciones functions;
 AnSISOP_kernel kernel_functions;

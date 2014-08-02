@@ -32,14 +32,30 @@ void inicializar_funciones_parser(){
 t_puntero definir_variable(t_nombre_variable identificador_variable){
 	t_puntero* posicion = malloc(sizeof(t_puntero));
 	*posicion = pcb->cursor_stack;
-	memcpy(stack + pcb->cursor_stack, &identificador_variable, 1);
-	pcb->cursor_stack += 5;
-	char variable[2];
-	variable[0] = identificador_variable;
-	variable[1] = '\0';
-	dictionary_put(diccionarioDeVariables, variable, posicion);
-	pcb->tamanio_contexto++;
-	log_info(logs, "La variable %c fue definida correctamente", identificador_variable);
+	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
+
+	etiq->base = pcb->segmento_stack;
+	etiq->offset = pcb->cursor_stack;
+	etiq->tamanio = 1;
+	tam->menu = ESCRIBIR_SEGMENTO;
+	tam->length = sizeof(t_etiqueta);
+
+	enviarDatos(socketUMV, tam, etiq, logs);
+	enviarDatos(socketUMV, tam, &identificador_variable, logs);
+	//recibirMenu(socketUMV, tam, logs);
+	if (tam->menu != SEG_FAULT){
+		pcb->cursor_stack += 5;
+		char variable[2];
+		variable[0] = identificador_variable;
+		variable[1] = '\0';
+		dictionary_put(diccionarioDeVariables, variable, posicion);
+		pcb->tamanio_contexto++;
+		log_info(logs, "La variable %c fue definida correctamente", identificador_variable);
+	}else{
+		log_info(logs, "Se produjo segmentation fault definiendo la variable %c", identificador_variable);
+		tam->menu = SEG_FAULT;
+		systemCall = 1;
+	}
 	return *posicion;
 }
 
@@ -58,15 +74,31 @@ t_puntero obtener_posicion_variable(t_nombre_variable identificador_variable){
 
 /* Primitiva que obtiene el valor de una direccion especifica */
 t_valor_variable dereferenciar(t_puntero direccion_variable){
-	t_valor_variable valor;
-	memcpy(&valor, stack + direccion_variable + 1, 4);
-	log_info(logs, "El valor de la direccion %d es %d", direccion_variable, valor);
-	return valor;
+	t_valor_variable* valor;
+	tam->menu = LEER_SEGMENTO;
+	tam->length = sizeof(t_etiqueta);
+	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
+	etiq->base = pcb->segmento_stack;
+	etiq->offset = direccion_variable + 1;
+	etiq->tamanio = 4;
+
+	enviarDatos(socketUMV, tam, etiq, logs);
+	recibirDatos(socketUMV, tam, (void*)&valor, logs);
+	log_info(logs, "El valor de la direccion %d es %d", direccion_variable, *valor);
+	return *valor;
 }
 
 /* Primitiva que asigna el valor de una variable, almacenandola en el stack */
 void asignar(t_puntero direccion_variable, t_valor_variable valor ){
-	memcpy(stack + direccion_variable + 1, &valor, 4);
+	tam->menu = ESCRIBIR_SEGMENTO;
+	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
+	etiq->base = pcb->segmento_stack;
+	etiq->offset = direccion_variable + 1;
+	etiq->tamanio = 4;
+	tam->length = sizeof(t_etiqueta);
+	enviarDatos(socketUMV, tam, etiq, logs);
+	tam->length = sizeof(t_valor_variable);
+	enviarDatos(socketUMV, tam, &valor, logs);
 	log_info(logs, "El valor %d fue asignado a la variable en la posicion %d", valor, direccion_variable);
 }
 
@@ -130,46 +162,95 @@ void ir_al_label(t_nombre_etiqueta etiqueta){
 }
 
 /* Primitiva que se invoca en los procedimientos, cambia el contexto de ejecucion a una etiqueta dada */
-void llamar_sin_retorno(t_nombre_etiqueta etiqueta){;
+void llamar_sin_retorno(t_nombre_etiqueta etiqueta){
 	pcb->cursor_anterior = pcb->cursor_stack  - pcb->tamanio_contexto * 5;
-	memcpy(stack + pcb->cursor_stack, &pcb->cursor_anterior, 4);
-	pcb->cursor_stack += 4;
+	tam->menu = ESCRIBIR_SEGMENTO;
+
+	unsigned char* stack = malloc(8);
+	memcpy(stack, &pcb->cursor_anterior, 4);
 	int pc = pcb->program_counter+1;
-	memcpy(stack + pcb->cursor_stack, &pc, 4);
-	pcb->cursor_stack += 4;
-	log_info(logs, "Se llamo a la funcion llamarSinRetorno con la etiqueta %s", etiqueta);
-	ir_al_label(etiqueta);
-	pcb->tamanio_contexto = 0;
+	memcpy(stack + 4, &pc, 4);
+
+	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
+	etiq->base = pcb->segmento_stack;
+	etiq->offset = pcb->cursor_stack;
+	etiq->tamanio = 8;
+	tam->length = sizeof(t_etiqueta);
+	enviarDatos(socketUMV, tam, etiq, logs);
+	tam->length = 8;
+	enviarDatos(socketUMV, tam, stack, logs);
+	//recibirMenu(socketUMV, tam, logs);
+	if (tam->menu != SEG_FAULT){
+		log_info(logs, "Se llamo a la funcion llamarSinRetorno con la etiqueta %s", etiqueta);
+		ir_al_label(etiqueta);
+		pcb->cursor_stack += 8;
+		pcb->tamanio_contexto = 0;
+	}else{
+		log_info(logs, "Se produjo segmentation fault llamando a llamar sin retorno con la etiqueta %s", etiqueta);
+		tam->menu = SEG_FAULT;
+		systemCall = 1;
+	}
+
+	free(stack);
 	vaciarDiccionario();
 }
 
 /* Primitiva que se invoca en las funciones, recibe la direccion donde retornar el valor y la etiqueta a la cual tiene que ir */
 void llamar_con_retorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar){
 	llamar_sin_retorno(etiqueta);
-	memcpy(stack + pcb->cursor_stack, &donde_retornar, 4);
-	pcb->cursor_stack += 4;
-	log_info(logs, "Se llamo a la funcion llamarConRetorno con la etiqueta %s y puntero %d", etiqueta, donde_retornar);
+	unsigned char* stack = malloc(4);
+	memcpy(stack, &donde_retornar, 4);
+	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
+	tam->menu = ESCRIBIR_SEGMENTO;
+	etiq->base = pcb->segmento_stack;
+	etiq->offset = pcb->cursor_stack;
+	etiq->tamanio = 4;
+	tam->length = sizeof(t_etiqueta);
+	enviarDatos(socketUMV, tam, etiq, logs);
+	tam->length = 4;
+	enviarDatos(socketUMV, tam, stack, logs);
+	//recibirMenu(socketUMV, tam, logs);
+	if (tam->menu != SEG_FAULT){
+		pcb->cursor_stack += 4;
+		log_info(logs, "Se llamo a la funcion llamarConRetorno con la etiqueta %s y puntero %d", etiqueta, donde_retornar);
+	}else{
+		log_info(logs, "Se produjo segmentation fault llamando a llamar sin retorno con la etiqueta %s", etiqueta);
+		tam->menu = SEG_FAULT;
+		systemCall = 1;
+	}
+	free(stack);
 }
 
 /* Primitiva que finaliza el contexto actual */
 void finalizar(){
 	if (pcb->tamanio_contexto * 5 == pcb->cursor_stack){
-		finalizo = 1;
 		tam->menu = FINALIZAR;
 		log_info(logs, "Finalizando el programa");
-		*systemCall = true;
+		systemCall = 1;
 	}else{
 		if (!llamoRetornar)
 			pcb->cursor_stack -= pcb->tamanio_contexto * 5;
 
 		llamoRetornar = 0;
-		pcb->cursor_stack -= 4;
-		memcpy(&pcb->program_counter, stack + pcb->cursor_stack, 4);
-		pcb->cursor_stack -= 4;
-		memcpy(&pcb->cursor_anterior, stack + pcb->cursor_stack, 4);
+		unsigned char* stack = malloc(8);
+		pcb->cursor_stack -= 8;
+		t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
+		etiq->base = pcb->segmento_stack;
+		etiq->offset = pcb->cursor_stack;
+		etiq->tamanio = 8;
+		tam->menu = LEER_SEGMENTO;
+		tam->length = sizeof(t_etiqueta);
+
+		enviarDatos(socketUMV, tam, etiq, logs);
+		recibirDatos(socketUMV, tam, (void*)&stack, logs);
+
+		memcpy(&pcb->cursor_anterior, stack, 4);
+		memcpy(&pcb->program_counter, stack + 4, 4);
+
 		log_info(logs, "Finalizando el contexto actual");
 		pcb->tamanio_contexto = (pcb->cursor_stack - pcb->cursor_anterior) / 5;
 		pcb->cursor_stack = pcb->cursor_anterior;
+		free(stack);
 		cargar_diccionario();
 	}
 }
@@ -179,9 +260,21 @@ void retornar(t_valor_variable retorno){
 	pcb->cursor_stack -= pcb->tamanio_contexto * 5;
 	llamoRetornar = 1;
 	t_puntero* posicion = malloc(sizeof(t_puntero));
+	unsigned char* stack = malloc(4);
 	pcb->cursor_stack -= 4;
-	memcpy(posicion, stack + pcb->cursor_stack, 4);
+	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
+	etiq->base = pcb->segmento_stack;
+	etiq->offset = pcb->cursor_stack;
+	etiq->tamanio = 4;
+	tam->menu = LEER_SEGMENTO;
+	tam->length = sizeof(t_etiqueta);
+
+	enviarDatos(socketUMV, tam, etiq, logs);
+	recibirDatos(socketUMV, tam, (void*)&stack, logs);
+
+	memcpy(posicion, stack, 4);
 	asignar(*posicion, retorno);
+	free(stack);
 	finalizar();
 	log_info(logs, "Se llamo a la funcion retornar");
 }
@@ -222,7 +315,6 @@ void imprimir_texto(char* texto){
 
 /* Primitiva que le dice al kernel que fue a entrada y salida con un dispositivo por un determinado tiempo */
 void entrada_salida(t_nombre_dispositivo dispositivo, int tiempo){
-	retorno_de_stack();
 	tam->menu = ENTRADA_SALIDA;
 	tam->length = sizeof(int);
 	if (!enviarDatos(socketKernel, tam, &tiempo, logs))
@@ -232,7 +324,7 @@ void entrada_salida(t_nombre_dispositivo dispositivo, int tiempo){
 		log_error(logs, "Se produjo un error enviando el nombre del dispositivo de entrada y salida al kernel");
 
 	log_info(logs, "El dispositivo %s fue a E/S con %d tiempos", dispositivo, tiempo);
-	*systemCall = true;
+	systemCall = 1;
 }
 
 /* Primitiva que envia la senial wait de un semaforo al kernel */
@@ -243,10 +335,12 @@ void wait(t_nombre_semaforo identificador_semaforo){
 	if (!enviarDatos(socketKernel, tam, identificador_semaforo, logs))
 		log_error(logs, "Se produjo un error enviando la senial de wait al semaforo %s", identificador_semaforo);
 
-	if (!recibirDatos(socketKernel, tam, (void*)&systemCall, logs))
+	int* sysCall;
+	if (!recibirDatos(socketKernel, tam, (void*)&sysCall, logs))
 		log_error(logs, "Se produjo un error recibiendo el resultado del wait a un semaforo");
 
-	if (*systemCall)
+	systemCall = *sysCall;
+	if (systemCall)
 		log_debug(logs, "El semaforo se bloqueo");
 
 }

@@ -55,10 +55,8 @@ int main(int argc, char** argv){
 	signal(SIGUSR1, manejar_senial);
 	pcb = malloc(sizeof(registroPCB));
 
-	systemCall = malloc(sizeof(bool));
 	while (seguir){
 		int cont = 0;
-		finalizo = 0;
 		ejecutando = 0;
 		log_debug(logs, "Recibiendo un PCB...");
 		tam->menu = PEDIR_PCB;
@@ -83,12 +81,11 @@ int main(int argc, char** argv){
 		if(!enviarDatos(socketUMV, tam, &pcb->pid, logs))
 			log_error(logs, "Se produjo un error enviando el pid a la UMV");
 
-		pedir_stack();
 		cargar_diccionario();
 
-		*systemCall = false;
+		systemCall = 0;
 
-		while (quantum > cont && !(*systemCall)){
+		while (quantum > cont && !systemCall){
 			pc = pcb->program_counter;
 
 			char* sentencia = recibir_sentencia();
@@ -101,16 +98,12 @@ int main(int argc, char** argv){
 			sleep(retardo/1000);
 		}
 
-		if (!(*systemCall))
+		if (!systemCall)
 			tam->menu = CONCLUYO_UN_QUANTUM;
 
 		tam->length = sizeof(registroPCB);
 		if (!enviarDatos(socketKernel, tam, pcb, logs))
 			log_error(logs, "Se produjo un error al notificar al pcp que concluyo un quantum.");
-		if (!finalizo)
-			retorno_de_stack();
-
-		free(stack);
 
 		vaciarDiccionario();
 		if (!seguir){

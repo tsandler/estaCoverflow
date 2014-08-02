@@ -73,63 +73,41 @@ int recibir(int dato){
 void cargar_diccionario(){
 	t_nombre_variable variable;
 	int inicial;
-	if (pcb->cursor_stack != pcb->cursor_anterior)
-		inicial = pcb->cursor_stack - 5 * pcb->tamanio_contexto;
-	else{
-		inicial = pcb->cursor_stack;
-		pcb->cursor_stack += 5 * pcb->tamanio_contexto;
+	if (pcb->tamanio_contexto > 0){
+		if (pcb->cursor_stack != pcb->cursor_anterior)
+			inicial = pcb->cursor_stack - 5 * pcb->tamanio_contexto;
+		else{
+			inicial = pcb->cursor_stack;
+			pcb->cursor_stack += 5 * pcb->tamanio_contexto;
+		}
+		int i, cont = 0;
+		t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
+		etiq->base = pcb->segmento_stack;
+		etiq->offset = inicial;
+		etiq->tamanio = pcb->tamanio_contexto * 5;
+		tam->menu = LEER_SEGMENTO;
+		tam->length = sizeof(t_etiqueta);
+		enviarDatos(socketUMV, tam, etiq, logs);
+
+		unsigned char* stack;
+		recibirDatos(socketUMV, tam, (void*)&stack, logs);
+
+		for (i=0; i < pcb->tamanio_contexto; i++){
+			int aux = inicial + i*5;
+			int* pos = malloc(sizeof(int));
+			memcpy(pos, &aux, 4);
+			memcpy(&variable, stack + (i*5), 1);
+			char var[2];
+			var[0] = variable;
+			var[1] = '\0';
+			dictionary_put(diccionarioDeVariables, var, pos);
+			cont++;
+		}
+		free(stack);
 	}
-	int i, cont = 0;
-	for (i=0; i < pcb->tamanio_contexto; i++){
-		int aux = inicial + (i*5);
-		int* pos = malloc(sizeof(int));
-		memcpy(pos, &aux, 4);
-		memcpy(&variable, stack + aux, 1);
-		char var[2];
-		var[0] = variable;
-		var[1] = '\0';
-		dictionary_put(diccionarioDeVariables, var, pos);
-		cont++;
-	}
-	//pcb->cursor_stack =  cont * 5;
 	log_info(logs, "Se cargo el diccionario de variables");
 }
 
-/* Funcion que le pide el stack a la UMV */
-void pedir_stack(){
-	t_etiqueta* et = malloc(sizeof(t_etiqueta));
-	et->base = pcb->segmento_stack;
-	et->offset = 0;
-	et->tamanio = tamanioStack;
-	tam->length = sizeof(t_etiqueta);
-	tam->menu = LEER_SEGMENTO;
-
-	if(!enviarDatos(socketUMV, tam, et, logs))
-		log_error(logs, "Se produjo un error enviando la base a la UMV");
-
-	if (!recibirDatos(socketUMV, tam, (void*)&stack, logs))
-		log_error(logs, "Se produjo un error recibiendo el stack");
-
-}
-
-void retorno_de_stack(){
-	t_etiqueta* etiq = malloc(sizeof(t_etiqueta));
-	tam->menu = ESCRIBIR_SEGMENTO;
-	tam->length = sizeof(t_etiqueta);
-
-	etiq->base = pcb->segmento_stack;
-	etiq->offset = 0;
-	etiq->tamanio = tamanioStack;
-
-	if(!enviarDatos(socketUMV, tam, etiq, logs))
-		log_error(logs, "Se produjo un error al devolverle la etiqueta del stack a la umv");
-
-	tam->length = tamanioStack;
-
-	if(!enviarDatos(socketUMV, tam, stack, logs))
-		log_error(logs, "Se produjo un error al devolverle el stack a la umv");
-
-}
 /* Funcion que verifica que sea un archivo de configuracion valido */
 int archivo_de_configuracion_valido(){
 	if (!config_has_property(config, "IP_KERNEL"))
@@ -214,7 +192,6 @@ static char* _depurar_sentencia(char* sentencia, int tamanio){
 void liberar_estructuras(){
 	free(pcb);
 	free(tam);
-	free(stack);
 	dictionary_destroy(diccionarioDeVariables);
 	config_destroy(config);
 	log_destroy(logs);
