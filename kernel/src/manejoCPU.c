@@ -237,7 +237,7 @@ void manejoCPU(int fd) {
 			fdMal = string_from_format("%d", fd);
 			dictionary_remove(pcbCPU, fdMal);
 			log_info(logs, "Se coloco en la cola Ready el proceso %i", pcb->pid);
-			log_debug(logss, "El FD del cpu es %d", fd);
+
 		}else{
 			fdMal = string_from_format("%d", fd);
 			dictionary_remove(pcbCPU, fdMal);
