@@ -55,6 +55,10 @@ char* recibir_sentencia(){
 				tam->menu = SIGNAL;
 				enviarMenu(socketKernel, tam, logs);
 				break;
+			case SEG_FAULT:
+				tam->menu = FINALIZAR;
+				printf("Se produjo un segmentation fault");
+				break;
 			case ERROR:
 				tam->menu = FINALIZAR;
 				printf("El programa tuvo que finalizar insatisfactoriamente");
@@ -67,7 +71,7 @@ char* recibir_sentencia(){
 		log_error(logs, "Se produjo un error recibiendo la sentencia");
 		tam->menu = FINALIZAR;
 	}
-	return "hola";
+	return "ok";
 }
 
 /* Funcion que se conecta al kernel y devuelve el socket al que conecto */

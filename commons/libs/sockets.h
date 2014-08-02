@@ -54,6 +54,7 @@ typedef enum{
 	LEER_SEGMENTO,
 	OK,
 	ERROR,
+	SEG_FAULT,
 }t_menu;
 
 typedef struct t_length{

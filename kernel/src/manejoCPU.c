@@ -258,6 +258,7 @@ void manejoCPU(int fd) {
 			int* fdTemporal = dictionary_get(fileDescriptors, pidR);
 			enviarMenu(*fdTemporal, tam, logs); //aviso al programa q finalizo.
 		}
+		muestraNombres(EXIT, "Cola EXIT");
 		dictionary_remove(fileDescriptors, pidR);
 		log_info(logs, "El programa ha finalizado");
 		sem_post(&mutexFinalizar);
@@ -293,15 +294,16 @@ void manejoCPU(int fd) {
 		int ret = 1;
 		pthread_exit(&ret);
 		case SEG_FAULT:
+			recibirDato(fd, tam->length, (void*) &PCBrecibido, logs);
 			fdMal = string_from_format("%d", fd);
 			if (dictionary_has_key(pcbCPU, fdMal)) {
 				dictionary_remove(pcbCPU, fdMal);
-				eliminarSegmentoUMV(socket_UMV, logs, ULTIMOPCB);
+				eliminarSegmentoUMV(socket_UMV, logs, PCBrecibido);
 				sem_post(&gradoProg);
 
-				ponerCola(ULTIMOPCB, EXIT, &mutexEXIT, &hayAlgoEnExit);
+				ponerCola(PCBrecibido, EXIT, &mutexEXIT, &hayAlgoEnExit);
 
-				char* p2 = string_from_format("%d", ULTIMOPCB->pid);
+				char* p2 = string_from_format("%d", PCBrecibido->pid);
 				int* fd2 = dictionary_get(fileDescriptors, p2);
 				tam->menu = SEG_FAULT;
 				enviarMenu(*fd2, tam, logs);
