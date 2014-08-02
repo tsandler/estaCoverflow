@@ -53,18 +53,12 @@ int recibir(int dato){
 			break;
 		case 2:
 			if(!recibirDatos(socketKernel, tam, (void*)&valor, logs)){
-				log_error(logs, "Se produjo un error al recibir el tamanio del stack");
-				*valor = -1;
-			}else
-				log_info(logs, "Se recibio el tamanio del stack de %d", *valor);
-			break;
-		case 3:
-			if(!recibirDatos(socketKernel, tam, (void*)&valor, logs)){
 				log_error(logs, "Se produjo un error al recibir el quantum del kernel");
 				*valor = -1;
 			}else
 				log_info(logs, "Se recibio el retardo %d", *valor);
 			break;
+
 	}
 	return *valor;
 }

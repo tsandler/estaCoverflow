@@ -42,7 +42,7 @@ t_puntero definir_variable(t_nombre_variable identificador_variable){
 
 	enviarDatos(socketUMV, tam, etiq, logs);
 	enviarDatos(socketUMV, tam, &identificador_variable, logs);
-	//recibirMenu(socketUMV, tam, logs);
+	recibirMenu(socketUMV, tam, logs);
 	if (tam->menu != SEG_FAULT){
 		pcb->cursor_stack += 5;
 		char variable[2];
@@ -99,6 +99,7 @@ void asignar(t_puntero direccion_variable, t_valor_variable valor ){
 	enviarDatos(socketUMV, tam, etiq, logs);
 	tam->length = sizeof(t_valor_variable);
 	enviarDatos(socketUMV, tam, &valor, logs);
+	recibirMenu(socketUMV, tam, logs);
 	log_info(logs, "El valor %d fue asignado a la variable en la posicion %d", valor, direccion_variable);
 }
 
@@ -179,7 +180,7 @@ void llamar_sin_retorno(t_nombre_etiqueta etiqueta){
 	enviarDatos(socketUMV, tam, etiq, logs);
 	tam->length = 8;
 	enviarDatos(socketUMV, tam, stack, logs);
-	//recibirMenu(socketUMV, tam, logs);
+	recibirMenu(socketUMV, tam, logs);
 	if (tam->menu != SEG_FAULT){
 		log_info(logs, "Se llamo a la funcion llamarSinRetorno con la etiqueta %s", etiqueta);
 		ir_al_label(etiqueta);
@@ -209,7 +210,7 @@ void llamar_con_retorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar){
 	enviarDatos(socketUMV, tam, etiq, logs);
 	tam->length = 4;
 	enviarDatos(socketUMV, tam, stack, logs);
-	//recibirMenu(socketUMV, tam, logs);
+	recibirMenu(socketUMV, tam, logs);
 	if (tam->menu != SEG_FAULT){
 		pcb->cursor_stack += 4;
 		log_info(logs, "Se llamo a la funcion llamarConRetorno con la etiqueta %s y puntero %d", etiqueta, donde_retornar);

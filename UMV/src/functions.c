@@ -173,14 +173,14 @@ void funcion_CPU(int socket){
 
 				if(haySegFault == -1){ //FIXME
 					tam->menu= SEG_FAULT;
-
 					enviarMenu(socket,tam,logs);
-					sem_post(&mutexOpera);
-					break;
+					log_debug(logs,"[HILO CPU] El CPU: %d Escribio el segmento nro: %d",socket,nroSegmento);
+				}else{
+					tam->menu= OK;
+					enviarMenu(socket,tam,logs);
 				}
-
 				nroSegmento++;
-				log_debug(logs,"[HILO CPU] El CPU: %d Escribio el segmento nro: %d",socket,nroSegmento);
+
 				sem_post(&mutexOpera);
 				break;
 
@@ -605,7 +605,7 @@ unsigned char *leer_segmento(int dirLog, int tamanioALeer, int offset, int pidAc
 				memcpy(destino,desde,tamanioALeer);
 				return destino;
 			}else
-				log_error(logs,"se esta tratando de acceder fuera de los rangos del segmento-segmentation fault-");
+				log_error(logs,"se esta tratando de leer fuera de los rangos del segmento-segmentation fault-");
 		}else
 			log_error(logs,"se intento acceder a una base inexistente");
 	}
@@ -644,7 +644,7 @@ int escribir_segmento(int dirLog, int tamanioAEscribir, int offset, char* buffer
 }
 
 void retardo(){
-	if(!retardoActual)
+	if(retardoActual)
 		sleep(retardoActual/1000);
 }
 

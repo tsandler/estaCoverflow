@@ -42,8 +42,7 @@ int main(int argc, char** argv){
 	enviarMenu(socketUMV, tam, logs);
 
 	int quantum = recibir(1);
-	tamanioStack = recibir(2);
-	int retardo = recibir(3);
+	int retardo = recibir(2);
 
 	inicializar_funciones_parser();
 	diccionarioDeVariables = dictionary_create();
@@ -95,7 +94,7 @@ int main(int argc, char** argv){
 				pcb->program_counter++;
 			cont++;
 			log_debug(logs, "Concluyo el quantum %d\n\n\n", cont);
-			sleep(retardo/1000);
+			//sleep(retardo/1000);
 		}
 
 		if (!systemCall)

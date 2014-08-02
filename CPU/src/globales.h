@@ -25,7 +25,6 @@ int socketKernel, socketUMV;
 int seguir;
 int systemCall;
 int ejecutando;
-int tamanioStack;
 int llamoRetornar;
 
 AnSISOP_funciones functions;

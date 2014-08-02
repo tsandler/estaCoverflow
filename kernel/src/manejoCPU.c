@@ -74,9 +74,7 @@ void manejoCPU(int fd) {
 	registroPCB* PCBPOP = malloc(sizeof(registroPCB));
 	registroPCB* ULTIMOPCB = malloc(sizeof(registroPCB));
 	tam->length = sizeof(int);
-	int stack = config_get_int_value(config, "TAMANIO_STACK");
 	enviarDatos(fd, tam, &quantum, logs);
-	enviarDatos(fd, tam, &stack, logs);
 	enviarDatos(fd, tam, &retardo, logs);
 
 	t_log* logss = log_create("logggg", "Cpu", 1, LOG_LEVEL_TRACE);
@@ -294,6 +292,24 @@ void manejoCPU(int fd) {
 		log_error(logs, "Se cierra la CPU.");
 		int ret = 1;
 		pthread_exit(&ret);
+		case SEG_FAULT:
+			fdMal = string_from_format("%d", fd);
+			if (dictionary_has_key(pcbCPU, fdMal)) {
+				dictionary_remove(pcbCPU, fdMal);
+				eliminarSegmentoUMV(socket_UMV, logs, ULTIMOPCB);
+				sem_post(&gradoProg);
+
+				ponerCola(ULTIMOPCB, EXIT, &mutexEXIT, &hayAlgoEnExit);
+
+				char* p2 = string_from_format("%d", ULTIMOPCB->pid);
+				int* fd2 = dictionary_get(fileDescriptors, p2);
+				tam->menu = SEG_FAULT;
+				enviarMenu(*fd2, tam, logs);
+				log_error(logs,
+						"Se interrumpio el proceso con el PID: %d debido a que hubo segmentation fault",
+						ULTIMOPCB->pid);
+			}
+			break;
 		default:
 		fdMal = string_from_format("%d", fd);
 		if (dictionary_has_key(pcbCPU, fdMal)) {
