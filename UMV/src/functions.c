@@ -355,9 +355,13 @@ void funcion_kernel(int socket){
 					log_error(logs, "Se produjo un error recibiendo el pid");
 					break;
 				}
-				if(!destruir_segmentos(*pid)){
-					break;
-				}
+
+//				if(!destruir_segmentos(*pid)){
+//					sem_post(&mutexOpera);
+//					break;
+//				}
+
+				destruir_segmentos(*pid);
 				sem_post(&mutexOpera);
 				break;
 			case OK:
