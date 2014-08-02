@@ -52,7 +52,6 @@ int main(int argc, char** argv){
 	seguir = 1;
 
 	signal(SIGUSR1, manejar_senial);
-	pcb = malloc(sizeof(registroPCB));
 
 	while (seguir){
 		int cont = 0;
@@ -104,6 +103,7 @@ int main(int argc, char** argv){
 		if (!enviarDatos(socketKernel, tam, pcb, logs))
 			log_error(logs, "Se produjo un error al notificar al pcp que concluyo un quantum.");
 
+		free(pcb);
 		vaciarDiccionario();
 		if (!seguir){
 			tam->menu = ERROR;

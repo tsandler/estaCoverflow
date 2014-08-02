@@ -161,7 +161,6 @@ static char* _depurar_sentencia(char* sentencia, int tamanio){
 
 /* Funcion que libera las estructuras usadas */
 void liberar_estructuras(){
-	free(pcb);
 	free(tam);
 	dictionary_destroy(diccionarioDeVariables);
 	config_destroy(config);
