@@ -94,7 +94,7 @@ int main(int argc, char** argv){
 				pcb->program_counter++;
 			cont++;
 			log_debug(logs, "Concluyo el quantum %d\n\n\n", cont);
-			//sleep(retardo/1000);
+			sleep(retardo/1000);
 		}
 
 		if (!systemCall)

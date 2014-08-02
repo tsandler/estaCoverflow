@@ -41,12 +41,14 @@ int programa_valido(registroPCB* pcb) {
 	int* fd2 = dictionary_get(fileDescriptors, p2);
 	t_length* aux = malloc(sizeof(t_length));
 	aux->menu = OK;
-	aux->length=sizeof(int);
+
 	enviarMenu(*fd2, aux, logs);
 	recibirMenu(*fd2, aux, logs);
 	if (aux->menu != OK) {
+		free(aux);
 		return 1;
 	}
+	free(aux);
 	return 0;
 }
 void manejoCPU(int fd) {

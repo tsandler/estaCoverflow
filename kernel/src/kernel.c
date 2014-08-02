@@ -103,7 +103,7 @@ int main(int argc, char **argv) {
 	logs = log_create("log_Principal", "kernel.c", 1, LOG_LEVEL_TRACE); //LOG
 
 	log_info(logs, "Conectandose con la UMV...");
-	conectarseUMV();
+	socket_UMV=conectarseUMV();
 
 ///////////////////////////77
 

@@ -55,6 +55,7 @@ typedef enum{
 	OK,
 	ERROR,
 	SEG_FAULT,
+	MEMORY_OVERLOAD,
 }t_menu;
 
 typedef struct t_length{

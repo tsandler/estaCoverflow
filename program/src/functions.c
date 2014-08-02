@@ -59,6 +59,10 @@ char* recibir_sentencia(){
 				tam->menu = FINALIZAR;
 				printf("Se produjo un segmentation fault");
 				break;
+			case MEMORY_OVERLOAD:
+				tam->menu = FINALIZAR;
+				printf("Se produjo un overload solicitando la creacion de los segmentos");
+				break;
 			case ERROR:
 				tam->menu = FINALIZAR;
 				printf("El programa tuvo que finalizar insatisfactoriamente");

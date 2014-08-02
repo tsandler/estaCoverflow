@@ -342,6 +342,7 @@ void funcion_kernel(int socket){
 				}
 
 				int baseLog = crear_agregar_segmento(pidTam->pid,pidTam->tamanio);
+
 				tam->length = sizeof(int);
 				enviarDatos(socket, tam, &baseLog, logs);
 				sem_post(&mutexOpera);
@@ -454,6 +455,9 @@ int crear_agregar_segmento(int pidInt, int tamanio){
 	unElem->tamanioSegmento= tamanio;
 	unElem->dirLogica= obtener_proxima_dir_logica(tamanio,pid);
 	unElem->dirFisica = obtener_proxima_dirFisica(tamanio);
+	if( string_equals_ignore_case(unElem->dirFisica,"-1") ){ //FIXME
+		return -1;
+	}
 	if(dictionary_is_empty(tablaPidSeg) || !(dictionary_has_key(tablaPidSeg, pid))){
 		unElem->idSegmento=1;
 		listaSeg = list_create();
@@ -553,7 +557,6 @@ char *first_fit(int tamanio){ //
 		unElem = list_remove_by_condition(listaHuecos,(void*)filtra_por_tamanio);
 		if(!unElem){
 			log_error(logs,"Memory overload");
-			printf("Memory overload");
 			return string_itoa(-1);
 		}
 	}

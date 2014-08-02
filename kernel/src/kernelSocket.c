@@ -7,6 +7,8 @@
 
 #include "kernelSocket.h"
 #include <commons/string.h>
+#include "funcionesPCB.h"
+
 
 #define BROKEN "BROKEN"
 #define GREAT "GREAT"
@@ -16,6 +18,7 @@ extern t_queue *NEW;
 extern sem_t mutexNEW;
 extern sem_t hayAlgo;
 extern t_log*logs;
+extern int socket_UMV;
 
 int openSocketServerPLP(int PORT) {
 
@@ -93,10 +96,17 @@ int openSocketServerPLP(int PORT) {
 				log_info(logs,"%s \n",buf);
 				registroPCB* unPCB = malloc(sizeof(registroPCB));
 				unPCB = armarPCB(buf,newfd);
+				if(unPCB->peso==-1){
+					eliminarSegmentoUMV(socket_UMV,logs,unPCB);
+					tam->menu=MEMORY_OVERLOAD;
+					enviarMenu(newfd,tam,logs);
+					log_info(logs,"La UMV se quedo sin memoria");
+				}else {
 
 				ponerCola(unPCB,NEW,&mutexNEW, &hayAlgo);
 				muestraNombres(NEW,"NEW");
 				log_info(logs,"Se coloco en la cola NEW el programa %i",unPCB->pid);
+				}
 
 
 
