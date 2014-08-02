@@ -65,7 +65,7 @@ char* retornarBufferPedido(char **operacion,char *cadena,int tamAEscr){
 		tamACortar = tamACortar + strlen(operacion[i] );
 		log_info(logs,"%s",operacion[i]);
 	}
-	tamACortar = tamACortar + 7;
+	tamACortar = tamACortar + 6;
 
 	memcpy(buffer,string_substring_from(cadena,tamACortar),tamAEscr);
 	return buffer;
@@ -80,12 +80,15 @@ char *almacenarBytesPorConsola(char **operacion,char *cadena) {
 	escribir_segmento(base, tamSeg, offset, buffer, pid);
 
 	if (cadenasIguales(operacion[2], "archivo")) {
-		txt_write_in_file(resultadoConsola, "Se almaceno correctamente el buffer: \n");
+		char* mje = string_from_format("Se almaceno: %s  en el espacio de memoria del proceso %d \n",buffer,pid);
+		txt_write_in_file(resultadoConsola,mje);
 		txt_write_in_file(resultadoConsola,buffer);
 		txt_write_in_file(resultadoConsola,"\n==================================================\n");
+		free(mje);
 	}
-
-	return string_from_format("Se almaceno correctamente \n");
+	printf("Se escrbio en la posicion de memoria solicitada el siguiente contenido\n %s \n", buffer);
+//FIXME
+	return string_from_format("Se almaceno: %s  en el espacio de memoria del proceso %d \n",buffer,pid);
 }
 
 
@@ -197,12 +200,13 @@ int consola(void) {
 
 			if (cadenasIguales(comandoS,"almacenarBytes")) {
 				if (cantidadDeArgumentosNoValida(cantEspacios,7)){
+					ingresoAOperacion=0;
 					sem_post(&mutexOpera);
 					break;
 				}
 				publicacion = almacenarBytesPorConsola(operacion,cadenaSinEspacios);
-				ingresoAOperacion=1;
-				printf("%s \n", publicacion);
+				sem_post(&mutexOpera);
+				ingresoAOperacion=0;
 				break;
 			}
 

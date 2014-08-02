@@ -738,11 +738,13 @@ void imprime_estado_mem_ppal(char* pid){
 
 void reporteContenidoMp(char **operacion){
 
+
 //	int offset = atoi(operacion[2]);
 //	int tam =  atoi(operacion[3]);
-//	int base = ramUMVInicial; FIXME: esto es una incoherencia :)
+//	int base = ramUMVInicial;
+//  char* publicacion = leer_segmento(,tam,offset,);
 
-	//FIXME: char* publicacion = leer_segmento(,tam,offset,);
+
 }
 
 /* Funcion que retorna el mayor idSegmento entre dos elementos */
