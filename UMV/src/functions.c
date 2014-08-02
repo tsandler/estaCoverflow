@@ -705,7 +705,7 @@ void imprime_campos_listahuecos(nodoHuecos *unElem){
 
 }
 
-void imprime_estructuras_memoria(char** operacion){
+void imprime_estructuras_memoria(char* pid){
 	void itera_diccionario(char* pid,t_list* listaSeg){
 		list_iterate(listaSeg, (void*)imprime_campos_listatablaSegUMV);
 	}
@@ -713,19 +713,21 @@ void imprime_estructuras_memoria(char** operacion){
 		txt_write_in_file(reporteEstructuras,"**Actualmente no hay segmentos en memoria**\n\n");
 	else{
 
-		if(operacion[2] == 0)
+		if( string_equals_ignore_case(pid,"0") )
 			dictionary_iterator(tablaPidSeg,(void*)itera_diccionario);
 		else{
-			int pid=atoi(operacion[2]);
-			t_list* listSeg = dictionary_remove(tablaPidSeg,string_itoa(pid));
-			list_iterate(listSeg,(void*)imprime_campos_listatablaSegUMV);
+			if(dictionary_has_key(tablaPidSeg,pid)){
+				t_list* listSeg = dictionary_get(tablaPidSeg,pid);
+				list_iterate(listSeg,(void*)imprime_campos_listatablaSegUMV);
+			}
 		}
+
 	}
 }
 
-void imprime_estado_mem_ppal(char** operacion){
+void imprime_estado_mem_ppal(char* pid){
 	txt_write_in_file(reporteEstructuras,"			---ESTRUCTURAS DE MEMORIA---\n\n");
-	imprime_estructuras_memoria(operacion);
+	imprime_estructuras_memoria(pid);
 	txt_write_in_file(reporteEstructuras,"\n			---BLOQUES LIBRES DE MEMORIA---\n");
 	imprime_listahuecos();
 }

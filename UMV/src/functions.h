@@ -45,9 +45,9 @@ void cambiarAlgoritmo(int cambioAlgoritmo);
 void imprime_listahuecos();
 void imprime_campos_listatablaSegUMV(tablaSegUMV *unElem);
 void imprime_campos_listahuecos(nodoHuecos *unElem);
-void imprime_estructuras_memoria();
+void imprime_estructuras_memoria(char* pid);
 void reporteContenidoMp(char **operacion);
-void imprime_estado_mem_ppal(char** operacion);
+void imprime_estado_mem_ppal(char* pid);
 
 bool archivo_config_valido();
 void inicializar_var_config();

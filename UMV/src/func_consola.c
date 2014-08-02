@@ -6,6 +6,7 @@
  */
 
 #include "func_consola.h"
+extern sem_t mutexOpera;
 
 
 int cadenaEntera(char s[]) {
@@ -164,114 +165,136 @@ int consola(void) {
 
 	switch(numeroComando){
 
-	case OPERACION:
+		case OPERACION:
+			sem_wait(&mutexOpera);
 
-		if (cantidadDeArgumentosNoValida(cantEspacios,1))
-			return 0;
-
-		comandoS = operacion[1];
-
-		if (cadenasIguales(comandoS,"crearSegmento")) {
-			if (cantidadDeArgumentos(cantEspacios,4))
+			if (cantidadDeArgumentosNoValida(cantEspacios,1))
 				return 0;
-			publicacion = crearSegmentoPorConsola(operacion);
-		}
 
-		if (cadenasIguales(comandoS, "destruirSegmento")) {
-			if (cantidadDeArgumentos(cantEspacios,3))
-				return 0;
-			publicacion = destruirSegmentosPorConsola(operacion);
-		}
+			comandoS = operacion[1];
 
-		if (cadenasIguales(comandoS,"almacenarBytes")) {
-			if (cantidadDeArgumentosNoValida(cantEspacios,7))
-				return 0;
-			publicacion = almacenarBytesPorConsola(operacion,cadenaSinEspacios);
-			printf("%s \n", publicacion);
-			break;
-		}
-
-		if (cadenasIguales(comandoS,"solicitarBytes")) {
-			if (cantidadDeArgumentos(cantEspacios,6))
-				return 0;
-			publicacion = solicitarBytesPorConsola(operacion);
-		}
-
-		printf("%s \n", publicacion);
-
-		if (cadenasIguales(operacion[2], "archivo")) {
-			txt_write_in_file(resultadoConsola, publicacion);
-			txt_write_in_file(resultadoConsola,"\n==================================================\n");
-		}
-
-		break;
-
-	case RETARDO:
-		if (cantidadDeArgumentos(cantEspacios,1))
-			return 0;
-		cambiar_retardo(atoi(operacion[1]));
-		printf("Se cambio el retardo exitosamente\n");
-
-		break;
-
-	case ALGORITMO:
-		if (cantidadDeArgumentos(cantEspacios,1))
-			return 0;
-		comandoS = operacion[1];
-		if (cadenasIguales(comandoS,"first-fit"))
-			cambiarAlgoritmo(0);
-
-		if (cadenasIguales(comandoS,"worst-fit"))
-			cambiarAlgoritmo(1);
-
-		if(!cadenasIguales(comandoS,"worst-fit") && !cadenasIguales(comandoS,"first-fit")){
-			printf("El algoritmo ingresado es incorrecto. Reintente\n");
-			break;
-		}
-
-		if(algoritmoActual)
-			printf("Se cambio el algoritmo de asignacion de memoria a: worst-fit\n");
-		else
-			printf("Se cambio el algoritmo de asignacion de memoria a: first-fit\n");
-
-		break;
-
-	case COMPACTAR:
-
-		compactar_memoria();
-		printf("Se compacto la memoria exitosamente\n");
-
-		break;
-
-	case DUMP:
-		if (cantidadDeArgumentosNoValida(cantEspacios,1))
-			return 0;
-
-		if (cadenasIguales(operacion[1], "tablaDeSegmentos")) {
-
-			imprime_estructuras_memoria();
-
-		} else {
-			if (cadenasIguales(operacion[1], "estructuraMp")) {
-
-				imprime_estado_mem_ppal(operacion);
-
-			} else {
-				if (cadenasIguales(operacion[1], "contenidoMp")) {
-					reporteContenidoMp(operacion);
-				} else {
-					printf("Comando no valido \n");
-				}
+			if (cadenasIguales(comandoS,"crearSegmento")) {
+				if (cantidadDeArgumentos(cantEspacios,4))
+					return 0;
+				publicacion = crearSegmentoPorConsola(operacion);
 			}
-		}
-		break;
 
-	case HELP:
-		printf("\n\t\t\t   ---COMANDOS---   \n operacion crearSegmento <archivo/consola> <id programa> <tamaño> \n operacion destruirSegmento <archivo/consola> <id programa>\n operacion solicitarBytes <archivo/consola> <id programa> <base> <offset> <tamaño>\n operacion almacenarBytes <archivo/consola> <base> <offset> <tamaño> <id programa> <buffer>\n\n retardo <milisegundos>\n\n algoritmo <firstFit/worstFit>\n\n compactacion \n\n dump tablaDeSegmentos <id programa/0>\n dump contenidoMp <offset> <tamaño>\n dump estructuraMp\n\n");
-		break;
+			if (cadenasIguales(comandoS, "destruirSegmento")) {
+				if (cantidadDeArgumentos(cantEspacios,3))
+					return 0;
+				publicacion = destruirSegmentosPorConsola(operacion);
+			}
 
-	default:
-		printf("\n No es un comando válido \n");
+			if (cadenasIguales(comandoS,"almacenarBytes")) {
+				if (cantidadDeArgumentosNoValida(cantEspacios,7))
+					return 0;
+				publicacion = almacenarBytesPorConsola(operacion,cadenaSinEspacios);
+				printf("%s \n", publicacion);
+				break;
+			}
+
+			if (cadenasIguales(comandoS,"solicitarBytes")) {
+				if (cantidadDeArgumentos(cantEspacios,6))
+					return 0;
+				publicacion = solicitarBytesPorConsola(operacion);
+			}
+
+			printf("%s \n", publicacion);
+
+			if (cadenasIguales(operacion[2], "archivo")) {
+				txt_write_in_file(resultadoConsola, publicacion);
+				txt_write_in_file(resultadoConsola,"\n==================================================\n");
+			}
+			sem_post(&mutexOpera);
+			break;
+
+		case RETARDO:
+			sem_wait(&mutexOpera);
+
+			if (cantidadDeArgumentos(cantEspacios,1))
+				printf("No se ingreso correctamente el nuevo valor de retardo\n");
+			else{
+				cambiar_retardo(atoi(operacion[1]));
+				printf("Se cambio el retardo exitosamente\n");
+			}
+			sem_post(&mutexOpera);
+			break;
+
+		case ALGORITMO:
+			sem_wait(&mutexOpera);
+
+			if (cantidadDeArgumentos(cantEspacios,1)){
+				printf("No se ingreso correctamente el nuevo algoritmo de asignacion de memoria. Reintente\n");
+				sem_post(&mutexOpera);
+				break;
+			}
+
+			comandoS = operacion[1];
+			if (cadenasIguales(comandoS,"first-fit"))
+				cambiarAlgoritmo(0);
+
+			if (cadenasIguales(comandoS,"worst-fit"))
+				cambiarAlgoritmo(1);
+
+			if(!cadenasIguales(comandoS,"worst-fit") && !cadenasIguales(comandoS,"first-fit")){
+				printf("El algoritmo ingresado es incorrecto. Reintente\n");
+				break;
+			}
+
+			if(algoritmoActual)
+				printf("Se cambio el algoritmo de asignacion de memoria a: worst-fit\n");
+			else
+				printf("Se cambio el algoritmo de asignacion de memoria a: first-fit\n");
+
+			sem_post(&mutexOpera);
+			break;
+
+		case COMPACTAR:
+			sem_wait(&mutexOpera);
+
+			compactar_memoria();
+			printf("Se compacto la memoria exitosamente\n");
+
+			sem_post(&mutexOpera);
+			break;
+
+		case DUMP:
+			sem_wait(&mutexOpera);
+
+			if (cantidadDeArgumentosNoValida(cantEspacios,1))
+				printf("No se han ingresado correctamente los argumentos. Reintente");
+			else{
+
+				if (cadenasIguales(operacion[1], "tablaDeSegmentos")) {
+
+					imprime_estructuras_memoria(operacion[2]);
+
+				}else{
+					if(cadenasIguales(operacion[1], "estructuraMp"))
+						imprime_estado_mem_ppal(operacion);
+					else{
+						if (cadenasIguales(operacion[1], "contenidoMp"))
+							reporteContenidoMp(operacion);
+						else
+							printf("Comando no valido \n");
+					}
+				}
+
+			}
+			sem_post(&mutexOpera);
+			break;
+
+		case HELP:
+			sem_wait(&mutexOpera);
+
+			printf("\n\t\t\t   ---COMANDOS---   \n operacion crearSegmento <archivo/consola> <id programa> <tamaño> \n operacion destruirSegmento <archivo/consola> <id programa>\n operacion solicitarBytes <archivo/consola> <id programa> <base> <offset> <tamaño>\n operacion almacenarBytes <archivo/consola> <base> <offset> <tamaño> <id programa> <buffer>\n\n retardo <milisegundos>\n\n algoritmo <firstFit/worstFit>\n\n compactacion \n\n dump tablaDeSegmentos <id programa/0>\n dump contenidoMp <offset> <tamaño>\n dump estructuraMp\n\n");
+
+			sem_post(&mutexOpera);
+			break;
+
+		default:
+			printf("\n No es un comando válido \n");
+			break;
 	}
 
 	free(comandoS);
