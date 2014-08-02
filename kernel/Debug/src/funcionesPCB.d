@@ -17,13 +17,13 @@ src/funcionesPCB.d: ../src/funcionesPCB.c \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/collections/node.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/collections/dictionary.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/log.h \
- ../src/planificador_corto_plazo.h ../src/kernelSocket.h \
+ ../src/kernelSocket.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/sockets.h \
  ../src/manejoCPU.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/config.h \
  ../src/colas.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/string.h \
- ../src/manejoSemaforos.h ../src/funcionesPCB.h
+ ../src/funcionesPCB.h
 
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/manejoDelPCB.h:
 
@@ -63,8 +63,6 @@ src/funcionesPCB.d: ../src/funcionesPCB.c \
 
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/log.h:
 
-../src/planificador_corto_plazo.h:
-
 ../src/kernelSocket.h:
 
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/sockets.h:
@@ -76,7 +74,5 @@ src/funcionesPCB.d: ../src/funcionesPCB.c \
 ../src/colas.h:
 
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/string.h:
-
-../src/manejoSemaforos.h:
 
 ../src/funcionesPCB.h:

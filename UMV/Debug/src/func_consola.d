@@ -1,4 +1,5 @@
-src/UMV.d: ../src/UMV.c ../src/functions.h ../src/globales.h \
+src/func_consola.d: ../src/func_consola.c ../src/func_consola.h \
+ ../src/functions.h ../src/globales.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/string.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/log.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/config.h \
@@ -11,8 +12,9 @@ src/UMV.d: ../src/UMV.c ../src/functions.h ../src/globales.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../commons/config.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../commons/log.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/collections/queue.h \
- /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/collections/list.h \
- ../src/func_consola.h
+ /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/collections/list.h
+
+../src/func_consola.h:
 
 ../src/functions.h:
 
@@ -43,5 +45,3 @@ src/UMV.d: ../src/UMV.c ../src/functions.h ../src/globales.h \
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/collections/queue.h:
 
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/collections/list.h:
-
-../src/func_consola.h:

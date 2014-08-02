@@ -5,16 +5,19 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../src/UMV.c \
+../src/func_consola.c \
 ../src/functions.c \
 ../src/testeo.c 
 
 OBJS += \
 ./src/UMV.o \
+./src/func_consola.o \
 ./src/functions.o \
 ./src/testeo.o 
 
 C_DEPS += \
 ./src/UMV.d \
+./src/func_consola.d \
 ./src/functions.d \
 ./src/testeo.d 
 

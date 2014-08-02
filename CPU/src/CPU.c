@@ -15,14 +15,14 @@
 int main(int argc, char** argv){
 
 	logs = log_create("log", "CPU.c", 1, LOG_LEVEL_TRACE);
-	/*if (argc < 2){
+	if (argc < 2){
 		log_error(logs, "No se pasaron parametros.");
 		log_destroy(logs);
 		return 0;
-	}*/
+	}
 
-//	config = config_create(argv[1]);
-	config=config_create("config");
+	config = config_create(argv[1]);
+
 	diccionarioDeVariables = dictionary_create();
 	tam = malloc(sizeof(t_length));
 	if (!archivo_de_configuracion_valido()){

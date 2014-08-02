@@ -55,28 +55,20 @@ char *solicitarBytesPorConsola(char **operacion) {
 	return publicacion;
 }
 
-char* retornarBufferPedido(char **operacion,char *cadena,int tamSeg){
-//	FIXME
-//	int i=0;
-//	int tamACortar=0;
-//	int max= sizeof(operacion)/sizeof(operacion[0]);
-////	cadena =  borrarEspaciosInnecesarios(cadena);
-//	for(i=0;i<=max;i++){
-//		string_length(operacion[i]);
-//
-//	}
-//	char* buffer=malloc(tamSeg);
-//	while(i<7){
-//		tamACortar =+ string_length(operacion[i]);
-//		i++;
-//	}
-//	tamACortar =+ 7;
-//
-//
-//
-//	memcpy(buffer,operacion[7],tamSeg);
-//	return buffer;
-	return NULL;
+char* retornarBufferPedido(char **operacion,char *cadena,int tamAEscr){
+
+	int i, tamACortar=0;
+	char* buffer=malloc(tamAEscr);
+
+	for(i=0;i<7;i++){
+//		char* aux = string_from_vformat("%s\0",operacion[i]);
+		tamACortar = tamACortar + strlen(operacion[i] );
+		log_info(logs,"%s",operacion[i]);
+	}
+	tamACortar = tamACortar + 7;
+
+	memcpy(buffer,string_substring_from(cadena,tamACortar),tamAEscr);
+	return buffer;
 }
 
 char *almacenarBytesPorConsola(char **operacion,char *cadena) {
@@ -154,6 +146,7 @@ void manejo_consola(){
 int consola(void) {
 	char* cadena = malloc(200);
 	int numeroComando = 0;
+	int ingresoAOperacion=0;
 
 	printf("\nIngresar comando:\n");
 	gets(cadena);
@@ -177,35 +170,55 @@ int consola(void) {
 		case OPERACION:
 			sem_wait(&mutexOpera);
 
-			if (cantidadDeArgumentosNoValida(cantEspacios,1))
-				return 0;
+			if (cantidadDeArgumentosNoValida(cantEspacios,1)){
+				sem_post(&mutexOpera);
+				break;
+			}
 
 			comandoS = operacion[1];
 
 			if (cadenasIguales(comandoS,"crearSegmento")) {
-				if (cantidadDeArgumentos(cantEspacios,4))
-					return 0;
+				if (cantidadDeArgumentos(cantEspacios,4)){
+					sem_post(&mutexOpera);
+					break;
+				}
 				publicacion = crearSegmentoPorConsola(operacion);
+				ingresoAOperacion=1;
 			}
 
 			if (cadenasIguales(comandoS, "destruirSegmento")) {
-				if (cantidadDeArgumentos(cantEspacios,3))
-					return 0;
+				if (cantidadDeArgumentos(cantEspacios,3)){
+					sem_post(&mutexOpera);
+					break;
+				}
 				publicacion = destruirSegmentosPorConsola(operacion);
+				ingresoAOperacion=1;
 			}
 
 			if (cadenasIguales(comandoS,"almacenarBytes")) {
-				if (cantidadDeArgumentosNoValida(cantEspacios,7))
-					return 0;
+				if (cantidadDeArgumentosNoValida(cantEspacios,7)){
+					sem_post(&mutexOpera);
+					break;
+				}
 				publicacion = almacenarBytesPorConsola(operacion,cadenaSinEspacios);
+				ingresoAOperacion=1;
 				printf("%s \n", publicacion);
 				break;
 			}
 
 			if (cadenasIguales(comandoS,"solicitarBytes")) {
-				if (cantidadDeArgumentos(cantEspacios,6))
-					return 0;
+				if (cantidadDeArgumentos(cantEspacios,6)){
+					sem_post(&mutexOpera);
+					break;
+				}
 				publicacion = solicitarBytesPorConsola(operacion);
+				ingresoAOperacion=1;
+			}
+
+			if(!ingresoAOperacion){
+				printf("No es una operacion valida. Reintente\n");
+				sem_post(&mutexOpera);
+				break;
 			}
 
 			printf("%s \n", publicacion);
@@ -214,6 +227,8 @@ int consola(void) {
 				txt_write_in_file(resultadoConsola, publicacion);
 				txt_write_in_file(resultadoConsola,"\n==================================================\n");
 			}
+
+			ingresoAOperacion=0;
 			sem_post(&mutexOpera);
 			break;
 

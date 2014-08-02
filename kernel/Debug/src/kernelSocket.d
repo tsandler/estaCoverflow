@@ -5,7 +5,7 @@ src/kernelSocket.d: ../src/kernelSocket.c ../src/kernelSocket.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/collections/node.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/collections/dictionary.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/log.h \
- ../src/planificador_largo_plazo.h ../src/planificador_corto_plazo.h \
+ ../src/planificador_largo_plazo.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/config.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/collections/dictionary.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/string.h \
@@ -19,7 +19,6 @@ src/kernelSocket.d: ../src/kernelSocket.c ../src/kernelSocket.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/sockets.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../commons/config.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../commons/log.h \
- ../src/manejoSemaforos.h \
  /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/sockets.h \
  ../src/funcionesPCB.h ../src/colas.h ../src/manejoCPU.h
 
@@ -38,8 +37,6 @@ src/kernelSocket.d: ../src/kernelSocket.c ../src/kernelSocket.h \
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/log.h:
 
 ../src/planificador_largo_plazo.h:
-
-../src/planificador_corto_plazo.h:
 
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/commons/config.h:
 
@@ -66,8 +63,6 @@ src/kernelSocket.d: ../src/kernelSocket.c ../src/kernelSocket.h \
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../commons/config.h:
 
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/../commons/log.h:
-
-../src/manejoSemaforos.h:
 
 /home/utnso/workspace/tp-2014-1c-out-of-range/commons/libs/sockets.h:
 

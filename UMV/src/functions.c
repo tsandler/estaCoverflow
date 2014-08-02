@@ -327,7 +327,7 @@ void funcion_kernel(int socket){
 
 				escribir_segmento(base,tamanio,offset,buffer,pidLocal);
 
-				log_debug(logs,"Se escribio el segmento nro: %d",segEscritos);
+				log_debug(logs,"Se escribio el segmento nro: %d del pid %d",segEscritos, pidLocal);
 
 				sem_post(&mutexOpera);
 				sem_post(&yaEscribio);
@@ -457,7 +457,7 @@ int crear_agregar_segmento(int pidInt, int tamanio){
 	unElem->tamanioSegmento= tamanio;
 	unElem->dirLogica= obtener_proxima_dir_logica(tamanio,pid);
 	unElem->dirFisica = obtener_proxima_dirFisica(tamanio);
-	if( string_equals_ignore_case(unElem->dirFisica,"-1") ){ //FIXME
+	if( string_equals_ignore_case(unElem->dirFisica,"-1") ){
 		return -1;
 	}
 	if(dictionary_is_empty(tablaPidSeg) || !(dictionary_has_key(tablaPidSeg, pid))){
@@ -465,6 +465,7 @@ int crear_agregar_segmento(int pidInt, int tamanio){
 		listaSeg = list_create();
 		list_add(listaSeg, (void*)unElem);
 		dictionary_put(tablaPidSeg, pid, (void*)listaSeg);
+		log_info(logs,"Se creo el segmento nro: 1 del pid %d",nroSeg);
 
 		if(!dictionary_has_key(tablaPidSeg,pid))
 			log_error(logs,"El nuevo campo pid/lista no se agregó al diccionario");
@@ -475,7 +476,7 @@ int crear_agregar_segmento(int pidInt, int tamanio){
 		unElem->idSegmento=nroSeg;
 		list_add_in_index(listaSeg,0,(void*)unElem);
 		if(nroSeg == (obtener_nuevo_nroSeg(listaSeg) - 1))
-			log_info(logs,"Se creo el segmento nro: %d del pid:",nroSeg);
+			log_info(logs,"Se creo el segmento nro: %d del pid %d",nroSeg,pidInt);
 		else
 			log_error(logs,"El nuevo segmento no se agregó a la lista correspondiente");
 	}
@@ -604,7 +605,7 @@ unsigned char *leer_segmento(int dirLog, int tamanioALeer, int offset, int pidAc
 		tablaSegUMV* unElem= list_find(listaSeg,(void*)buscar_dirLogica);
 		if(unElem){
 			if( unElem->dirFisica + offset + tamanioALeer <= unElem->dirFisica + unElem->tamanioSegmento ){
-				unsigned char* destino = malloc(sizeof(char) * tamanioALeer); //FIXME memory leak
+				unsigned char* destino = malloc(sizeof(char) * tamanioALeer);
 				char* desde = unElem->dirFisica + offset;
 				memcpy(destino,desde,tamanioALeer);
 				return destino;
