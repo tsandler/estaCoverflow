@@ -208,7 +208,7 @@ void manejoCPU(int fd) {
 					muestraNombres(tSem->cola, "SIGNAL BLOQUEADOS");
 
 
-					printf("voya poner en ready el PID desbloqueado");
+
 
 					ponerCola(PCBPOP, READY, &mutexREADY, &hayAlgoEnReady);
 					muestraNombres(READY, "READY");
@@ -223,7 +223,7 @@ void manejoCPU(int fd) {
 			}
 
 		}
-		puts("LLEGO AL SIGNAL");
+
 		log_info(logs, "y su valor es %i", tSem->valor);
 		sem_post(&mutexSemaforos);
 
@@ -271,7 +271,7 @@ void manejoCPU(int fd) {
 			int* fdTemporal = dictionary_get(fileDescriptors, pidR);
 			enviarMenu(*fdTemporal, tam, logs); //aviso al programa q finalizo.
 		}
-		//muestraNombres(EXIT, "Cola EXIT");
+		muestraNombres(EXIT, "Cola EXIT");
 		dictionary_remove(fileDescriptors, pidR);
 		log_info(logs, "El programa ha finalizado");
 		sem_post(&mutexFinalizar);

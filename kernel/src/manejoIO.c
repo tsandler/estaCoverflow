@@ -18,7 +18,7 @@ while(1){
 	sleep(unPCB->retrasoIO*io->retardo/1000);
 
 	ponerCola(unPCB, READY,&mutexREADY,&hayAlgoEnReady);
-	log_info(logs, "Se coloco en la cola ready el programa: %i",unPCB->pid);
+
 
 
 
